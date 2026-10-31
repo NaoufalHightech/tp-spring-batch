@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spring Batch · IDE animé</title>
+<style>
+:root{--bg:#14161a;--panel:#1e2127;--ed:#1b1d22;--line:#2b2f37;--text:#d7dae0;--dim:#8a909c;--cyan:#56c8e8;--green:#7ed491;--orange:#f0a35e;--red:#ef6b6b;--purple:#b48ef0;--yellow:#e9d36b;--blue:#6aa5f5}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;overflow:hidden;color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,sans-serif}
+#wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{width:1920px;height:1080px;position:relative;background:var(--bg);transform-origin:center center;flex:none;overflow:hidden}
+#hud{position:absolute;left:0;top:0;right:0;height:64px;display:flex;align-items:center;gap:24px;padding:0 32px;border-bottom:1px solid var(--line);font:600 20px ui-monospace,Consolas,monospace;color:var(--cyan)}
+#hud .sc{color:var(--text);font-family:Inter,system-ui,sans-serif;font-size:24px}
+#hud .tag{margin-left:auto;font-size:18px;padding:4px 12px;border:1px solid var(--line);border-radius:999px;color:var(--dim)}
+#main{position:absolute;left:32px;top:84px;width:1200px;height:700px}
+#notes{position:absolute;left:1256px;top:84px;width:632px;height:700px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px;overflow:hidden}
+#notes h3{margin:0 0 16px;font-size:34px;color:var(--cyan)}
+#notes p{margin:0;font-size:29px;line-height:1.45}
+#notes .src{position:absolute;left:28px;bottom:20px;font:18px ui-monospace,monospace;color:var(--dim)}
+#console{position:absolute;left:32px;top:800px;width:1856px;height:178px;background:#0e0f12;border:1px solid var(--line);border-radius:12px;padding:12px 20px;font:19px/1.4 ui-monospace,Consolas,monospace;overflow:hidden;color:#b9f0c4}
+#console .h{color:var(--dim);font-size:15px;letter-spacing:.1em}
+#console div.o{white-space:pre;overflow:hidden;text-overflow:ellipsis}
+#caption{position:absolute;left:32px;right:32px;top:990px;height:46px;font-size:25px;color:#fff;text-align:center;line-height:46px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#bar{position:absolute;left:0;right:0;bottom:0;height:34px;display:flex;align-items:center;gap:6px;padding:0 32px;border-top:1px solid var(--line);font:16px ui-monospace,monospace;color:var(--dim)}
+#bar .d{width:34px;height:8px;border-radius:4px;background:#2c3038;cursor:pointer}
+#bar .d.on{background:var(--cyan)} #bar .d.done{background:#3d6f80}
+#bar .ctl{margin-left:auto;display:flex;gap:16px}
+/* editor */
+.ide{width:100%;height:100%;background:var(--ed);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.tabs{display:flex;background:#16181c;border-bottom:1px solid var(--line);height:46px;flex:none}
+.tab{padding:0 22px;display:flex;align-items:center;font:18px ui-monospace,monospace;color:var(--dim);border-right:1px solid var(--line)}
+.tab.on{background:var(--ed);color:#fff;border-top:2px solid var(--cyan)}
+.code{flex:1;overflow:hidden;padding:14px 0;font:21px/1.5 ui-monospace,Consolas,"JetBrains Mono",monospace}
+.ln{display:flex;position:relative;padding-right:16px}
+.ln .n{flex:none;width:62px;text-align:right;padding-right:16px;color:#566;user-select:none}
+.ln .t{white-space:pre-wrap;word-break:break-all;flex:1}
+.ln.hl{background:rgba(86,200,232,.14);box-shadow:inset 3px 0 0 var(--cyan)}
+.ln.dim{opacity:.55}
+.ln.bad{background:rgba(239,107,107,.18);box-shadow:inset 3px 0 0 var(--red)}
+.ln.new .t{animation:wipe var(--d,.8s) steps(24,end) var(--dl,0s) both}
+@keyframes wipe{from{clip-path:inset(0 100% 0 0);opacity:.2}to{clip-path:inset(0 0 0 0);opacity:1}}
+.gap{color:#566;padding-left:78px;font-size:16px;line-height:1.1}
+.mk{position:absolute;right:16px;top:0;font:700 16px Inter,sans-serif;color:var(--red);background:#2a1618;padding:0 10px;border-radius:6px}
+.k{color:#c58af0}.a{color:#e9d36b}.s{color:#7ed491}.c{color:#6c7480;font-style:italic}.ty{color:#56c8e8}
+/* views */
+.view{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-start;padding:40px 30px}.view.c{justify-content:center}
+.big{font-size:64px;font-weight:700;line-height:1.1;margin:0 0 18px}
+.sub{font-size:30px;color:var(--dim);margin:0 0 30px}
+.chips{display:flex;gap:14px;flex-wrap:wrap}
+.chip{padding:10px 22px;border-radius:999px;border:1px solid var(--cyan);color:var(--cyan);font-size:26px;animation:pop .5s both}
+.item{font-size:34px;padding:16px 24px;margin:8px 0;border-left:6px solid var(--c,var(--cyan));background:var(--panel);border-radius:8px;animation:slide .5s both}
+@keyframes slide{from{transform:translateX(-30px);opacity:0}to{transform:none;opacity:1}}
+@keyframes pop{from{transform:scale(.8);opacity:0}to{transform:none;opacity:1}}
+.view h2{font-size:38px;margin:0 0 14px;color:var(--cyan)}
+table.tb{border-collapse:collapse;font-size:27px;width:100%}
+.tb th{text-align:left;color:var(--cyan);padding:12px 16px;border-bottom:2px solid var(--line)}
+.tb td{padding:14px 16px;border-bottom:1px solid var(--line)}
+.opt{font-size:32px;padding:20px 26px;margin:10px 0;background:var(--panel);border:2px solid var(--line);border-radius:10px;transition:.4s}
+.opt.good{border-color:var(--green);background:#16301f}.opt.bad{border-color:var(--red);opacity:.45}
+.count{font:700 110px ui-monospace,monospace;color:var(--yellow);text-align:right}
+.rule{font-size:56px;line-height:1.3;font-weight:700;text-align:center;color:#fff;animation:pop .8s both}
+svg text{font-family:Inter,system-ui,sans-serif}
+svg .e{transition:opacity .5s}
+/* best-practice card */
+#bp{position:absolute;left:32px;top:300px;width:1200px;border-radius:14px;padding:26px 32px;background:#2a2112;border:3px solid var(--orange);box-shadow:0 20px 60px rgba(0,0,0,.6);display:none;z-index:9}
+#bp.trap{background:#2a1416;border-color:var(--red)}
+#bp.upd{background:#1a1a2e;border-color:var(--purple)}
+#bp.side .row{flex-direction:column;gap:2px;font-size:25px}#bp.side .lab{width:auto}#bp.side .ti{font-size:32px}#bp.show{display:block;animation:rise .45s cubic-bezier(.2,1.4,.4,1) both}
+#bp.shake{animation:rise .45s both,shake .5s .45s}
+@keyframes rise{from{transform:translateY(60px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+@keyframes shake{0%,100%{transform:none}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+#bp .hd{display:flex;align-items:center;gap:14px;font-size:30px;font-weight:800;color:var(--orange);letter-spacing:.04em}
+#bp.trap .hd{color:var(--red)}#bp.upd .hd{color:var(--purple)}
+#bp .hd .bell{display:inline-block;animation:ring 1s .2s 2}
+@keyframes ring{0%,100%{transform:rotate(0)}20%{transform:rotate(18deg)}40%{transform:rotate(-16deg)}60%{transform:rotate(10deg)}80%{transform:rotate(-8deg)}}
+#bp .ti{font-size:36px;font-weight:700;margin:10px 0 14px;color:#fff}
+#bp .row{display:flex;gap:14px;font-size:27px;line-height:1.4;margin:8px 0}
+#bp .lab{flex:none;width:210px;font-weight:700}
+#bp .why .lab{color:var(--yellow)}#bp .sav .lab{color:var(--green)}
+#start{position:absolute;inset:0;background:rgba(0,0,0,.88);z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center}
+#start button{font-size:34px;padding:18px 44px;border-radius:12px;border:0;background:var(--cyan);color:#001;font-weight:700;cursor:pointer}
+#start p{font-size:24px;color:var(--dim);max-width:900px;margin:0}
+button.m{background:none;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:4px 12px;font:15px ui-monospace,monospace;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage">
+  <div id="hud"><span id="hudt">SB1 // SPRING BATCH</span><span class="sc" id="sct"></span><span class="tag" id="tag"></span></div>
+  <div id="main"></div>
+  <div id="notes"><h3 id="nt"></h3><p id="nx"></p><div class="src" id="ns"></div></div>
+  <div id="bp"></div>
+  <div id="console"><div class="h">CONSOLE · sortie réelle (docs/verifications)</div></div>
+  <div id="caption"></div>
+  <div id="bar"><span id="dots" style="display:flex;gap:6px"></span><span class="ctl">
+    <button class="m" id="bPrev">◀ préc.</button><button class="m" id="bPlay">⏸ pause</button><button class="m" id="bNext">suiv. ▶</button>
+    <button class="m" id="bVoice">voix : off</button><button class="m" id="bSnd">son : on</button></span></div>
+  <div id="start"><h1 style="font-size:54px;margin:0">Spring Batch · IDE animé</h1>
+    <p>Chaque bonne pratique est annoncée par un signal sonore, puis expliquée : pourquoi, et ce qu'elle nous évite. Active le son. La voix de synthèse est optionnelle.</p>
+    <button id="go">▶ Démarrer</button><p style="font-size:18px">Espace : pause · ← → : beat précédent / suivant · V : voix · M : son</p></div>
+</div></div>
+<script>
+const DATA = /*__DATA__*/null;
+const SC = DATA.scenes, FILES = DATA.files;
+const $ = s => document.querySelector(s);
+/* ---------- scaling ---------- */
+function fit(){const k=Math.min(innerWidth/1920,innerHeight/1080);$('#stage').style.transform='scale('+k+')'}
+addEventListener('resize',fit);fit();
+/* ---------- audio ---------- */
+let AC=null, sndOn=true;
+function tone(f,t0,d,type='sine',g=.2,f2){if(!AC||!sndOn)return;const o=AC.createOscillator(),a=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,AC.currentTime+t0);if(f2)o.frequency.linearRampToValueAtTime(f2,AC.currentTime+t0+d);a.gain.setValueAtTime(0,AC.currentTime+t0);a.gain.linearRampToValueAtTime(g,AC.currentTime+t0+.02);a.gain.exponentialRampToValueAtTime(.001,AC.currentTime+t0+d);o.connect(a).connect(AC.destination);o.start(AC.currentTime+t0);o.stop(AC.currentTime+t0+d+.05)}
+const SND={
+  bp(){tone(880,0,.35,'sine',.28);tone(1320,.16,.5,'sine',.28);tone(1760,.16,.4,'triangle',.08)},      // carillon montant : bonne pratique
+  trap(){tone(300,0,.22,'sawtooth',.16,200);tone(300,.28,.22,'sawtooth',.16,200);tone(150,.56,.4,'square',.1)}, // double buzz grave : piège
+  upd(){tone(523,0,.25,'sine',.2);tone(659,.15,.25,'sine',.2);tone(784,.3,.45,'sine',.2)},
+  ok(){tone(660,0,.18,'sine',.2);tone(990,.12,.3,'sine',.2)}
+};
+/* ---------- helpers ---------- */
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function hi(src){
+  const re=/(\/\/.*$)|("(?:[^"\\]|\\.)*")|(@\w+)|\b(public|private|protected|class|interface|implements|extends|return|new|var|static|final|void|throws|abstract|if|else|for|true|false|null)\b|\b([A-Z][A-Za-z0-9_]*)\b/g;
+  let o='',last=0,m;
+  while((m=re.exec(src))){o+=esc(src.slice(last,m.index));const t=esc(m[0]);
+    o+=m[1]?`<span class="c">${t}</span>`:m[2]?`<span class="s">${t}</span>`:m[3]?`<span class="a">${t}</span>`:m[4]?`<span class="k">${t}</span>`:`<span class="ty">${t}</span>`;
+    last=re.lastIndex}
+  return o+esc(src.slice(last));
+}
+const words=t=>t.split(/\s+/).length;
+function dur(b){return Math.max(2.6,words(b.text)/2.5+1.0)+(DATA.extra[b.id]||0)}
+/* ---------- state ---------- */
+let si=0,bi=0,playing=true,voiceOn=false,timer=null,cd=null,gen=0;
+let S=null; // per-scene state
+function fresh(){return{tab:null,tabs:[],rev:{},hl:null,marks:{},note:null,out:[],view:null,vdata:null,bp:null}}
+function applyAct(a,anim,b,delay){
+  switch(a.k){
+    case'tab': if(!S.tabs.includes(a.f))S.tabs.push(a.f);S.tab=a.f;S.view='code';break;
+    case'code':{
+      if(!S.tabs.includes(a.f))S.tabs.push(a.f);S.tab=a.f;S.view='code';
+      const set=S.rev[a.f]||(S.rev[a.f]=new Set());const fresh_=[];
+      for(const [x,y] of a.r){for(let i=x;i<=y;i++){if(!set.has(i)){set.add(i);fresh_.push(i)}}}
+      S.hl={f:a.f,r:a.r,new:anim?fresh_:[]};
+      if(a.t)S.note={t:a.t,x:a.x||'',s:FILES[a.f].name};break}
+    case'mark': S.marks[a.f+':'+a.line]=a.text;break;
+    case'out': if(a.clear)S.out=[];for(const l of a.lines)S.out.push(l);S.outNew=anim?a.lines.length:0;break;
+    case'bp': S.bp=a;S.bpAnim=anim;break;
+    default: S.view=a.k;S.vdata=a;S.vAnim=anim;
+  }
+}
+function buildScene(i,upto,animLast){
+  S=fresh();const sc=SC[i];
+  for(let j=0;j<=upto;j++){const b=sc.beats[j];S.bp=null;for(const a of b.acts)applyAct(a,animLast&&j===upto,b)}
+}
+/* ---------- rendering ---------- */
+function renderCode(dur_){
+  const f=FILES[S.tab];const set=S.rev[S.tab]||new Set();let h='<div class="ide"><div class="tabs">';
+  for(const t of S.tabs.slice(-3))h+=`<div class="tab ${t===S.tab?'on':''}">${FILES[t].name}</div>`;
+  h+='</div><div class="code">';let prev=-1,k=0;
+  const hlset=new Set();if(S.hl&&S.hl.f===S.tab)for(const [x,y] of S.hl.r)for(let i=x;i<=y;i++)hlset.add(i);
+  const newset=new Set(S.hl&&S.hl.f===S.tab?S.hl.new:[]);
+  for(const [n,t] of f.lines){
+    if(!set.has(n))continue;
+    if(prev>=0&&n>prev+1)h+='<div class="gap">⋯</div>';
+    const isNew=newset.has(n);const mk=S.marks[S.tab+':'+n];
+    const cls=['ln',hlset.has(n)?'hl':(S.hl&&S.hl.f===S.tab?'dim':''),mk?'bad':'',isNew?'new':''].join(' ');
+    const d=Math.min(1.1,.25+t.length*.012);
+    h+=`<div class="${cls}" style="--d:${d}s;--dl:${isNew?(k++*.35):0}s"><span class="n">${n}</span><span class="t">${hi(t)||' '}</span>${mk?`<span class="mk">⚠ ${esc(mk)}</span>`:''}</div>`;
+    prev=n;
+  }
+  return h+'</div></div>';
+}
+const DIA={
+arch:`<svg viewBox="0 0 1200 700" style="width:100%;height:auto;max-height:780px">
+<g class="e" data-k="job"><rect x="20" y="20" width="1160" height="470" rx="18" fill="#1b2a36" stroke="#56c8e8" stroke-width="3"/><text x="44" y="62" font-size="30" fill="#56c8e8" font-weight="700">JOB</text></g>
+<g class="e" data-k="step"><rect x="50" y="90" width="820" height="370" rx="14" fill="#202833" stroke="#6aa5f5" stroke-width="2"/><text x="70" y="126" font-size="26" fill="#6aa5f5" font-weight="700">STEP (chunk)</text></g>
+<g class="e" data-k="tx"><rect x="70" y="146" width="780" height="290" rx="12" fill="none" stroke="#f0a35e" stroke-width="3" stroke-dasharray="10 8"/><text x="90" y="428" font-size="24" fill="#f0a35e">1 chunk = 1 transaction (commit ou rollback du bloc)</text></g>
+<g class="e" data-k="reader"><rect x="95" y="210" width="200" height="110" rx="10" fill="#16301f" stroke="#7ed491" stroke-width="3"/><text x="195" y="258" font-size="28" fill="#7ed491" text-anchor="middle" font-weight="700">Reader</text><text x="195" y="292" font-size="22" fill="#d7dae0" text-anchor="middle">lit 1 élément</text></g>
+<g class="e" data-k="proc"><rect x="340" y="210" width="200" height="110" rx="10" fill="#2a2112" stroke="#e9d36b" stroke-width="3"/><text x="440" y="258" font-size="28" fill="#e9d36b" text-anchor="middle" font-weight="700">Processor</text><text x="440" y="292" font-size="22" fill="#d7dae0" text-anchor="middle">transforme / filtre</text></g>
+<g class="e" data-k="writer"><rect x="585" y="210" width="240" height="110" rx="10" fill="#241a33" stroke="#b48ef0" stroke-width="3"/><text x="705" y="258" font-size="28" fill="#b48ef0" text-anchor="middle" font-weight="700">Writer</text><text x="705" y="292" font-size="22" fill="#d7dae0" text-anchor="middle">écrit le bloc de 5</text></g>
+<g class="e" data-k="chunk"><path d="M295 265H340M540 265H585" stroke="#d7dae0" stroke-width="3"/><text x="320" y="190" font-size="22" fill="#8a909c">× 5 éléments</text></g>
+<g class="e" data-k="tasklet"><rect x="900" y="150" width="250" height="110" rx="14" fill="#202833" stroke="#6aa5f5" stroke-width="2"/><text x="1025" y="196" font-size="26" fill="#6aa5f5" text-anchor="middle" font-weight="700">STEP (tasklet)</text><text x="1025" y="232" font-size="22" fill="#d7dae0" text-anchor="middle">1 action unique</text></g>
+<g class="e" data-k="repo"><path d="M420 520h360v110a180 28 0 0 1-360 0z" fill="#202833" stroke="#56c8e8" stroke-width="3"/><ellipse cx="600" cy="520" rx="180" ry="28" fill="#2a3a48" stroke="#56c8e8" stroke-width="3"/><text x="600" y="590" font-size="28" fill="#56c8e8" text-anchor="middle" font-weight="700">JobRepository</text><text x="600" y="624" font-size="21" fill="#d7dae0" text-anchor="middle">tables BATCH_*</text><path d="M600 490V540" stroke="#56c8e8" stroke-width="3" stroke-dasharray="6 6"/></g>
+</svg>`,
+instance:`<svg viewBox="0 0 1200 700" style="width:100%;height:auto;max-height:780px">
+<g class="e" data-k="job"><rect x="40" y="40" width="360" height="110" rx="12" fill="#1b2a36" stroke="#56c8e8" stroke-width="3"/><text x="220" y="88" font-size="28" fill="#56c8e8" text-anchor="middle" font-weight="700">Job</text><text x="220" y="124" font-size="22" fill="#d7dae0" text-anchor="middle">le type de tâche</text></g>
+<g class="e" data-k="params"><rect x="460" y="40" width="320" height="110" rx="12" fill="#2a2112" stroke="#e9d36b" stroke-width="3"/><text x="620" y="88" font-size="28" fill="#e9d36b" text-anchor="middle" font-weight="700">JobParameters</text><text x="620" y="124" font-size="22" fill="#d7dae0" text-anchor="middle">identifiants</text></g>
+<g class="e" data-k="inst"><rect x="200" y="230" width="580" height="120" rx="12" fill="#16301f" stroke="#7ed491" stroke-width="3"/><text x="490" y="280" font-size="30" fill="#7ed491" text-anchor="middle" font-weight="700">JobInstance = Job + paramètres</text><text x="490" y="320" font-size="22" fill="#d7dae0" text-anchor="middle">unique : une exécution COMPLETED la ferme</text><path d="M220 150L350 230M620 150L560 230" stroke="#d7dae0" stroke-width="3"/></g>
+<g class="e" data-k="exec"><rect x="120" y="440" width="360" height="110" rx="12" fill="#2a1416" stroke="#ef6b6b" stroke-width="3"/><text x="300" y="488" font-size="26" fill="#ef6b6b" text-anchor="middle" font-weight="700">JobExecution #1</text><text x="300" y="522" font-size="22" fill="#d7dae0" text-anchor="middle">FAILED → relançable</text>
+<rect x="540" y="440" width="360" height="110" rx="12" fill="#16301f" stroke="#7ed491" stroke-width="3"/><text x="720" y="488" font-size="26" fill="#7ed491" text-anchor="middle" font-weight="700">JobExecution #2</text><text x="720" y="522" font-size="22" fill="#d7dae0" text-anchor="middle">COMPLETED → instance fermée</text><path d="M350 350L300 440M600 350L720 440" stroke="#d7dae0" stroke-width="3"/></g>
+<g class="e" data-k="step"><text x="1000" y="500" font-size="24" fill="#8a909c">→ StepExecution :</text><text x="1000" y="534" font-size="22" fill="#8a909c">read / write / skip counts</text></g>
+</svg>`,
+partition:`<svg viewBox="0 0 1200 700" style="width:100%;height:auto;max-height:780px">
+<g class="e" data-k="m"><rect x="360" y="30" width="480" height="110" rx="12" fill="#1b2a36" stroke="#56c8e8" stroke-width="3"/><text x="600" y="78" font-size="28" fill="#56c8e8" text-anchor="middle" font-weight="700">managerStep</text><text x="600" y="114" font-size="22" fill="#d7dae0" text-anchor="middle">Partitioner → 4 contextes (from, to)</text></g>
+<g class="e" data-k="w"><g font-size="24" text-anchor="middle">
+<rect x="20" y="300" width="270" height="150" rx="12" fill="#16301f" stroke="#7ed491" stroke-width="3"/><text x="155" y="346" fill="#7ed491" font-weight="700">worker 1 · thread 1</text><text x="155" y="386" fill="#d7dae0">id de from à to</text><text x="155" y="420" fill="#8a909c" font-size="20">reader paginé @StepScope</text>
+<rect x="315" y="300" width="270" height="150" rx="12" fill="#16301f" stroke="#7ed491" stroke-width="3"/><text x="450" y="346" fill="#7ed491" font-weight="700">worker 2 · thread 2</text><text x="450" y="386" fill="#d7dae0">id de from à to</text><text x="450" y="420" fill="#8a909c" font-size="20">reader paginé @StepScope</text>
+<rect x="610" y="300" width="270" height="150" rx="12" fill="#16301f" stroke="#7ed491" stroke-width="3"/><text x="745" y="346" fill="#7ed491" font-weight="700">worker 3 · thread 3</text><text x="745" y="386" fill="#d7dae0">id de from à to</text><text x="745" y="420" fill="#8a909c" font-size="20">reader paginé @StepScope</text>
+<rect x="905" y="300" width="270" height="150" rx="12" fill="#16301f" stroke="#7ed491" stroke-width="3"/><text x="1040" y="346" fill="#7ed491" font-weight="700">worker 4 · thread 4</text><text x="1040" y="386" fill="#d7dae0">id de from à to</text><text x="1040" y="420" fill="#8a909c" font-size="20">reader paginé @StepScope</text></g>
+<path d="M520 140L155 300M560 140L450 300M640 140L745 300M680 140L1040 300" stroke="#d7dae0" stroke-width="3"/></g>
+<g class="e" data-k="db"><rect x="20" y="560" width="1155" height="80" rx="12" fill="#202833" stroke="#6aa5f5" stroke-width="2"/><text x="600" y="610" font-size="26" fill="#6aa5f5" text-anchor="middle">table product_with_details : plages d'id disjointes, aucun doublon</text></g>
+</svg>`,
+flow:`<svg viewBox="0 0 1200 700" style="width:100%;height:auto;max-height:780px">
+<g class="e" data-k="s1"><rect x="30" y="270" width="250" height="110" rx="12" fill="#1b2a36" stroke="#56c8e8" stroke-width="3"/><text x="155" y="318" font-size="26" fill="#56c8e8" text-anchor="middle" font-weight="700">step1</text><text x="155" y="352" font-size="20" fill="#d7dae0" text-anchor="middle">augmente les prix</text></g>
+<g class="e" data-k="dec"><path d="M400 270L500 325L400 380L300 325z" fill="#2a2112" stroke="#e9d36b" stroke-width="3"/><text x="400" y="332" font-size="22" fill="#e9d36b" text-anchor="middle" font-weight="700">decider</text><path d="M280 325H300" stroke="#d7dae0" stroke-width="3"/></g>
+<g class="e" data-k="many"><rect x="620" y="110" width="270" height="110" rx="12" fill="#16301f" stroke="#7ed491" stroke-width="3"/><text x="755" y="158" font-size="22" fill="#7ed491" text-anchor="middle" font-weight="700">stepWhenMany</text><text x="755" y="190" font-size="19" fill="#d7dae0" text-anchor="middle">message MANY</text><path d="M450 300L620 175" stroke="#d7dae0" stroke-width="3"/><text x="330" y="262" font-size="19" fill="#7ed491">COMPLETED_WITH_MANY_UPDATED</text></g>
+<g class="e" data-k="stat"><rect x="940" y="110" width="240" height="110" rx="12" fill="#241a33" stroke="#b48ef0" stroke-width="3"/><text x="1060" y="158" font-size="22" fill="#b48ef0" text-anchor="middle" font-weight="700">stepStat</text><text x="1060" y="190" font-size="19" fill="#d7dae0" text-anchor="middle">productStats.csv</text><path d="M890 165H940" stroke="#d7dae0" stroke-width="3"/></g>
+<g class="e" data-k="few"><rect x="620" y="440" width="270" height="110" rx="12" fill="#202833" stroke="#6aa5f5" stroke-width="3"/><text x="755" y="488" font-size="22" fill="#6aa5f5" text-anchor="middle" font-weight="700">stepWhenFew</text><text x="755" y="520" font-size="19" fill="#d7dae0" text-anchor="middle">message few</text><path d="M450 350L620 495" stroke="#d7dae0" stroke-width="3"/><text x="440" y="500" font-size="19" fill="#6aa5f5">COMPLETED</text></g>
+</svg>`};
+function renderView(){
+  const a=S.vdata,m=$('#main');if(!S.view){m.innerHTML='';return}
+  if(S.view==='code'){m.innerHTML=renderCode();return}
+  if(S.view==='title'){m.innerHTML=`<div class="view c"><div class="big">${a.title}</div><div class="sub">${a.sub}</div><div class="chips">${a.chips.map((c,i)=>`<span class="chip" style="animation-delay:${i*.15}s">${c}</span>`).join('')}</div></div>`}
+  else if(S.view==='list'){m.innerHTML=`<div class="view"><h2>${a.title}</h2>${a.items.slice(0,a.n).map(([t,c],i)=>`<div class="item" style="--c:var(--${c});${(S.vAnim&&i===a.n-1)?'':'animation:none'}">${t}</div>`).join('')}</div>`}
+  else if(S.view==='table'){m.innerHTML=`<div class="view"><h2>${a.title}</h2><table class="tb"><tr>${a.head.map(h=>`<th>${h}</th>`).join('')}</tr>${a.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table></div>`}
+  else if(S.view==='rule'){m.innerHTML=`<div class="view c"><div class="rule" ${S.vAnim?'':'style="animation:none"'}>${a.text}</div></div>`}
+  else if(S.view==='dia'){m.innerHTML=`<div class="view">${DIA[a.id]}</div>`;m.querySelectorAll('[data-k]').forEach(e=>{e.style.opacity=a.hl.includes(e.dataset.k)?1:.18})}
+  else if(S.view==='pred'){m.innerHTML=`<div class="view" style="justify-content:flex-start;padding-top:30px"><h2>[PRÉDIRE]</h2><div style="font-size:30px;margin-bottom:14px">${a.q}</div>${a.opts.map((o,i)=>`<div class="opt ${a.reveal?(i===a.ans?'good':'bad'):''}">${'ABC'[i]} · ${o}</div>`).join('')}${a.reveal?'':'<div class="count" id="cd"></div>'}</div>`}
+}
+function render(){
+  $('#sct').textContent=SC[si].title;$('#tag').textContent=SC[si].beats[bi].screen.split('·').pop().trim();
+  renderView();
+  const n=S.note;$('#nt').textContent=n?n.t:'';$('#nx').textContent=n?n.x:'';$('#ns').textContent=n?n.s:'';
+  $('#notes').style.display=(S.view==='code'&&!S.bp)?'block':'none';
+  const hasC=S.out.length>0;const H=hasC?'700px':'880px';
+  $('#main').style.width=S.view==='code'?'1200px':'1856px';$('#main').style.height=H;$('#notes').style.height=H;
+  const co=$('#console');co.style.display=S.out.length?'block':'none';
+  co.innerHTML='<div class="h">CONSOLE · sortie réelle (docs/verifications/mvn_test_full.log)</div>'+S.out.slice(-5).map(l=>`<div class="o">${esc(l)}</div>`).join('');
+  const bp=$('#bp');
+  if(S.bp){const b=S.bp;bp.className=(b.kind==='bp'?'':b.kind)+' show'+(S.bpAnim?(b.kind==='trap'?' shake':''):'');
+    const hd={bp:'BONNE PRATIQUE',trap:'PIÈGE',upd:'MISE À JOUR'}[b.kind];
+    bp.innerHTML=`<div class="hd"><span class="bell">🔔</span> ${hd}</div><div class="ti">${b.title}</div>${b.why?`<div class="row why"><span class="lab">Pourquoi</span><span>${b.why}</span></div>`:''}${b.saves?`<div class="row sav"><span class="lab">${b.kind==='upd'?'À retenir':'Ce que ça nous évite'}</span><span>${b.saves}</span></div>`:''}`;
+    if(S.view==='code'){bp.style.left='1256px';bp.style.top='84px';bp.style.width='632px';bp.style.height=H;bp.classList.add('side')}else{bp.style.left='360px';bp.style.top=(S.view==='pred'?'520px':'470px');bp.style.width='1200px';bp.style.height='auto';bp.classList.remove('side')}
+    if(S.bpAnim)(SND[b.kind]||SND.bp)();
+  }else{bp.className='';bp.innerHTML=''}
+  $('#caption').textContent=SC[si].beats[bi].text;
+  document.querySelectorAll('#dots .d').forEach((d,i)=>d.className='d '+(i===si?'on':i<si?'done':''));
+}
+/* ---------- playback ---------- */
+function est(){return dur(SC[si].beats[bi])*1000}
+function startCountdown(sec){clearInterval(cd);let r=sec;const el=$('#cd');if(!el)return;el.textContent=r;cd=setInterval(()=>{if(!playing)return;r--;const e=$('#cd');if(e)e.textContent=r>0?r:'';if(r<=0)clearInterval(cd)},1000)}
+function show(anim){
+  gen++;clearTimeout(timer);clearInterval(cd);speechSynthesis.cancel();
+  buildScene(si,bi,anim);render();
+  const b=SC[si].beats[bi];
+  if(anim&&S.view==='pred'&&!S.vdata.reveal)startCountdown(DATA.extra[b.id]||20);
+  const my=gen;
+  const next=()=>{if(my!==gen||!playing)return;step(1)};
+  if(!anim)return;
+  const extraMs=(DATA.extra[b.id]||0)*1000;
+  if(voiceOn&&'speechSynthesis' in window){
+    const u=new SpeechSynthesisUtterance(b.text);u.lang='fr-FR';u.rate=1.0;
+    const v=speechSynthesis.getVoices().find(v=>v.lang&&v.lang.startsWith('fr'));if(v)u.voice=v;
+    u.onend=()=>{timer=setTimeout(next,500+extraMs)};u.onerror=()=>{timer=setTimeout(next,est())};
+    speechSynthesis.speak(u);
+  }else timer=setTimeout(next,est());
+}
+function step(d){
+  let b=bi+d,s=si;
+  if(b>=SC[s].beats.length){s++;b=0}
+  if(b<0){s--;if(s<0){s=0;b=0}else b=SC[s].beats.length-1}
+  if(s>=SC.length){playing=false;$('#bPlay').textContent='▶ lecture';return}
+  si=s;bi=b;show(true);
+}
+function jumpScene(i){si=i;bi=0;show(true)}
+/* ---------- ui ---------- */
+SC.forEach((s,i)=>{const d=document.createElement('span');d.className='d';d.title=s.title;d.onclick=()=>jumpScene(i);$('#dots').appendChild(d)});
+$('#go').onclick=()=>{AC=new (window.AudioContext||window.webkitAudioContext)();$('#start').style.display='none';SND.ok();show(true)};
+$('#bNext').onclick=()=>step(1);$('#bPrev').onclick=()=>step(-1);
+$('#bPlay').onclick=()=>{playing=!playing;$('#bPlay').textContent=playing?'⏸ pause':'▶ lecture';if(playing)show(true);else{clearTimeout(timer);speechSynthesis.cancel()}};
+$('#bVoice').onclick=()=>{voiceOn=!voiceOn;$('#bVoice').textContent='voix : '+(voiceOn?'on':'off');show(true)};
+$('#bSnd').onclick=()=>{sndOn=!sndOn;$('#bSnd').textContent='son : '+(sndOn?'on':'off')};
+addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();$('#bPlay').click()}else if(e.key==='ArrowRight')step(1);else if(e.key==='ArrowLeft')step(-1);else if(e.key==='v')$('#bVoice').click();else if(e.key==='m')$('#bSnd').click()});
+/* test hooks */
+window.__sb={go:(s,b)=>{si=s;bi=b;playing=false;gen++;clearTimeout(timer);buildScene(si,bi,false);render()},SC,
+  start:()=>{$('#start').style.display='none'}};
+</script>
+</body>
+</html>
