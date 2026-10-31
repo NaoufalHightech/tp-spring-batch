@@ -10,9 +10,15 @@
 html,body{margin:0;height:100%;background:#000;overflow:hidden;color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,sans-serif}
 #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 #stage{width:1920px;height:1080px;position:relative;background:var(--bg);transform-origin:center center;flex:none;overflow:hidden}
-#hud{position:absolute;left:0;top:0;right:0;height:64px;display:flex;align-items:center;gap:24px;padding:0 32px;border-bottom:1px solid var(--line);font:600 20px ui-monospace,Consolas,monospace;color:var(--cyan)}
-#hud .sc{color:var(--text);font-family:Inter,system-ui,sans-serif;font-size:24px}
-#hud .tag{margin-left:auto;font-size:18px;padding:4px 12px;border:1px solid var(--line);border-radius:999px;color:var(--dim)}
+#hud{position:absolute;left:0;top:0;right:0;height:64px;display:flex;align-items:center;gap:18px;white-space:nowrap;padding:0 32px;border-bottom:1px solid var(--line);font:600 20px ui-monospace,Consolas,monospace;color:var(--cyan)}
+#hud .sc{color:var(--text);font-family:Inter,system-ui,sans-serif;font-size:24px;white-space:nowrap}
+#road{display:flex;gap:6px;margin-left:auto}
+#road i{width:30px;height:30px;border-radius:50%;border:2px solid #3a3f49;color:var(--dim);font:700 15px/26px ui-monospace,monospace;text-align:center;font-style:normal}
+#road i.done{border-color:#3d6f80;color:#7fb7c9}#road i.on{background:var(--cyan);border-color:var(--cyan);color:#001;box-shadow:0 0 14px var(--cyan)}
+#lay{display:flex;gap:6px}
+#lay b{font:700 15px ui-monospace,monospace;padding:5px 12px;border-radius:6px;border:2px solid #3a3f49;color:#667}
+#lay b.app.on{background:#4fa83d;border-color:#4fa83d;color:#041}#lay b.core.on{background:#3f7fa0;border-color:#3f7fa0;color:#fff}#lay b.infra.on{background:#f2c200;border-color:#f2c200;color:#210}
+#hud .tag{max-width:330px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:18px;padding:4px 12px;border:1px solid var(--line);border-radius:999px;color:var(--dim)}
 #main{position:absolute;left:32px;top:84px;width:1200px;height:700px}
 #notes{position:absolute;left:1256px;top:84px;width:632px;height:700px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px;overflow:hidden}
 #notes h3{margin:0 0 16px;font-size:34px;color:var(--cyan)}
@@ -77,7 +83,7 @@ svg .e{transition:opacity .5s}
 #bp .ti{font-size:36px;font-weight:700;margin:10px 0 14px;color:#fff}
 #bp .row{display:flex;gap:14px;font-size:27px;line-height:1.4;margin:8px 0}
 #bp .lab{flex:none;width:210px;font-weight:700}
-#bp .why .lab{color:var(--yellow)}#bp .sav .lab{color:var(--green)}
+#bp .src2{margin-top:10px;font-size:19px;color:var(--dim)}#bp .why .lab{color:var(--yellow)}#bp .sav .lab{color:var(--green)}
 #start{position:absolute;inset:0;background:rgba(0,0,0,.88);z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center}
 #start button{font-size:34px;padding:18px 44px;border-radius:12px;border:0;background:var(--cyan);color:#001;font-weight:700;cursor:pointer}
 #start p{font-size:24px;color:var(--dim);max-width:900px;margin:0}
@@ -86,7 +92,7 @@ button.m{background:none;border:1px solid var(--line);color:var(--text);border-r
 </head>
 <body>
 <div id="wrap"><div id="stage">
-  <div id="hud"><span id="hudt">SB1 // SPRING BATCH</span><span class="sc" id="sct"></span><span class="tag" id="tag"></span></div>
+  <div id="hud"><span id="hudt">SB1</span><span class="sc" id="sct"></span><span id="road"></span><span id="lay"></span><span class="tag" id="tag"></span></div>
   <div id="main"></div>
   <div id="notes"><h3 id="nt"></h3><p id="nx"></p><div class="src" id="ns"></div></div>
   <div id="bp"></div>
@@ -169,6 +175,24 @@ function renderCode(dur_){
   return h+'</div></div>';
 }
 const DIA={
+layers:`<svg viewBox="0 0 1200 700" style="width:100%;height:auto;max-height:780px">
+<g class="e" data-k="app"><rect x="330" y="30" width="560" height="140" rx="10" fill="#4fa83d"/><text x="610" y="112" font-size="38" font-weight="700" text-anchor="middle" fill="#041">Application</text><text x="920" y="90" font-size="24" fill="#d7dae0">Jobs, steps et code écrits</text><text x="920" y="122" font-size="24" fill="#d7dae0">par les développeurs</text></g>
+<g class="e" data-k="core"><rect x="330" y="270" width="560" height="140" rx="10" fill="#3f7fa0"/><text x="610" y="352" font-size="38" font-weight="700" text-anchor="middle" fill="#fff">Batch Core</text><text x="920" y="330" font-size="24" fill="#d7dae0">Lancer et contrôler un job :</text><text x="920" y="362" font-size="24" fill="#d7dae0">JobOperator*, Job, Step</text></g>
+<g class="e" data-k="infra"><rect x="330" y="510" width="560" height="140" rx="10" fill="#f2c200"/><text x="610" y="592" font-size="38" font-weight="700" text-anchor="middle" fill="#210">Batch Infrastructure</text><text x="920" y="570" font-size="24" fill="#d7dae0">ItemReader, ItemWriter,</text><text x="920" y="602" font-size="24" fill="#d7dae0">RetryTemplate…</text></g>
+<g stroke="#d7dae0" stroke-width="3" fill="none"><path d="M560 170V270M560 410V510"/><path d="M660 270V170M660 510V410" stroke-dasharray="6 6"/><path d="M330 100H240V580H330"/><path d="M330 130H200V610" stroke-dasharray="6 6"/><path d="M200 610H330" stroke-dasharray="6 6"/></g>
+<text x="40" y="690" font-size="20" fill="#8a909c">* JobOperator en Spring Batch 6 ; JobLauncher dans notre dépôt (Spring Batch 5) · RECONSTITUTION pour la v6</text>
+</svg>`,
+partfig:`<svg viewBox="0 0 1200 700" style="width:100%;height:auto;max-height:780px">
+<g class="e" data-k="single"><g fill="#3b6fb0" stroke="#9cc1f0" stroke-width="2"><rect x="40" y="40" width="170" height="90" rx="6"/><rect x="500" y="40" width="210" height="90" rx="6"/><rect x="990" y="40" width="170" height="90" rx="6"/></g><g font-size="28" fill="#fff" text-anchor="middle"><text x="125" y="93">Input</text><text x="605" y="93">Large Process</text><text x="1075" y="93">Output</text></g><path d="M210 85H500M710 85H990" stroke="#d7dae0" stroke-width="3"/></g>
+<path d="M40 180H1160" stroke="#555" stroke-width="2"/>
+<g class="e" data-k="par"><g font-size="22" fill="#8a909c" text-anchor="middle"><text x="330" y="222">Split Process</text><text x="600" y="222">Partitioned Process</text><text x="870" y="222">Merge Process</text></g>
+<g fill="#3b6fb0" stroke="#9cc1f0" stroke-width="2"><rect x="40" y="430" width="170" height="90" rx="6"/><rect x="990" y="430" width="170" height="90" rx="6"/>
+<rect x="300" y="250" width="50" height="50"/><rect x="300" y="340" width="50" height="50"/><rect x="300" y="430" width="50" height="50"/><rect x="300" y="520" width="50" height="50"/><rect x="300" y="610" width="50" height="50"/>
+<rect x="500" y="245" width="200" height="60"/><rect x="500" y="335" width="200" height="60"/><rect x="500" y="425" width="200" height="60"/><rect x="500" y="515" width="200" height="60"/><rect x="500" y="605" width="200" height="60"/>
+<rect x="850" y="250" width="50" height="50"/><rect x="850" y="340" width="50" height="50"/><rect x="850" y="430" width="50" height="50"/><rect x="850" y="520" width="50" height="50"/><rect x="850" y="610" width="50" height="50"/></g>
+<g font-size="26" fill="#fff" text-anchor="middle"><text x="125" y="483">Input</text><text x="1075" y="483">Output</text><text x="600" y="285">Controller</text><text x="600" y="375">Controller</text><text x="600" y="465">Controller</text><text x="600" y="555">Controller</text><text x="600" y="645">Controller</text></g>
+<g stroke="#d7dae0" stroke-width="2.5"><path d="M210 460L300 275M210 470L300 365M210 475L300 455M210 480L300 545M210 490L300 635"/><path d="M350 275H500M350 365H500M350 455H500M350 545H500M350 635H500"/><path d="M700 275H850M700 365H850M700 455H850M700 545H850M700 635H850"/><path d="M900 275L990 450M900 365L990 460M900 455L990 470M900 545L990 480M900 635L990 490"/></g></g>
+</svg>`,
 arch:`<svg viewBox="0 0 1200 700" style="width:100%;height:auto;max-height:780px">
 <g class="e" data-k="job"><rect x="20" y="20" width="1160" height="470" rx="18" fill="#1b2a36" stroke="#56c8e8" stroke-width="3"/><text x="44" y="62" font-size="30" fill="#56c8e8" font-weight="700">JOB</text></g>
 <g class="e" data-k="step"><rect x="50" y="90" width="820" height="370" rx="14" fill="#202833" stroke="#6aa5f5" stroke-width="2"/><text x="70" y="126" font-size="26" fill="#6aa5f5" font-weight="700">STEP (chunk)</text></g>
@@ -208,6 +232,8 @@ flow:`<svg viewBox="0 0 1200 700" style="width:100%;height:auto;max-height:780px
 function renderView(){
   const a=S.vdata,m=$('#main');if(!S.view){m.innerHTML='';return}
   if(S.view==='code'){m.innerHTML=renderCode();return}
+  if(S.view==='blank'){m.innerHTML='';return}
+  if(S.view==='road'){const cur=SC[si].beats[bi].step;m.innerHTML=`<div class="view"><h2>Feuille de route du TP fil rouge</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 28px">${DATA.steps.map((t,i)=>`<div class="item" style="--c:var(--${i+1===cur?'cyan':'dim'});margin:0;font-size:30px;${i+1===cur?'background:#1b3440':''}"><b style="color:var(--cyan)">${i+1}</b> · ${t}</div>`).join('')}</div></div>`;return}
   if(S.view==='title'){m.innerHTML=`<div class="view c"><div class="big">${a.title}</div><div class="sub">${a.sub}</div><div class="chips">${a.chips.map((c,i)=>`<span class="chip" style="animation-delay:${i*.15}s">${c}</span>`).join('')}</div></div>`}
   else if(S.view==='list'){m.innerHTML=`<div class="view"><h2>${a.title}</h2>${a.items.slice(0,a.n).map(([t,c],i)=>`<div class="item" style="--c:var(--${c});${(S.vAnim&&i===a.n-1)?'':'animation:none'}">${t}</div>`).join('')}</div>`}
   else if(S.view==='table'){m.innerHTML=`<div class="view"><h2>${a.title}</h2><table class="tb"><tr>${a.head.map(h=>`<th>${h}</th>`).join('')}</tr>${a.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table></div>`}
@@ -216,7 +242,9 @@ function renderView(){
   else if(S.view==='pred'){m.innerHTML=`<div class="view" style="justify-content:flex-start;padding-top:30px"><h2>[PRÉDIRE]</h2><div style="font-size:30px;margin-bottom:14px">${a.q}</div>${a.opts.map((o,i)=>`<div class="opt ${a.reveal?(i===a.ans?'good':'bad'):''}">${'ABC'[i]} · ${o}</div>`).join('')}${a.reveal?'':'<div class="count" id="cd"></div>'}</div>`}
 }
 function render(){
-  $('#sct').textContent=SC[si].title;$('#tag').textContent=SC[si].beats[bi].screen.split('·').pop().trim();
+  const bb=SC[si].beats[bi];$('#sct').textContent=bb.step?('ÉTAPE '+bb.step+'/11 · '+DATA.steps[bb.step-1]):('INTRO · '+SC[si].title);$('#tag').textContent=bb.screen.split('·').pop().trim();
+  $('#road').innerHTML=DATA.steps.map((t,i)=>`<i title="${t}" class="${i+1===bb.step?'on':(i+1<bb.step?'done':'')}">${i+1}</i>`).join('');
+  $('#lay').innerHTML=[['app','APPLICATION'],['core','CORE'],['infra','INFRA']].map(([k,n])=>`<b class="${k} ${bb.layer===k?'on':''}">${n}</b>`).join('');
   renderView();
   const n=S.note;$('#nt').textContent=n?n.t:'';$('#nx').textContent=n?n.x:'';$('#ns').textContent=n?n.s:'';
   $('#notes').style.display=(S.view==='code'&&!S.bp)?'block':'none';
@@ -227,7 +255,7 @@ function render(){
   const bp=$('#bp');
   if(S.bp){const b=S.bp;bp.className=(b.kind==='bp'?'':b.kind)+' show'+(S.bpAnim?(b.kind==='trap'?' shake':''):'');
     const hd={bp:'BONNE PRATIQUE',trap:'PIÈGE',upd:'MISE À JOUR'}[b.kind];
-    bp.innerHTML=`<div class="hd"><span class="bell">🔔</span> ${hd}</div><div class="ti">${b.title}</div>${b.why?`<div class="row why"><span class="lab">Pourquoi</span><span>${b.why}</span></div>`:''}${b.saves?`<div class="row sav"><span class="lab">${b.kind==='upd'?'À retenir':'Ce que ça nous évite'}</span><span>${b.saves}</span></div>`:''}`;
+    bp.innerHTML=`<div class="hd"><span class="bell">🔔</span> ${hd}</div><div class="ti">${b.title}</div>${b.why?`<div class="row why"><span class="lab">Pourquoi</span><span>${b.why}</span></div>`:''}${b.saves?`<div class="row sav"><span class="lab">${b.kind==='upd'?'À retenir':'Ce que ça nous évite'}</span><span>${b.saves}</span></div>`:''}${b.src?`<div class="src2">${b.src}</div>`:''}`;
     if(S.view==='code'){bp.style.left='1256px';bp.style.top='84px';bp.style.width='632px';bp.style.height=H;bp.classList.add('side')}else{bp.style.left='360px';bp.style.top=(S.view==='pred'?'520px':'470px');bp.style.width='1200px';bp.style.height='auto';bp.classList.remove('side')}
     if(S.bpAnim)(SND[b.kind]||SND.bp)();
   }else{bp.className='';bp.innerHTML=''}

@@ -6,6 +6,27 @@ Chaque étape correspond à une scène de la vidéo (`video/index.html`) et à u
 
 Légende : ✅ CONFIRMÉ (exécuté ici, `docs/verifications/`) · 📐 CONVENTION · 🔔 bonne pratique (signal sonore dans la vidéo).
 
+## Avant de commencer : vue d'ensemble (scènes 3 à 5 de la vidéo)
+
+Source : documentation officielle Spring Batch (texte fourni), résumée dans le cours (§ 2.5 à 2.7).
+**Trois couches** : *Application* (notre code : jobs, steps, readers, processors) · *Batch Core* (lancer et contrôler un job :
+`Job`, `Step`, `JobLauncher` en v5 / `JobOperator` en v6 — RECONSTITUTION pour la v6) · *Batch Infrastructure* (readers/writers communs, `RetryTemplate`).
+Dans la vidéo, un **repère permanent** (en haut) indique l'**étape du TP (1 à 11)** et la **couche** du composant montré.
+
+| Étape | Sujet | Couche dominante |
+|---|---|---|
+| 1 | Projet et JobRepository | Core |
+| 2 | Premier job : tasklet | Application |
+| 3 | Job, instance, paramètres | Core |
+| 4 | Chunk : CSV vers console | Application / Infrastructure |
+| 5 | JSON et XML (hors vidéo) | Infrastructure |
+| 6 | Base de données | Infrastructure |
+| 7 | Flow et decider | Core |
+| 8 | Erreurs : skip | Core |
+| 9 | Reprise : restart | Core |
+| 10 | Partitions | Core / Infrastructure |
+| 11 | Tests | Application |
+
 ## Préparation (à faire une fois)
 
 ```bash
@@ -27,7 +48,7 @@ sans `skip` : c'est le point de départ de l'étape 9.
 
 ---
 
-## Étape 1 · Projet et JobRepository (scène 3)
+## Étape 1 · Projet et JobRepository (scène 6)
 
 1. Spring Initializr : Java 17, Maven, Spring Boot 3.x, dépendances *Spring Batch* et *H2*.
 2. `application.properties` :
@@ -46,7 +67,7 @@ spring.productdb.datasource.url=jdbc:h2:~/productDb   # base métier (secondaire
 🔔 **Pas d'`@EnableBatchProcessing` avec Boot 3** — *Pourquoi* : il désactive l'auto-configuration. *Évite* : JobRepository/lanceur non créés comme prévu.
 🔔 **Secrets hors du dépôt** — le dépôt contient `spring.datasource.password=root`. *Évite* : fuite de mot de passe dans git (`${DB_PASSWORD}`).
 
-## Étape 2 · Premier job : une tasklet (scène 4)
+## Étape 2 · Premier job : une tasklet (scène 7)
 
 Écris `PrintMessageTasklet` (`execute()` affiche le message, retourne `RepeatStatus.FINISHED`), puis
 `HelloWorldJobConfig` : un `Step` (`StepBuilder(nom, jobRepository).tasklet(tasklet, txManager)`) et un `Job`.
@@ -55,7 +76,7 @@ spring.productdb.datasource.url=jdbc:h2:~/productDb   # base métier (secondaire
 
 🔔 **Même nom partout** (job, bean, journal) — *Évite* : chercher un job sous un autre nom en supervision.
 
-## Étape 3 · Lancer le job et comprendre la JobInstance (scène 5)
+## Étape 3 · Lancer le job et comprendre la JobInstance (scène 8)
 
 `TpSpringBatchApplication` (un `CommandLineRunner`) récupère le job par son nom et appelle `jobLauncher.run(job, params)`.
 
@@ -65,7 +86,7 @@ spring.productdb.datasource.url=jdbc:h2:~/productDb   # base métier (secondaire
 🔔 **Paramètre métier plutôt qu'horodatage** 📐 — le TP ajoute `timeStampOfJobInstance` pour relancer à volonté ;
 en production, un horodatage crée une nouvelle instance à chaque fois, donc **aucune reprise possible** d'un job échoué.
 
-## Étape 4 · Chunk : CSV → console, puis processor (scène 6)
+## Étape 4 · Chunk : CSV → console, puis processor (scène 9)
 
 1. Modèles `BasicProduct` / `Product`, fichier `data/input/csv/products.csv` (`id;main_category;label;price;time_stamp;features`).
 2. Reader : `FlatFileItemReaderBuilder` (`linesToSkip(1)`, `delimited().delimiter(";")`, `names(...)`, `targetType(Product.class)`), en `@JobScope` avec `#{jobParameters['inputFilePath']}`.
@@ -85,7 +106,7 @@ en production, un horodatage crée une nouvelle instance à chaque fois, donc **
 des **paramètres du job** (`inputFilePath`, `outputFilePath`, `enableUpperCase`). Comparer avec
 `data/expected_output/` (le helper de test `verifSameContentExceptedResultFile` le fait).
 
-## Étape 6 · Base de données (scène 7)
+## Étape 6 · Base de données (scène 10)
 
 1. Reader `JdbcCursorItemReader` + `ProductWithDetailsRowMapper` (colonnes `f_*` → sous-objet `ProductFeatures`).
 2. Processor `IncreasePriceOfProductWithDetailsProcessor` : +x % sur une catégorie.
@@ -96,7 +117,7 @@ des **paramètres du job** (`inputFilePath`, `outputFilePath`, `enableUpperCase`
 Les tests sont verts. *Évite* : une donnée perdue sans erreur. **Exercice** : corrige le mapper et ajoute une assertion.
 🔔 **Écriture idempotente** (UPDATE par id) — *Évite* : doublons à la reprise.
 
-## Étape 7 · Flow conditionnel avec un decider (scène 8)
+## Étape 7 · Flow conditionnel avec un decider (scène 11)
 
 1. Le processor compte les produits ajustés dans `stepExecution.getExecutionContext()` (`nbAjustedProducts`).
 2. `MyUpdatedCountCheckingDecider` retourne `COMPLETED_WITH_MANY_UPDATED` si le compteur ≥ `minManyUpdated`, sinon l'`ExitStatus` du step.
@@ -109,7 +130,7 @@ Les tests sont verts. *Évite* : une donnée perdue sans erreur. **Exercice** : 
 *Évite* : un job qui plante sur le cas le plus banal. **Exercice** : écris le test `productCategoryToIncrease=zzz` pour le confirmer, puis corrige.
 🔔 **Un seul nom de job** — ✅ le journal affiche `FlowJob: [name=insertIntoCsvFromDbJob]` pour le bean `increaseProductPriceInDbJob`.
 
-## Étape 8 · Erreurs : skip (scène 9)
+## Étape 8 · Erreurs : skip (scène 12)
 
 ```java
 .chunk(5, batchTxManager).reader(reader)
@@ -122,7 +143,7 @@ Les tests sont verts. *Évite* : une donnée perdue sans erreur. **Exercice** : 
 
 🔔 **Borner le skip, cibler l'exception, tracer** — *Évite* : données perdues en silence.
 
-## Étape 9 · Reprise : restart (scène 9)
+## Étape 9 · Reprise : restart (scène 12)
 
 Même fichier **sans skip** : échec `FlatFileParseException` ligne 3 (✅ c'est l'unique test en échec).
 Pour reprendre : `BatchStatus` du step `FAILED`/`STOPPED` (pas l'`ExitStatus`), `startLimit(3)`,
@@ -137,7 +158,7 @@ reader paginé `@StepScope` lisant `#{stepExecutionContext[from]}` et `[to]`.
 
 🔔 **Reader paginé en `@StepScope`** — un `JdbcCursorItemReader` n'est pas sûr entre threads. *Évite* : lignes lues deux fois ou manquantes.
 
-## Étape 11 · Tests (scène 11)
+## Étape 11 · Tests (scène 14)
 
 `AbstractBasicActiveTestJob` lance le job (`JobLauncherTestUtils`), vérifie le nom et l'`exitCode`
 `COMPLETED`, puis appelle `postJobCheckings()`. Chaque test concret ne fournit que ses paramètres.

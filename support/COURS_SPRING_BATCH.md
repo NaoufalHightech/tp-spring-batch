@@ -102,6 +102,41 @@ Job                  = le type de tâche (code/config)           ex : fromCsvToX
 
 En v5, le `JobRepository` **exige une base de données** (au minimum H2 en mémoire).
 
+### 2.5 Architecture en couches (vue d'ensemble)
+
+```
+┌────────────────────────────────────────────┐
+│ Application : jobs et code des développeurs │ ← notre code (readers, processors, config)
+├────────────────────────────────────────────┤
+│ Batch Core : Job, Step, JobLauncher/Operator │ ← lancer et contrôler un job
+├────────────────────────────────────────────┤
+│ Batch Infrastructure : ItemReader/Writer,   │ ← briques communes, RetryTemplate
+│ RetryTemplate…                              │   (utilisées par l'application ET par le cœur)
+└────────────────────────────────────────────┘
+```
+
+`JobOperator` est le point d'entrée de la version 6 ; le dépôt (Spring Batch 5.1) utilise `JobLauncher`.
+
+### 2.6 Principes généraux d'un bon batch (documentation officielle)
+
+| Principe | Pourquoi | Ce que ça évite |
+|---|---|---|
+| Minimiser les E/S (faire un maximum en mémoire, analyser le SQL) | première source de coût | relire à chaque transaction, scans inutiles, `WHERE` sans clé |
+| Ne pas faire les choses deux fois (incrémenter les totaux au fil de l'eau) | un total recalculé relit tout | un second passage complet |
+| Toujours supposer le pire sur les données (validation, totaux de contrôle, ligne de fin) | une donnée non contrôlée est suspecte | un fichier tronqué accepté comme complet |
+| Tester la charge tôt, avec des volumes réalistes | un batch grossit avec le temps | découvrir la limite en production |
+| Sauvegarder aussi les fichiers, et tester la restauration | les fichiers plats sont oubliés | un batch dépendant de fichiers perdus |
+| Rester simple, données et traitement proches, briques communes avec l'en ligne | complexité = risque | des batchs monolithiques ingérables |
+
+### 2.7 Stratégies de traitement
+
+* **Briques standard** : conversion, validation, extraction, extraction/mise à jour, traitement et mise à jour, mise en forme de sortie ; utilitaires : tri, répartition, fusion.
+* **Sources d'entrée** : base de données, fichier, messages.
+* **Stratégies (du plus simple au plus complexe)** : traitement normal en fenêtre batch → batch concurrent avec l'en ligne → jobs en parallèle → **partitionnement** → combinaison.
+  Même dans le cas simple, prévoir des **points de validation et la reprise** (un unique commit final est douloureux à faire évoluer).
+* **Verrouillage logique** : *optimiste* (horodatage relu dans le `WHERE` de l'`UPDATE`, peu de conflits) plutôt pour l'en ligne ; *pessimiste* (drapeau/verrou à la lecture) plutôt pour le batch ; **même schéma pour toutes les applications** qui touchent la donnée.
+* **Partitionnement** (même job, plusieurs instances, chacune sur sa part, puis fusion). Approches : parts égales, colonne clé, vues, indicateur de traitement, extraction vers fichiers, colonne de hachage. À **valider avant lancement** : partitions couvrant toute la plage, sans trou, chacune limitée à ses données ; décider du sort des autres partitions si l'une échoue ; prévoir attente/retry en cas d'interblocage.
+
 ## 3. Mise en place du projet
 
 ### 3.1 Dépendances (Spring Boot, recommandé)
