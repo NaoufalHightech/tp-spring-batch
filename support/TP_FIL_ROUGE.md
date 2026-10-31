@@ -10,7 +10,7 @@ Légende : ✅ CONFIRMÉ (exécuté ici, `docs/verifications/`) · 📐 CONVENTI
 
 Source : documentation officielle Spring Batch (texte fourni), résumée dans le cours (§ 2.5 à 2.7).
 **Trois couches** : *Application* (notre code : jobs, steps, readers, processors) · *Batch Core* (lancer et contrôler un job :
-`Job`, `Step`, `JobLauncher` en v5 / `JobOperator` en v6 — RECONSTITUTION pour la v6) · *Batch Infrastructure* (readers/writers communs, `RetryTemplate`).
+`Job`, `Step`, `JobLauncher` en v5 / `JobOperator` en v6, d'après la documentation officielle) · *Batch Infrastructure* (readers/writers communs, `RetryTemplate`).
 Dans la vidéo, un **repère permanent** (en haut) indique l'**étape du TP (1 à 11)** et la **couche** du composant montré.
 
 | Étape | Sujet | Couche dominante |
@@ -170,5 +170,5 @@ Piste : `spring.sql.init.*` ou `@Sql` sur la base `productdb` de test.
 
 ## Ce qui reste hors périmètre vérifié
 
-* Spring Batch 6 / Spring Boot 4 (`JobOperator`, fusion de `JobExplorer`) : 🧩 **RECONSTITUTION** (connaissance, non exécutée) : lis la note de version avant de migrer.
+* Spring Batch 6 / Spring Boot 4 : décrit d'après la **documentation officielle** (scène 15 de la vidéo, § 13 du cours), **non exécuté ici** : `JobOperator`, `ChunkOrientedStep`, annotations `@EnableJdbcJobRepository`, dépréciation du XML et de Jackson 2. Lis le guide de migration avant de migrer.
 * Retry, Spring Cloud Data Flow, monitoring : traités dans le cours, non rejoués ici.

@@ -91,6 +91,26 @@ Job                  = le type de tâche (code/config)           ex : fromCsvToX
 > ⚠️ **BatchStatus ≠ ExitStatus.** Le `BatchStatus` pilote le **redémarrage** ; l'`ExitStatus` pilote
 > l'**aiguillage** (flows conditionnels).
 
+#### Schéma de référence (documentation officielle)
+
+Un `JobOperator` pilote un `Job` ; un `Job` a 1..* `Step` ; chaque `Step` a exactement **un** `ItemReader`, un `ItemProcessor` optionnel
+et **un** `ItemWriter` ; `JobOperator`, `Job` et `Step` lisent/écrivent leurs métadonnées dans le `JobRepository`.
+
+#### Exemple EndOfDay (JobInstance, paramètres, exécutions)
+
+* `Job` EndOfDay → *une* `JobInstance` **par date** (job + paramètre identifiant `schedule.date`) → *plusieurs* `JobExecution` (tentatives).
+* Relancer le 01-01 après un échec : **même instance, nouvelle exécution**. Seule une exécution `COMPLETED` ferme l'instance.
+
+| JOB_EXEC_ID | JOB_INST_ID | paramètre | STATUS |
+|---|---|---|---|
+| 1 | 1 | 2017-01-01 | FAILED |
+| 2 | 1 | 2017-01-01 (relance) | COMPLETED |
+| 3 | 2 | 2017-01-02 | COMPLETED |
+
+Relancer une instance **déjà en cours** lève `JobExecutionAlreadyRunningException`. Chaque `Step` a sa `StepExecution` (rattachée à une `JobExecution`),
+avec compteurs et `ExecutionContext` (ex. `{piece.count=40321}` dans `BATCH_STEP_EXECUTION_CONTEXT`) : c'est ce qui permet de reprendre où l'on s'est arrêté.
+Il existe un `ExecutionContext` par `JobExecution` (sauvegardé entre les steps) et un par `StepExecution` (sauvegardé à chaque commit) ; les entrées doivent être sérialisables.
+
 ### 2.4 Historique
 
 | Version | Apport |
@@ -374,3 +394,22 @@ Le dépôt simule un arrêt avec `MyStoppedForRestartExecutionListener`, qui for
 | reprendre après plantage | `BatchStatus` FAILED/STOPPED + `startLimit` + `ItemStream` |
 | aller plus vite | partitions (`Partitioner` + `TaskExecutor`) |
 | tester | `@SpringBatchTest` + `JobLauncherTestUtils` |
+
+---
+
+## 13. Nouveautés de Spring Batch 6 (documentation officielle, non exécutée ici)
+
+Dépendances : Spring Framework 7.0, Spring Integration 7.0, Spring Data 4.0, Spring LDAP/AMQP/Kafka 4.0, Micrometer 1.16.
+Notre dépôt est en **Spring Boot 3.2.4 / Spring Batch 5.1.x** : tout ce qui suit est à planifier, pas à appliquer tel quel.
+
+| Nouveauté v6 | Ce que ça change | Impact sur notre TP |
+|---|---|---|
+| Infrastructure simplifiée | `JobRepository` étend `JobExplorer` ; `JobOperator` étend `JobLauncher` ; `JobRegistry` et gestionnaire de transaction optionnels | `JobLauncher` → `JobOperator` |
+| Annotations | `@EnableBatchProcessing` (attributs communs) + `@EnableJdbcJobRepository` / `@EnableMongoJobRepository` ; `DefaultBatchConfiguration` « sans ressource » (`ResourcelessJobRepository`, plus d'H2 obligatoire) | la règle « pas d'`@EnableBatchProcessing` » vaut pour Batch 5 + Boot 3 |
+| `ChunkOrientedStep` (stable) | remplace `TaskletStep`/`ChunkOrientedTasklet` ; retry basé sur Spring Framework 7 (plus Spring Retry) ; skip via `SkipPolicy` | `.faultTolerant().skipLimit(5).skip(...)` à migrer |
+| Nouveau modèle de concurrence | producteur-consommateur, file bornée ; local chunking, remote step, SEDA (Spring Integration) | partitions toujours valables |
+| Exploitation | `CommandLineJobOperator`, `JobOperator.recover`, `StoppableStep`, arrêt en douceur, événements JFR | plus de correction SQL manuelle |
+| Dépréciations | namespace XML `batch:…` (suppression prévue en 7.0), `modular = true`, JUnit 4, Jackson 2 | profil `xmlJobConfig`, `jackson-databind` |
+| Autres | annotations JSpecify, Jackson 3, configuration par lambdas (`.delimited(config -> …)`) | — |
+
+Voir le guide de migration officiel avant toute montée de version.
