@@ -350,8 +350,17 @@ Les lignes illisibles (ex. `LINE_WITH_ERROR` → `FlatFileParseException`, sous-
 
 ### 10.2 Retry — retenter
 
-`.faultTolerant().retryLimit(3).retry(TransientDataAccessException.class)` + `backOffPolicy` :
-pour les erreurs **transitoires** (réseau, verrou BDD).
+`.faultTolerant().retryLimit(3).retry(MyProcessException.class)` + `backOffPolicy` :
+pour les erreurs **transitoires** (réseau, verrou BDD). Depuis Spring Batch 2.2 le retry vient de la
+bibliothèque **Spring Retry**. Par défaut : `NoBackOffPolicy` (aucune pause) ; `ExponentialBackOffPolicy`
+espace les tentatives ; un `RetryListener` est facultatif.
+
+**Constaté en exécution** (`tp/tpComplements`, Spring Batch 5.1) : avec un processeur qui échoue 2 fois par
+élément, le job se termine `COMPLETED` mais le processeur est appelé **11 fois pour 3 éléments** et le step
+compte **6 rollbacks** : chaque échec annule le chunk, qui est **rejoué en entier**. Avec 5 échecs par
+élément et `retryLimit(3)`, le job finit `FAILED` après 3 appels. Sans `faultTolerant()`, le premier échec
+suffit à faire échouer le step. Le « bug en configuration Java » signalé dans le PDF ne s'est **pas**
+reproduit ici avec `.retryLimit(3).retry(...)`.
 
 ### 10.3 Restart — reprendre un job échoué
 
@@ -413,3 +422,44 @@ Notre dépôt est en **Spring Boot 3.2.4 / Spring Batch 5.1.x** : tout ce qui su
 | Autres | annotations JSpecify, Jackson 3, configuration par lambdas (`.delimited(config -> …)`) | — |
 
 Voir le guide de migration officiel avant toute montée de version.
+
+---
+
+## 14. Compléments du cours du formateur (exécutés dans `tp/tpComplements`)
+
+### 14.1 Fichier à positions fixes
+`FlatFileItemReaderBuilder.fixedLength().columns(new Range(1,34), …).names(…)`. Les bornes sont **1-based
+et inclusives**. Piège constaté : en mode strict (par défaut) une ligne **plus longue** que la dernière
+colonne (« false » après une colonne calée sur « true ») ou **plus courte** déclenche
+`IncorrectLineLengthException` ; on règle avec `.strict(false)` ou on cale la dernière colonne sur le cas le plus long.
+
+### 14.2 Format hybride
+Deux cas du cours :
+- **lignes de types différents** (en-tête, détail…) : `PatternMatchingCompositeLineMapper` avec un tokenizer
+  et un `FieldSetMapper` par motif (`"H*"`, `"D*"`) ;
+- **colonne qui se décompose** : un `LineMapper` personnalisé tokenise la ligne avec `;`, puis applique un
+  `FixedLengthTokenizer` au numéro de sécurité sociale (15 chiffres) et un `DelimitedLineTokenizer("!")` à l'adresse.
+
+### 14.3 Valider les paramètres et comprendre les instances
+`new DefaultJobParametersValidator(requis, optionnels)` posé avec `.validator(...)` : un paramètre requis
+absent fait refuser le lancement. Relancer avec **les mêmes** paramètres un job déjà `COMPLETED` lève
+`JobInstanceAlreadyCompleteException` ; ajouter un paramètre qui change (`timeStampOfJobInstance`) crée une nouvelle instance.
+
+### 14.4 Filtrer et composer
+Un processeur qui retourne `null` **filtre** l'élément (`filterCount`, pas une erreur). `CompositeItemProcessor`
+enchaîne les processeurs. Exemple exécuté : 3 lus, 1 filtré, 2 écrits.
+
+### 14.5 Composants personnalisés et patterns
+- Reader qui **délègue** à un sous-reader : implémenter `ItemStreamReader`, ouvrir/fermer le sous-reader dans
+  `open`/`close` (le step appelle ce cycle de vie) ; idem pour un writer.
+- Writer en **deux tables** : `GeneratedKeyHolder` récupère la clé auto-incrémentée de la 1re insertion pour la 2e.
+- En Spring Batch 5, `write(Chunk<? extends T>)` remplace `write(List<…>)` de la version 4.
+
+### 14.6 Logging
+Un listener (`JobExecutionListener` + `StepExecutionListener`) et slf4j tracent début, fin, compteurs lus/écrits/filtrés
+à chaque exécution : c'est la base du suivi quand il n'y a ni interface ni utilisateur.
+
+### 14.7 Lancement et supervision (résumé du cours, **non exécuté**)
+Un job se lance par un **scheduler** (Quartz, cron) ou par **Spring Cloud Data Flow** (qui enregistre
+l'application, la lance et affiche l'historique). Une application Spring Batch n'a que la responsabilité de
+démarrer le job en console et de produire des logs ; la supervision est externe.

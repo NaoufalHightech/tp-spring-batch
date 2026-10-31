@@ -1,0 +1,17 @@
+RESULT_FILTRE read=3 filter=1 write=2 -> [Jean BON (41), Alain THERIEUR (42)]
+RESULT_RETRY_LIMITE FAILED apr?s 3 appels (retryLimit=3)
+RESULT_CUSTOM reader d?l?gu? ouvert/ferm? par le step ; 2 tables li?es par la cl? g?n?r?e (2 lignes jointes)
+RESULT_LOG JOB START logJob params={'timeStampOfJobInstance':'{value=289639208469, type=class java.lang.Long, identifying=true}'}
+RESULT_LOG STEP START logStep
+RESULT_LOG STEP END logStep read=3 write=3 filter=0
+RESULT_LOG JOB END COMPLETED exit=COMPLETED
+RESULT_RETRY COMPLETED, appels processeur=11 pour 3 ?l?ments, ?crits=3 rollbacks=6
+RESULT_SANS_RETRY FAILED d?s le 1er ?chec, appels=1
+RESULT_VALIDATION param manquant refus? ; m?mes param?tres relanc?s = JobInstanceAlreadyComplete ; param?tre horodat? = nouvelle instance
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.758 s -- in tp.compl.JobsTest
+RESULT_HYBRID ssn.dept=03 town=Paris
+RESULT_PATTERN H*->ent?te, D*->ligne : OK
+RESULT_FIXED Jean Bon (41) | Alain Therieur (42) (longueur ligne=89)
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.039 s -- in tp.compl.FilesTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
