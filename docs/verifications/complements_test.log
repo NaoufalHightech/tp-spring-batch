@@ -1,0 +1,158 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< tp:tpSpringBatchSolution >----------------------
+[INFO] Building tpSpringBatchSolution 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ tpSpringBatchSolution ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 21 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ tpSpringBatchSolution ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 57 source files with javac [debug release 17] to target/classes
+[INFO] Annotation processing is enabled because one or more processors were found
+  on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ tpSpringBatchSolution ---
+[INFO] skip non existing resourceDirectory /home/user/tp-spring-batch/tp/tpSpringBatchSolution/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ tpSpringBatchSolution ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 21 source files with javac [debug release 17] to target/test-classes
+[INFO] Annotation processing is enabled because one or more processors were found
+  on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+[INFO] 
+[INFO] --- surefire:3.1.2:test (default-test) @ tpSpringBatchSolution ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running tp.tpSpringBatch.job.TestParallelFlowsJob
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.4)
+
+2026-10-31T18:27:58.727Z  INFO 1432 --- [           main] t.t.job.TestParallelFlowsJob             : Starting TestParallelFlowsJob using Java 21.0.12.1 with PID 1432 (started by root in /home/user/tp-spring-batch/tp/tpSpringBatchSolution)
+2026-10-31T18:27:58.730Z DEBUG 1432 --- [           main] t.t.job.TestParallelFlowsJob             : Running with Spring Boot v3.2.4, Spring v6.1.5
+2026-10-31T18:27:58.730Z  INFO 1432 --- [           main] t.t.job.TestParallelFlowsJob             : No active profile set, falling back to 1 default profile: "default"
+2026-10-31T18:27:59.275Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'tp.tpSpringBatch.config.AutomaticSpringBootBatchJobRepositoryConfig' of type [tp.tpSpringBatch.config.AutomaticSpringBootBatchJobRepositoryConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:27:59.293Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'jobRepositoryDbDataSourceProperties' of type [org.springframework.boot.autoconfigure.jdbc.DataSourceProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:27:59.300Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'dataSource' of type [com.zaxxer.hikari.HikariDataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:27:59.304Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration$JdbcTransactionManagerConfiguration' of type [org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration$JdbcTransactionManagerConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:27:59.310Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizationAutoConfiguration' of type [org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizationAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:27:59.315Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'transactionExecutionListeners' of type [org.springframework.boot.autoconfigure.transaction.ExecutionListenersTransactionManagerCustomizer] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:27:59.319Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'spring.transaction-org.springframework.boot.autoconfigure.transaction.TransactionProperties' of type [org.springframework.boot.autoconfigure.transaction.TransactionProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:27:59.320Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'platformTransactionManagerCustomizers' of type [org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizers] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:27:59.325Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'transactionManager' of type [org.springframework.jdbc.support.JdbcTransactionManager] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:27:59.335Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'spring.batch-org.springframework.boot.autoconfigure.batch.BatchProperties' of type [org.springframework.boot.autoconfigure.batch.BatchProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:27:59.339Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration$SpringBootBatchConfiguration' of type [org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration$SpringBootBatchConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [jobRegistryBeanPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2026-10-31T18:27:59.383Z  INFO 1432 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-31T18:27:59.723Z  INFO 1432 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:jr3 user=SA
+2026-10-31T18:27:59.726Z  INFO 1432 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-31T18:28:00.098Z  INFO 1432 --- [           main] t.t.job.TestParallelFlowsJob             : Started TestParallelFlowsJob in 1.62 seconds (process running for 2.406)
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/root/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.12/byte-buddy-agent-1.14.12.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+2026-10-31T18:28:01.023Z DEBUG 1432 --- [           main] t.t.AbstractBasicTestJobHelper           : >>>> jobName=parallelFlowsJob
+2026-10-31T18:28:01.090Z  INFO 1432 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [FlowJob: [name=parallelFlowsJob]] launched with the following parameters: [{'timeStampOfJobInstance':'{value=1793471281022, type=class java.lang.Long, identifying=true}'}]
+2026-10-31T18:28:01.128Z  INFO 1432 --- [        flows-1] o.s.batch.core.job.SimpleStepHandler     : Executing step: [step3]
+2026-10-31T18:28:01.131Z  INFO 1432 --- [        flows-2] o.s.batch.core.job.SimpleStepHandler     : Executing step: [step1]
+>>>>> step1 execute par le thread flows-2
+>>>>> step3 execute par le thread flows-1
+2026-10-31T18:28:01.142Z  INFO 1432 --- [        flows-2] o.s.batch.core.step.AbstractStep         : Step: [step1] executed in 10ms
+2026-10-31T18:28:01.145Z  INFO 1432 --- [        flows-1] o.s.batch.core.step.AbstractStep         : Step: [step3] executed in 16ms
+2026-10-31T18:28:01.147Z  INFO 1432 --- [        flows-2] o.s.batch.core.job.SimpleStepHandler     : Executing step: [step2]
+>>>>> step2 execute par le thread flows-2
+2026-10-31T18:28:01.152Z  INFO 1432 --- [        flows-2] o.s.batch.core.step.AbstractStep         : Step: [step2] executed in 5ms
+2026-10-31T18:28:01.156Z  INFO 1432 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [step4]
+>>>>> step4 execute par le thread main
+2026-10-31T18:28:01.164Z  INFO 1432 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [step4] executed in 7ms
+2026-10-31T18:28:01.171Z  INFO 1432 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [FlowJob: [name=parallelFlowsJob]] completed with the following parameters: [{'timeStampOfJobInstance':'{value=1793471281022, type=class java.lang.Long, identifying=true}'}] and the following status: [COMPLETED] in 64ms
+2026-10-31T18:28:01.179Z DEBUG 1432 --- [           main] t.t.AbstractBasicTestJobHelper           : jobExecution=JobExecution: id=1, version=2, startTime=2026-10-31T18:28:01.102433482, endTime=2026-10-31T18:28:01.167100930, lastUpdated=2026-10-31T18:28:01.167274871, status=COMPLETED, exitStatus=exitCode=COMPLETED;exitDescription=, job=[JobInstance: id=1, version=0, Job=[parallelFlowsJob]], jobParameters=[{'timeStampOfJobInstance':'{value=1793471281022, type=class java.lang.Long, identifying=true}'}]
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.074 s -- in tp.tpSpringBatch.job.TestParallelFlowsJob
+[INFO] Running tp.tpSpringBatch.job.TestFromCsvToConsoleWithCompositeJob
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.4)
+
+2026-10-31T18:28:01.339Z  INFO 1432 --- [           main] t.j.TestFromCsvToConsoleWithCompositeJob : Starting TestFromCsvToConsoleWithCompositeJob using Java 21.0.12.1 with PID 1432 (started by root in /home/user/tp-spring-batch/tp/tpSpringBatchSolution)
+2026-10-31T18:28:01.339Z DEBUG 1432 --- [           main] t.j.TestFromCsvToConsoleWithCompositeJob : Running with Spring Boot v3.2.4, Spring v6.1.5
+2026-10-31T18:28:01.339Z  INFO 1432 --- [           main] t.j.TestFromCsvToConsoleWithCompositeJob : No active profile set, falling back to 1 default profile: "default"
+2026-10-31T18:28:01.547Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'tp.tpSpringBatch.config.AutomaticSpringBootBatchJobRepositoryConfig' of type [tp.tpSpringBatch.config.AutomaticSpringBootBatchJobRepositoryConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:28:01.558Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'jobRepositoryDbDataSourceProperties' of type [org.springframework.boot.autoconfigure.jdbc.DataSourceProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:28:01.559Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'dataSource' of type [com.zaxxer.hikari.HikariDataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:28:01.560Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration$JdbcTransactionManagerConfiguration' of type [org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration$JdbcTransactionManagerConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:28:01.561Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizationAutoConfiguration' of type [org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizationAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:28:01.563Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'transactionExecutionListeners' of type [org.springframework.boot.autoconfigure.transaction.ExecutionListenersTransactionManagerCustomizer] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:28:01.566Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'spring.transaction-org.springframework.boot.autoconfigure.transaction.TransactionProperties' of type [org.springframework.boot.autoconfigure.transaction.TransactionProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:28:01.567Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'platformTransactionManagerCustomizers' of type [org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizers] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:28:01.567Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'transactionManager' of type [org.springframework.jdbc.support.JdbcTransactionManager] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:28:01.572Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'spring.batch-org.springframework.boot.autoconfigure.batch.BatchProperties' of type [org.springframework.boot.autoconfigure.batch.BatchProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-10-31T18:28:01.573Z  WARN 1432 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration$SpringBootBatchConfiguration' of type [org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration$SpringBootBatchConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [jobRegistryBeanPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2026-10-31T18:28:01.582Z  INFO 1432 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-10-31T18:28:01.584Z  INFO 1432 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection conn10: url=jdbc:h2:mem:jr3 user=SA
+2026-10-31T18:28:01.584Z  INFO 1432 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-10-31T18:28:01.695Z  INFO 1432 --- [           main] t.j.TestFromCsvToConsoleWithCompositeJob : Started TestFromCsvToConsoleWithCompositeJob in 0.406 seconds (process running for 4.003)
+2026-10-31T18:28:01.700Z DEBUG 1432 --- [           main] t.t.AbstractBasicTestJobHelper           : >>>> jobName=fromCsvToConsoleWithCompositeJob
+2026-10-31T18:28:01.705Z  INFO 1432 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=fromCsvToConsoleWithCompositeJob]] launched with the following parameters: [{'inputFilePath':'{value=data/input/csv/products.csv, type=class java.lang.String, identifying=true}','timeStampOfJobInstance':'{value=1793471281700, type=class java.lang.Long, identifying=true}'}]
+2026-10-31T18:28:01.710Z  INFO 1432 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [stepCsvToConsoleWithComposite]
+Product [features=golden] BasicProduct [id=1, main_category=ALIMENT, label=pommes, price=2.2, time_stamp=2024-05-23T11:31:00]
+Product [features=cameroun] BasicProduct [id=2, main_category=ALIMENT, label=bananes, price=1.8, time_stamp=2024-05-23T11:31:00]
+Product [features=blanc xl] BasicProduct [id=3, main_category=VETEMENT, label=t-shirt, price=7.7, time_stamp=2024-05-23T11:31:00]
+Product [features=beige xl] BasicProduct [id=4, main_category=VETEMENT, label=pull, price=12.75, time_stamp=2024-05-23T11:31:00]
+2026-10-31T18:28:01.780Z  INFO 1432 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [stepCsvToConsoleWithComposite] executed in 69ms
+2026-10-31T18:28:01.784Z  INFO 1432 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=fromCsvToConsoleWithCompositeJob]] completed with the following parameters: [{'inputFilePath':'{value=data/input/csv/products.csv, type=class java.lang.String, identifying=true}','timeStampOfJobInstance':'{value=1793471281700, type=class java.lang.Long, identifying=true}'}] and the following status: [COMPLETED] in 76ms
+2026-10-31T18:28:01.784Z DEBUG 1432 --- [           main] t.t.AbstractBasicTestJobHelper           : jobExecution=JobExecution: id=2, version=2, startTime=2026-10-31T18:28:01.706241851, endTime=2026-10-31T18:28:01.782791569, lastUpdated=2026-10-31T18:28:01.782920678, status=COMPLETED, exitStatus=exitCode=COMPLETED;exitDescription=, job=[JobInstance: id=2, version=0, Job=[fromCsvToConsoleWithCompositeJob]], jobParameters=[{'inputFilePath':'{value=data/input/csv/products.csv, type=class java.lang.String, identifying=true}','timeStampOfJobInstance':'{value=1793471281700, type=class java.lang.Long, identifying=true}'}]
+2026-10-31T18:28:01.799Z  INFO 1432 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=fromCsvToConsoleWithCompositeJob]] launched with the following parameters: [{'inputFilePath':'{value=data/input/csv/products.csv, type=class java.lang.String, identifying=true}','timeStampOfJobInstance':'{value=1793471281796, type=class java.lang.Long, identifying=true}'}]
+2026-10-31T18:28:01.804Z  INFO 1432 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [stepCsvToConsoleWithComposite]
+Product [features=golden] BasicProduct [id=1, main_category=ALIMENT, label=pommes, price=2.2, time_stamp=2024-05-23T11:31:00]
+Product [features=cameroun] BasicProduct [id=2, main_category=ALIMENT, label=bananes, price=1.8, time_stamp=2024-05-23T11:31:00]
+Product [features=blanc xl] BasicProduct [id=3, main_category=VETEMENT, label=t-shirt, price=7.7, time_stamp=2024-05-23T11:31:00]
+Product [features=beige xl] BasicProduct [id=4, main_category=VETEMENT, label=pull, price=12.75, time_stamp=2024-05-23T11:31:00]
+2026-10-31T18:28:01.812Z  INFO 1432 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [stepCsvToConsoleWithComposite] executed in 8ms
+2026-10-31T18:28:01.815Z  INFO 1432 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=fromCsvToConsoleWithCompositeJob]] completed with the following parameters: [{'inputFilePath':'{value=data/input/csv/products.csv, type=class java.lang.String, identifying=true}','timeStampOfJobInstance':'{value=1793471281796, type=class java.lang.Long, identifying=true}'}] and the following status: [COMPLETED] in 14ms
+2026-10-31T18:28:01.818Z  INFO 1432 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=fromCsvToConsoleWithCompositeJob]] launched with the following parameters: [{'inputFilePath':'{value=data/input/csv/products.csv, type=class java.lang.String, identifying=true}','timeStampOfJobInstance':'{value=1793471281815, type=class java.lang.Long, identifying=true}'}]
+2026-10-31T18:28:01.821Z  INFO 1432 --- [           main] o.s.batch.core.job.SimpleStepHandler     : Executing step: [stepCsvToConsoleWithComposite]
+Product [features=golden] BasicProduct [id=1, main_category=ALIMENT, label=pommes, price=2.2, time_stamp=2024-05-23T11:31:00]
+Product [features=cameroun] BasicProduct [id=2, main_category=ALIMENT, label=bananes, price=1.8, time_stamp=2024-05-23T11:31:00]
+Product [features=blanc xl] BasicProduct [id=3, main_category=VETEMENT, label=t-shirt, price=7.7, time_stamp=2024-05-23T11:31:00]
+Product [features=beige xl] BasicProduct [id=4, main_category=VETEMENT, label=pull, price=12.75, time_stamp=2024-05-23T11:31:00]
+2026-10-31T18:28:01.829Z  INFO 1432 --- [           main] o.s.batch.core.step.AbstractStep         : Step: [stepCsvToConsoleWithComposite] executed in 7ms
+2026-10-31T18:28:01.832Z  INFO 1432 --- [           main] o.s.b.c.l.support.SimpleJobLauncher      : Job: [SimpleJob: [name=fromCsvToConsoleWithCompositeJob]] completed with the following parameters: [{'inputFilePath':'{value=data/input/csv/products.csv, type=class java.lang.String, identifying=true}','timeStampOfJobInstance':'{value=1793471281815, type=class java.lang.Long, identifying=true}'}] and the following status: [COMPLETED] in 12ms
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.576 s -- in tp.tpSpringBatch.job.TestFromCsvToConsoleWithCompositeJob
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  7.941 s
+[INFO] Finished at: 2026-10-31T18:28:01Z
+[INFO] ------------------------------------------------------------------------
