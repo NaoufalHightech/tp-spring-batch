@@ -26,7 +26,7 @@ THUMBS.sb_m1a = function () {
 };
 THUMBS.sb_m1b = function () {
   bg(C.cyan, 0.2);
-  chip('SPRING BATCH 6 · BOOT 4 · POSTGRESQL', 90, 70, { size: 30, color: C.cyan, align: 'left', padX: 18 });
+  chip('SPRING BATCH 6 · SPRING BOOT 4 · POSTGRESQL', 90, 70, { size: 30, color: C.cyan, align: 'left', padX: 18 });
   txt('MODULE 1', CXt, 250, { size: 230, weight: 900, fam: DISP, color: C.text, glowC: 'rgba(76,201,255,0.4)', blur: 60, track: 4 });
   txt('FONDATIONS DE PRODUCTION', CXt, 410, { size: 70, weight: 900, fam: DISP, color: C.cyan, track: 3 });
   const items = [['JobInstance', C.green], ['JobExecution', C.orange], ['ExecutionContext', C.purple], ['JobRepository', C.red]];

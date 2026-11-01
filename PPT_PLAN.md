@@ -50,7 +50,7 @@
 
 | N° | Titre | Statut | Raison |
 |---|---|---|---|
-| 1 | Spring Batch | **mettre à jour** | sous-titre « Spring Boot 3 · Spring Batch 5 » : passer à Boot 4.1.2 · Spring Batch 6.0.6 |
+| 1 | Spring Batch | **mettre à jour** | sous-titre « Spring Boot 3 · Spring Batch 5 » : passer à Spring Boot 4.1.2 · Spring Batch 6.0.6 |
 | 2 | Plan du cours | **remplacer** | 9 modules et 2 parcours (Essentiel / Complet) au lieu de 8 parties |
 | 3 | 1 · Pourquoi le batch | **remplacer** | séparateur : nouvelle structure en 9 modules |
 | 4 | Le batch : lire, traiter, écrire | **garder** | concept stable, sans code |
@@ -67,9 +67,9 @@
 | 15 | JobInstance = Job + paramètres identifiants | **garder** | concept stable (exemple de dates) |
 | 16 | Step et StepExecution | **garder** | concept stable |
 | 17 | ExecutionContext et JobRepository | **mettre à jour** | REVUE §7.3 : « au minimum H2 » → PostgreSQL ; ajouter les colonnes `version` |
-| 18 | Historique des versions | **mettre à jour** | ajouter la ligne 6.x (Spring 7, Boot 4, Java 17 minimum) ; retirer H2 |
+| 18 | Historique des versions | **mettre à jour** | ajouter la ligne 6.x (Spring 7, Spring Boot 4, Java 17 minimum) ; retirer H2 |
 | 19 | 3 · Démarrer | **remplacer** | séparateur : nouvelle structure |
-| 20 | Le projet : dépendances Maven | **remplacer** | starter-batch-jdbc + PostgreSQL, Boot 4.1.2, Java 25 (M1 §2.1) |
+| 20 | Le projet : dépendances Maven | **remplacer** | starter-batch-jdbc + PostgreSQL, Spring Boot 4.1.2, Java 25 (M1 §2.1) |
 | 21 | Configurer le JobRepository | **remplacer** | @EnableJdbcJobRepository + PostgreSQL au lieu de @BatchDataSource H2 (M1 §2.2-2.3) |
 | 22 | Premier job : la Tasklet | **mettre à jour** | paquets Spring Batch 6 ; classe explicite (M2 §2.1) |
 | 23 | Configurer le Step et le Job | **mettre à jour** | noms `FirstJobConfig` / `HelloJobConfig`, imports v6 |
@@ -97,7 +97,7 @@
 | 45 | Restart : reprendre là où ça s'est arrêté | **mettre à jour** | REVUE §7.3 : code de démonstration ; `restart(id)` et restart implicite (M6 §2.4) |
 | 46 | Tester un job et un step | **remplacer** | REVUE §7.3 : `JobLauncherTestUtils.launchJob` déprécié → `JobOperatorTestUtils.startJob` (M8 §2.1) |
 | 47 | Composants personnalisés, logs et patterns | **mettre à jour** | reader délégué (`ItemStream`), `AbstractItemCountingItemStreamItemReader`, journaux structurés (M3B §2.2-2.4, M8 §2.4) |
-| 48 | Lancer et superviser | **mettre à jour** | ajouter Kubernetes, `CommandLineJobOperator`, Data Flow avec avertissement Boot 4 (M8 §1.4-1.5) |
+| 48 | Lancer et superviser | **mettre à jour** | ajouter Kubernetes, `CommandLineJobOperator`, Data Flow avec avertissement Spring Boot 4 (M8 §1.4-1.5) |
 | 49 | 7 · Démo du formateur | **remplacer** | séparateur : le cas bancaire traverse maintenant les modules 3 à 8 |
 | 50 | Le cas : des transactions bancaires | **mettre à jour** | nouveau CSV, PostgreSQL au lieu de H2 (M3 §2.1) |
 | 51 | L'objet métier et le repository | **remplacer** | entité JPA + `Date` → records `RawTransaction` / `BankTransaction` (M3 §2.2) |
@@ -116,7 +116,7 @@
 | 64 | Spring Batch 6 : les nouveautés | **remplacer** | REVUE §7.3 : `StoppableStep`, SEDA… non couverts ; remplacée par M1 §1.4 et M8 §1.2 (liste vérifiée dans les jars) |
 | 65 | Impact sur notre TP (Spring Batch 5 → 6) | **mettre à jour** | devient l'annexe « Migrer de Spring Batch 5 à 6 » |
 | 66 | Questions d'entretien | **mettre à jour** | ajouter les questions des modules 4 à 8 (double comptage, `SKIP LOCKED`, restart…) |
-| 67 | Le TP fil rouge : 14 étapes | **remplacer** | le nouveau TP (Boot 4 / Batch 6 / PostgreSQL) viendra en dernier |
+| 67 | Le TP fil rouge : 14 étapes | **remplacer** | le nouveau TP (Spring Boot 4 / Batch 6 / PostgreSQL) viendra en dernier |
 | 68 | Ce qu'il faut retenir | **remplacer** | récapitulatif des 8 modules (M8 §1.6) |
 | 69 | À toi de jouer | **mettre à jour** | liens vers `README.md`, `tp/tpProd` et le nouveau TP |
 
@@ -141,7 +141,7 @@ Ordre de lecture : M1 → M2 → M3 → **M3B** → M4 → M5 → M6 → M7 → 
 
 *Parcours : Essentiel · durée visée : 46 min · 31 diapositives*
 
-Sous-vidéos : **1.1** Pourquoi un batch de production ? · **1.2** Le vocabulaire en un schéma · **1.3** Le projet : Boot 4, Batch 6, PostgreSQL · **1.4** Votre premier job et son lancement · **1.5** Sous le capot : les tables, les versions, l'isolation · **1.6** Top 10 des pièges
+Sous-vidéos : **1.1** Pourquoi un batch de production ? · **1.2** Le vocabulaire en un schéma · **1.3** Le projet : Spring Boot 4, Batch 6, PostgreSQL · **1.4** Votre premier job et son lancement · **1.5** Sous le capot : les tables, les versions, l'isolation · **1.6** Top 10 des pièges
 
 | N° | Sous-vidéo | Titre de la diapositive | Type | Source |
 |---|---|---|---|---|
@@ -162,7 +162,7 @@ Sous-vidéos : **1.1** Pourquoi un batch de production ? · **1.2** Le vocabulai
 | 18 | 1.2 | Le schéma de référence : JobOperator, Job, Step, JobRepository | schéma | PPT n°13 (màj) |
 | 19 | 1.2 | Historique des versions : de 1.x à 6.x | tableau | PPT n°18 (màj) |
 | 20 | 1.2 | Ce qui change dans Spring Batch 6 | tableau | M1 §1.4 |
-| 21 | 1.3 | Dépendances Maven : Boot 4.1.2, Spring Batch 6.0.6, PostgreSQL | code | remplace PPT n°20 + M1 §2.1 |
+| 21 | 1.3 | Dépendances Maven : Spring Boot 4.1.2, Spring Batch 6.0.6, PostgreSQL | code | remplace PPT n°20 + M1 §2.1 |
 | 22 | 1.3 | application.properties : base, lancement automatique, schéma | code | remplace PPT n°21 + M1 §2.2 |
 | 23 | 1.3 | `@EnableJdbcJobRepository` ligne par ligne | code | remplace PPT n°21 + M1 §2.3 |
 | 24 | 1.4 | Un premier job : tasklet, step, job | code | M1 §2.4 |

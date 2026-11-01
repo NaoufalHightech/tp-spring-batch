@@ -49,7 +49,7 @@ Les renvois d'un module du parcours Essentiel vers un module optionnel sont marq
 
 | Projet | Pile | Usage |
 |---|---|---|
-| [`tp/tpProd`](tp/tpProd) | Boot 4.1.2, Spring Batch 6.0.6, PostgreSQL, JDK 25 | projet du Module 1 (`FirstJobConfig`) ; **non recompilé depuis le renommage des classes** |
+| [`tp/tpProd`](tp/tpProd) | Spring Boot 4.1.2, Spring Batch 6.0.6, PostgreSQL, JDK 25 | projet du Module 1 (`FirstJobConfig`) ; **non recompilé depuis le renommage des classes** |
 | [`tp/tpComplements`](tp/tpComplements) | Boot 3.2.4, Spring Batch 5.1 | compléments du cours d'origine (positions fixes, format hybride, retry, validation…), 10 tests exécutés |
 | [`tp/tpBankDemo`](tp/tpBankDemo) | Boot 3.2.4, Spring Batch 5.1 | démonstration bancaire du formateur, tests exécutés |
 | [`tp/tpSpringBatchSolution`](tp/tpSpringBatchSolution) | Boot 3.2.4, Spring Batch 5.1 | solutions des TP d'origine |

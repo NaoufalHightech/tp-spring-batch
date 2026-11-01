@@ -61,11 +61,11 @@ identifiants désignent la **même** instance ; si elle est déjà terminée ave
 
 > 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Le schéma de référence »** (n°13) du PPT du cours.
 
-### 1.4 Ce qui a changé dans Spring Batch 6 (Boot 4)
+### 1.4 Ce qui a changé dans Spring Batch 6 (Spring Boot 4)
 
 Dans la version 6.0.6 :
 
-- Boot 4.1.2 embarque **Spring Batch 6.0.6** via `spring-boot-starter-batch-jdbc`.
+- Spring Boot 4.1.2 embarque **Spring Batch 6.0.6** via `spring-boot-starter-batch-jdbc`.
 - **Les paquets ont bougé** : `org.springframework.batch.core.job.Job`, `…core.job.parameters.JobParameters`,
   `…core.step.Step`, et les readers/writers dans `org.springframework.batch.infrastructure.item.*`.
   Tout import copié d'un tutoriel Spring Batch 4/5 est faux.
@@ -412,7 +412,7 @@ rien ajouter à l'application.
 |---|---|---|---|
 | 1.1 | Pourquoi un batch de production ? | 6 min | §1.1, cas d'usage 4.1 |
 | 1.2 | Le vocabulaire en un schéma | 7 min | §1.2-1.3, JobInstance = Job + paramètres |
-| 1.3 | Le projet : Boot 4, Batch 6, PostgreSQL | 9 min | §2.1-2.3, `@EnableJdbcJobRepository` ligne par ligne |
+| 1.3 | Le projet : Spring Boot 4, Batch 6, PostgreSQL | 9 min | §2.1-2.3, `@EnableJdbcJobRepository` ligne par ligne |
 | 1.4 | Votre premier job et son lancement | 9 min | §2.4-2.5 |
 | 1.5 | Sous le capot : les tables, les versions, l'isolation | 9 min | §3 |
 | 1.6 | Top 10 des pièges | 6 min | §5 |

@@ -433,7 +433,7 @@ def build_module_1(d: Deck):
               "Un batch exploitable : traces, verrous, reprise, sur PostgreSQL",
               "Essentiel", 46,
               ["1.1 Pourquoi un batch de production ?", "1.2 Le vocabulaire en un schéma",
-               "1.3 Le projet : Boot 4, Batch 6, PostgreSQL", "1.4 Votre premier job et son lancement",
+               "1.3 Le projet : Spring Boot 4, Batch 6, PostgreSQL", "1.4 Votre premier job et son lancement",
                "1.5 Sous le capot : tables, versions, isolation", "1.6 Top 10 des pièges"],
               "Premier module : on pose le vocabulaire et l'environnement de production. Pile : Java 25, "
               "Spring Boot 4.1.2, Spring Batch 6.0.6, PostgreSQL 16.")
@@ -636,7 +636,7 @@ def build_module_1(d: Deck):
         ["**3.x**", "Spring 4", "Java 8, JSR-352"],
         ["**4.x**", "Spring 5", "alignement sur Spring 5"],
         ["**5.x**", "Spring 6", "Java 17 minimum, Jakarta EE"],
-        ["**6.x**", "Spring 7, Boot 4", "`JobOperator`, `ChunkOrientedStep`, retry de Spring Framework 7"]],
+        ["**6.x**", "Spring 7, Spring Boot 4", "`JobOperator`, `ChunkOrientedStep`, retry de Spring Framework 7"]],
         col_w=[1.6, 2.4, CW - 4.0], size=18, row_h=0.66)
     add_caption(s, "Spring Batch N pour Spring Framework N−1. Depuis la v5 : le JobRepository exige une base "
                    "de données (PostgreSQL en production).", y=6.3)
@@ -644,7 +644,7 @@ def build_module_1(d: Deck):
     s = d.slide("Ce qui change dans Spring Batch 6",
                 "Source : M1 §1.4. Tout import copié d'un tutoriel Spring Batch 4 ou 5 est faux : les paquets ont bougé.")
     add_table(s, ["Nouveauté (6.0.6)", "Conséquence"], [
-        ["Boot 4.1.2 embarque Spring Batch 6.0.6", "`spring-boot-starter-batch-jdbc`"],
+        ["Spring Boot 4.1.2 embarque Spring Batch 6.0.6", "`spring-boot-starter-batch-jdbc`"],
         ["Paquets déplacés", "`core.job.Job`, `core.job.parameters.JobParameters`, `core.step.Step`, `infrastructure.item.*`"],
         ["`JobOperator` étend `JobLauncher`", "`start`, `restart`, `stop`, `abandon`, `recover`"],
         ["`JobRepository` étend `JobExplorer`", "une seule interface pour lire et écrire les métadonnées"],
@@ -652,7 +652,7 @@ def build_module_1(d: Deck):
         col_w=[4.6, CW - 4.6], size=17, row_h=0.82)
 
     # ---- 1.3 Le projet ---------------------------------------------------------------------
-    s = d.slide("Dépendances Maven : Boot 4.1.2, Spring Batch 6.0.6, PostgreSQL",
+    s = d.slide("Dépendances Maven : Spring Boot 4.1.2, Spring Batch 6.0.6, PostgreSQL",
                 "Source : M1 §2.1 (remplace PPT n°20). Le parent Boot fixe les versions : aucune version de "
                 "Spring Batch à écrire à la main.")
     pom = """<parent>

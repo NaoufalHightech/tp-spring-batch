@@ -431,10 +431,10 @@ SCENES[6] = mk({
     ch({ id: 'L091', w: 'métier' }, 480, 930, 'mon métier → en haut', g, { size: 28, b: 'L094' }), ch({ id: 'L091', w: 'moteur' }, 1400, 930, 'le moteur : je ne le réécris pas', b, { size: 28, b: 'L094' }),
     ln('L094', 250, 290, 1700, 290, d, { lw: 4 }),
     ch({ id: 'L095', w: 'deux mille huit' }, 300, 230, '1.x · 2008 · XML', d, { size: 24 }), ch({ id: 'L095', w: 'Java' }, 590, 230, '2.x · 3.x', d, { size: 24 }),
-    ch({ id: 'L095', w: 'Quatre' }, 860, 230, '4.x · Spring 5', d, { size: 24 }), ch({ id: 'L095', w: 'Cinq' }, 1130, 230, '5.x · Spring 6', g, { size: 24 }), ch({ id: 'L097', w: 'six' }, 1500, 230, '6.x · Boot 4', y, { size: 28 }),
+    ch({ id: 'L095', w: 'Quatre' }, 860, 230, '4.x · Spring 5', d, { size: 24 }), ch({ id: 'L095', w: 'Cinq' }, 1130, 230, '5.x · Spring 6', g, { size: 24 }), ch({ id: 'L097', w: 'six' }, 1500, 230, '6.x · Spring Boot 4', y, { size: 28 }),
     ch({ id: 'L096', w: 'exige' }, 1130, 340, 'base de données obligatoire', g, { size: 24 }),
     tb('L097', 150, 420, [700, 920], ['Nouveauté (6.0.6)', 'Conséquence'], [
-      { a: { id: 'L098', w: 'quatre point un' }, cells: ['Boot 4.1.2 embarque Spring Batch 6.0.6', 'spring-boot-starter-batch-jdbc'], c: b },
+      { a: { id: 'L098', w: 'quatre point un' }, cells: ['Spring Boot 4.1.2 embarque Spring Batch 6.0.6', 'spring-boot-starter-batch-jdbc'], c: b },
       { a: { id: 'L099', w: 'paquets' }, cells: ['Paquets déplacés', 'core.job.Job · core.step.Step · infrastructure.item.*'], c: r },
       { a: { id: 'L101', w: 'JobOperator' }, cells: ['JobOperator étend JobLauncher', 'start · restart · stop · abandon · recover'], c: g },
       { a: { id: 'L102', w: 'JobRepository' }, cells: ['JobRepository étend JobExplorer', 'une seule interface : lire et écrire'], c: g },
