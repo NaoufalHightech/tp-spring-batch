@@ -127,7 +127,7 @@ Step loadBankMtStep(JobRepository jobRepository, PlatformTransactionManager tx,
 ```
 
 1. Un exécuteur asynchrone avec un **préfixe de nom de thread** : indispensable pour lire les journaux.
-2. **Plafond de 4 chunks simultanés.** Sans limite, un `SimpleAsyncTaskExecutor` crée un thread **par tâche**, sans recyclage : à proscrire en production tel quel.
+2. **Plafond de 4 chunks simultanés** (`setConcurrencyLimit`, *à confirmer en Spring Framework 7*). Sans limite, un `SimpleAsyncTaskExecutor` crée un thread **par tâche**, sans recyclage : à proscrire en production tel quel.
 3. Même chunk qu'au Module 3. **Chaque chunk, dans son thread, a sa propre transaction.**
 4. Le reader doit être **thread-safe** : un reader paginé l'est ; un reader de fichier ou un curseur ne l'est pas (§3.4).
 5. En version 6, `taskExecutor(...)` du builder de chunk attend un **`AsyncTaskExecutor`** (le `TaskExecutor` simple de la version 4 ne suffit plus).
@@ -464,6 +464,8 @@ Quand cela arrive-t-il **en pratique** ? Quand **deux processus modifient la mê
 **Une partition n'est qu'un `ExecutionContext`** : un petit dictionnaire (`minId`, `maxId`) qui est **stocké en base**. L'ouvrier le lit avec `#{stepExecutionContext['minId']}` (§2.3). C'est tout le « protocole » entre le maître et l'ouvrier.
 
 ### 3.3 Le partitionnement et la reprise
+
+> *Basé sur la documentation et sur la lecture du code de découpage des partitions ; à tester sur votre version avant de s'y fier.*
 
 Au `restart` du job, le découpeur **consulte la dernière exécution** du step maître (`getLastStepExecution`) :
 - les partitions **déjà terminées** ne sont **pas rejouées** (sauf `allowStartIfComplete`) ;
