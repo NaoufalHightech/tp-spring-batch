@@ -91,7 +91,7 @@ PLAN = [
     ("Cas d'usage techniques","tableau","PPT n°7"),
     ("Principes d'un bon batch","tableau","PPT n°8"),
     ("Stratégies de traitement : du plus simple au plus complexe","schéma","PPT n°9"),
-    ("Trois questions de production : trace, verrou, reprise","tableau","M1 §1.1 · nouveau S02"),
+    ("Trois questions de production : trace, verrou, reprise","tableau","M1 §1.1"),
     ("La nuit interrompue : crash à 3 h 12, reprise au matin","schéma","M1 §4.1 · nouveau S04")]),
   ("1.2 Le vocabulaire en un schéma",[
     ("Job, JobInstance, JobExecution","schéma","PPT n°14 · Doc officielle « Job Hierarchy With Steps »"),
@@ -335,7 +335,7 @@ PLAN = [
   ("8.1 Les trois piliers et le récapitulatif de la version 6",[
     ("Les trois piliers : tests, monitoring, déploiement","schéma","M8 §1.1 · nouveau S34"),
     ("Spring Batch 6 : ce qui change, module par module","tableau","remplace PPT n°64, 59 + M8 §1.2"),
-    ("La nuit d'un batch : CronJob, pod, job, métriques, alerte","schéma","M8 §1.1 · nouveau S33")]),
+    ]),
   ("8.2 Tester un job et un step",[
     ("Tester un job et un step : `JobOperatorTestUtils`","code","remplace PPT n°46 + M8 §2.1"),
     ("Tester un composant `@StepScope`","code","M8 §2.1"),
@@ -387,7 +387,6 @@ BACK = [
 
 CUSTOM = {  # id: (module, titre, priorité VISUELS ou —, description)
  "S01":("1","ERD des 6 tables BATCH_* avec les colonnes `version`","#12","entité-relation annoté PostgreSQL ; `version` en évidence"),
- "S02":("1","Les trois questions de production","—","tableau en 3 icônes (intégré à la diapositive « Trois questions »)"),
  "S03":("1","Séquence du verrouillage optimiste (serveurs A et B)","#5","`UPDATE … WHERE version = ?` : 1 ligne puis 0 ligne ; version en rouge"),
  "S04":("1","La nuit interrompue : crash à 3 h 12 et reprise","—","frise temporelle (cas d'usage M1 §4.1)"),
  "S05":("2","Tasklet contre chunk","—","deux colonnes : une action, une boucle lire-traiter-écrire"),
@@ -418,7 +417,6 @@ CUSTOM = {  # id: (module, titre, priorité VISUELS ou —, description)
  "S30":("7","Livraison en double et `OptimisticLockingFailureException`","—","deux workers sur la même partition"),
  "S31":("7","Quel reader est thread-safe ?","—","tableau en pastilles vertes et rouges"),
  "S32":("7","Débit contre nombre de threads","—","courbe qui plafonne quand l'I/O sature"),
- "S33":("8","Frise de la nuit d'un batch","—","CronJob → pod → job → métriques → alerte, modules 1 à 7 placés"),
  "S34":("8","Les trois piliers","—","tests / monitoring / déploiement"),
  "S35":("8","Récapitulatif : les 8 modules et leur piège phare","—","carte de la formation"),
  "S36":("8","Machine à états Kubernetes d'un batch","—","⭐ `restartPolicy`, `backoffLimit`, `activeDeadlineSeconds`"),
@@ -488,9 +486,9 @@ def esc(s): return s.replace("|","\\|")
 out=[]
 A=out.append
 A("# Plan du PPT final (Phase 1)\n")
-A("> **Statut :** plan à valider avant la Phase 2 (animations). Aucune diapositive n'est encore produite.")
+A("> **Statut :** plan **validé**. Les décisions sont en §7. La production du PPT se fait module par module avec `pptx/generate_pptx.py` (Module 1 en premier).")
 A("> **Sources :** `MODULE_1.md` à `MODULE_8.md` (+ `MODULE_3B_READERS.md`), `support/modules/VISUELS.md`, `REVUE_CROISEE.md` §7.3, `pptx/Spring_Batch_cours_complet.pptx` (69 diapositives, Spring Batch 5.1).")
-A("> **Remarque sur le format :** la consigne « Format proposé pour chaque module : » était coupée dans le message ; le format ci-dessous est donc **une proposition** (§1). Il se corrige sans refaire le plan.\n")
+A("> **Format :** table `N° | Sous-vidéo | Titre | Type | Source` par module (§1).\n")
 
 # bilan rapide
 cnt_status=collections.Counter(v[1] for v in INV.values())
@@ -501,7 +499,7 @@ A("|---|---|")
 A(f"| Diapositives du PPT d'origine | **69** : {cnt_status[G]} à garder · {cnt_status[M]} à mettre à jour · {cnt_status[R]} à remplacer · {cnt_status[S]} à supprimer |")
 A(f"| Diapositives du **nouveau PPT** | **{tot}** (parcours Essentiel : **{sum(1 for s in slides if s[0] in ('0','1','2','3','4','5','6','9'))}**, parcours Complet : **{tot}**) |")
 A(f"| Origine des diapositives du nouveau PPT | {by_kind['reprise']} reprises telles quelles · {by_kind['reprise màj']} reprises mises à jour · {by_kind['remplace']} nouvelles qui remplacent une ancienne · {by_kind['conversion']} converties depuis un module · {by_kind['nouveau']} nouvelles (séparateurs, introduction) |")
-A(f"| Schémas personnalisés à créer | **{len(CUSTOM)}** (S01 à S38, voir §4) ; 6 schémas officiels à insérer (§5) |")
+A(f"| Schémas personnalisés à créer | **{len(CUSTOM)}** (S01 à S38 sauf S02 et S33, retirés ; voir §4) ; 6 schémas officiels à insérer (§5) |")
 A("| Diapositives sans équivalent dans l'original | tout ce qui concerne : verrouillage optimiste, `@EnableJdbcJobRepository`, `SKIP LOCKED`, remote chunking, Micrometer, JFR, Kubernetes |")
 A("")
 A("## 1. Conventions\n")
@@ -598,17 +596,65 @@ ess=len(FRONT)+len(BACK)+sum(per_module[m][2] for m in ('1','2','3','4','5','6')
 A(f"| **Total** | **{tot}** | 1–{tot} | 504 min | {504/tot:.1f} | Essentiel : {ess} diapositives · Complet : {tot} |")
 A("")
 A("**Intégrité (contrôle automatique) :** chaque diapositive d'origine marquée « garder », « mettre à jour » ou « remplacer » figure dans le nouveau plan avec la notation correspondante ; aucune diapositive « supprimer » n'y figure ; chaque schéma `Sxx` cité est défini et chaque schéma défini est cité au moins une fois.\n")
-A("## 7. Points ouverts pour validation\n")
-A("| # | Question | Proposition |")
+A("## 7. Décisions validées\n")
+A("| # | Point | Décision |")
 A("|---|---|---|")
-A("| 1 | **Volume** : le nouveau PPT compte " + str(tot) + " diapositives (≈ " + f"{504/tot:.1f}" + " min chacune), contre 69 pour l'original. Convient-il ? | oui : les modules sont de 40 à 73 min, avec code construit ligne par ligne |")
-A("| 2 | **Format du plan** : message coupé ; le format de §1 convient-il ? | à confirmer ; ajouter une colonne « Animation (Phase 2) » si besoin |")
-A("| 3 | **Diapositive n°25 (XML)** : supprimer ou annexe ? | supprimer ; une annexe XML peut venir après le TP |")
-A("| 4 | **Diapositive n°10** (verrouillage logique) : Module 7 plutôt que Module 1 ? | Module 7 (verrouillage et partitionnement) |")
-A("| 5 | **Séparateurs** : un par module, avec le badge de parcours ? | oui |")
-A("| 6 | **Schémas officiels « à confirmer »** : qui relève les titres exacts sur la documentation en ligne ? | l'équipe, avant la Phase 2 |")
-A("| 7 | **Le nouveau TP** (dernier) : les diapositives de TP sont-elles à prévoir dans ce PPT ? | un seul emplacement réservé en clôture |")
+A("| 1 | Volume du nouveau PPT | **validé** : support de cours dense (≈ 25 diapositives par heure) |")
+A("| 2 | Diapositive n°25 (XML) | **supprimée** (configuration XML dépréciée, suppression prévue en v7) |")
+A("| 3 | Diapositive n°10 (verrouillage logique) | **déplacée vers le Module 7** (concept multi-instance) |")
+A("| 4 | TP fil rouge | **un seul emplacement**, en clôture |")
+A("| 5 | Module 1 dense (31 diapositives) | **validé** : module d'introduction |")
+A("| 6 | Schémas S02 et S33 | **retirés** (orphelins, non nécessaires) ; la diapositive « Trois questions de production » reste, sans schéma dédié |")
+A("| 7 | Titres de schémas officiels « à confirmer » | **validé** : vérification à l'insertion |")
 A("")
 open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','..','PPT_PLAN.md'),'w').write("\n".join(out))
+
+APPROACH = {  # S -> (approche, état)
+ "S01":("Manim","placeholder dans M1 (bandeau sous le tableau)"),"S03":("Manim","placeholder dans M1"),"S04":("natif python-pptx","**réalisé** nativement dans M1 (4 boîtes)"),
+ "S05":("natif python-pptx","à faire (M2)"),"S06":("Manim","à faire (animé en 4 temps)"),"S07":("natif python-pptx","à faire (M2)"),
+ "S08":("Manim","à faire"),"S09":("natif python-pptx","à faire (M3)"),"S10":("Manim","à faire"),"S11":("Manim","à faire"),"S12":("Manim","à faire"),"S13":("Manim","à faire"),
+ "S14":("natif python-pptx","à faire (M4)"),"S15":("Manim","à faire : priorité n°1"),"S16":("Manim","à faire"),"S17":("natif python-pptx","à faire (tableau coloré)"),
+ "S18":("natif python-pptx","à faire (M5)"),"S19":("Manim","à faire : priorité"),"S20":("Manim","à faire"),"S21":("natif python-pptx","à faire"),
+ "S22":("natif python-pptx","à faire (M6)"),"S23":("Manim","à faire : priorité"),"S24":("Manim","à faire"),"S25":("Manim","à faire"),
+ "S26":("Manim","à faire"),"S27":("natif python-pptx","à faire (M7)"),"S28":("Manim","à faire : priorité"),"S29":("natif python-pptx","à faire"),
+ "S30":("natif python-pptx","à faire"),"S31":("natif python-pptx","à faire (tableau)"),"S32":("Manim","à faire"),
+ "S34":("natif python-pptx","à faire (M8)"),"S35":("Manim","à faire"),"S36":("Manim","à faire : priorité"),"S37":("Manim","à faire"),"S38":("Manim","à faire"),
+}
+B=[]; Bp=B.append
+Bp("# Schémas à créer\n")
+Bp("> Généré avec `PPT_PLAN.md` par `pptx/plan_tools/gen_plan.py`. Règle de `pptx/generate_pptx.py` : un schéma **personnalisé** de **plus de 5 formes** devient un **placeholder** (rectangle en pointillés) dans le PPT ; il est à créer en **Manim**.")
+Bp("> Un schéma de **5 formes ou moins** est dessiné nativement (`python-pptx`).\n")
+Bp("## 1. Schémas personnalisés S01 à S38\n")
+Bp("S02 et S33 sont **retirés** (décision validée).\n")
+Bp("| Id | Module | Schéma | Approche | État | Description | Diapositive(s) du plan |")
+Bp("|---|---|---|---|---|---|---|")
+for sid,(mod,t,prio,desc) in CUSTOM.items():
+    ap,et=APPROACH[sid]
+    where=", ".join(f"n°{x}" for x in pos.get(sid,[]))
+    Bp(f"| {sid} | {mod} | {esc(t)} | {ap} | {et} | {esc(desc)} | {where} |")
+Bp("")
+Bp("## 2. Schémas officiels à insérer (titres vérifiés)\n")
+Bp("L'insertion d'images officielles est manuelle : le script place une légende « Schéma officiel à insérer » sur les diapositives concernées.\n")
+Bp("| Titre officiel | Page | Où l'insérer |")
+Bp("|---|---|---|")
+for t,pg,w in OFFICIAL: Bp(f"| « {t} » | {pg} | {w} |")
+Bp("")
+Bp("## 3. Schémas du PPT d'origine\n")
+Bp("Le PPT d'origine **ne contient aucune image** (0 balise `p:pic`, dossier média vide) : tous ses schémas sont des **formes natives**. L'extraction d'images est donc impossible (voir `pptx/assets/EXTRACTION.md`). Les schémas d'origine **simples** (jusqu'à 8 formes) sont redessinés nativement dans le script ; les autres sont des placeholders listés ici.\n")
+Bp("| Diapositive d'origine | Schéma | Traitement dans le nouveau PPT |")
+Bp("|---|---|---|")
+Bp("| n°4 | lire, traiter, écrire | **redessiné** nativement (Module 1) |")
+Bp("| n°9 | cinq stratégies | **redessiné** nativement (Module 1) |")
+Bp("| n°12 | trois couches | **redessiné** nativement (Module 1) |")
+Bp("| n°13 | schéma de référence (6 formes) | **redessiné** nativement (Module 1) |")
+Bp("| n°14 | Job, JobInstance, JobExecution | **redessiné** nativement + légende du schéma officiel (Module 1) |")
+Bp("| n°27, 28, 29, 38, 39, 40, 41, 58 | tasklet/chunk, chunk, algorithme, flux, decider, split, partitions, double comptage | **à redessiner** dans les modules concernés (M2, M3, M5, M7, M4) |")
+Bp("")
+Bp("## 4. Placeholders présents dans le Module 1\n")
+Bp("| Diapositive du plan | Placeholder | Contenu à créer |")
+Bp("|---|---|---|")
+Bp(f"| n°{pos['S01'][0]} | S01 | ERD des 6 tables `BATCH_*` avec les colonnes `version` en évidence |")
+Bp(f"| n°{pos['S03'][0]} | S03 | séquence A / B / base du verrouillage optimiste |")
+open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','..','ASSETS_A_CREER.md'),'w').write("\n".join(B)+"\n")
 print("PPT_PLAN.md écrit :",len(slides),"diapositives;",collections.Counter(v[1] for v in INV.values()))
 for mid,(a,b,c,p,mi) in per_module.items(): print(mid,c,f"{mi/c:.1f} min/diapo")

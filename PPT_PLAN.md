@@ -1,17 +1,17 @@
 # Plan du PPT final (Phase 1)
 
-> **Statut :** plan à valider avant la Phase 2 (animations). Aucune diapositive n'est encore produite.
+> **Statut :** plan **validé**. Les décisions sont en §7. La production du PPT se fait module par module avec `pptx/generate_pptx.py` (Module 1 en premier).
 > **Sources :** `MODULE_1.md` à `MODULE_8.md` (+ `MODULE_3B_READERS.md`), `support/modules/VISUELS.md`, `REVUE_CROISEE.md` §7.3, `pptx/Spring_Batch_cours_complet.pptx` (69 diapositives, Spring Batch 5.1).
-> **Remarque sur le format :** la consigne « Format proposé pour chaque module : » était coupée dans le message ; le format ci-dessous est donc **une proposition** (§1). Il se corrige sans refaire le plan.
+> **Format :** table `N° | Sous-vidéo | Titre | Type | Source` par module (§1).
 
 ## 0. Synthèse
 
 | | |
 |---|---|
 | Diapositives du PPT d'origine | **69** : 15 à garder · 28 à mettre à jour · 24 à remplacer · 2 à supprimer |
-| Diapositives du **nouveau PPT** | **214** (parcours Essentiel : **141**, parcours Complet : **214**) |
-| Origine des diapositives du nouveau PPT | 15 reprises telles quelles · 28 reprises mises à jour · 14 nouvelles qui remplacent une ancienne · 147 converties depuis un module · 10 nouvelles (séparateurs, introduction) |
-| Schémas personnalisés à créer | **38** (S01 à S38, voir §4) ; 6 schémas officiels à insérer (§5) |
+| Diapositives du **nouveau PPT** | **213** (parcours Essentiel : **141**, parcours Complet : **213**) |
+| Origine des diapositives du nouveau PPT | 15 reprises telles quelles · 28 reprises mises à jour · 14 nouvelles qui remplacent une ancienne · 146 converties depuis un module · 10 nouvelles (séparateurs, introduction) |
+| Schémas personnalisés à créer | **36** (S01 à S38 sauf S02 et S33, retirés ; voir §4) ; 6 schémas officiels à insérer (§5) |
 | Diapositives sans équivalent dans l'original | tout ce qui concerne : verrouillage optimiste, `@EnableJdbcJobRepository`, `SKIP LOCKED`, remote chunking, Micrometer, JFR, Kubernetes |
 
 ## 1. Conventions
@@ -152,7 +152,7 @@ Sous-vidéos : **1.1** Pourquoi un batch de production ? · **1.2** Le vocabulai
 | 8 | 1.1 | Cas d'usage techniques | tableau | PPT n°7 |
 | 9 | 1.1 | Principes d'un bon batch | tableau | PPT n°8 |
 | 10 | 1.1 | Stratégies de traitement : du plus simple au plus complexe | schéma | PPT n°9 |
-| 11 | 1.1 | Trois questions de production : trace, verrou, reprise | tableau | M1 §1.1 · nouveau S02 |
+| 11 | 1.1 | Trois questions de production : trace, verrou, reprise | tableau | M1 §1.1 |
 | 12 | 1.1 | La nuit interrompue : crash à 3 h 12, reprise au matin | schéma | M1 §4.1 · nouveau S04 |
 | 13 | 1.2 | Job, JobInstance, JobExecution | schéma | PPT n°14 · Doc officielle « Job Hierarchy With Steps » |
 | 14 | 1.2 | JobInstance = Job + paramètres identifiants | schéma | PPT n°15 · Doc officielle « Job Parameters » |
@@ -389,7 +389,7 @@ Sous-vidéos : **7.1** Mesurer avant d'optimiser ; pourquoi passer à l'échelle
 
 ### Module 8 · Production : tests, monitoring, déploiement, cloud
 
-*Parcours : Complet : Optionnel / Avancé · durée visée : 73 min · 29 diapositives*
+*Parcours : Complet : Optionnel / Avancé · durée visée : 73 min · 28 diapositives*
 
 Sous-vidéos : **8.1** Les trois piliers et le récapitulatif de la version 6 · **8.2** Tester un job et un step · **8.3** Le test de contenu : le piège récurrent · **8.4** Les métriques : celles du framework et les vôtres · **8.5** JFR et journaux structurés · **8.6** Un batch cloud native : les douze facteurs · **8.7** Lancer sans bloquer en production · **8.8** Kubernetes : `Job`, `CronJob`, reprise · **8.9** Spring Cloud Data Flow et Spring Cloud Task · **8.10** Top 10 et bilan de la formation
 
@@ -398,41 +398,40 @@ Sous-vidéos : **8.1** Les trois piliers et le récapitulatif de la version 6 ·
 | 182 | — | Module 8 · Production (optionnel) | section | nouveau (gabarit PPT n°60) |
 | 183 | 8.1 | Les trois piliers : tests, monitoring, déploiement | schéma | M8 §1.1 · nouveau S34 |
 | 184 | 8.1 | Spring Batch 6 : ce qui change, module par module | tableau | remplace PPT n°64, 59 + M8 §1.2 |
-| 185 | 8.1 | La nuit d'un batch : CronJob, pod, job, métriques, alerte | schéma | M8 §1.1 · nouveau S33 |
-| 186 | 8.2 | Tester un job et un step : `JobOperatorTestUtils` | code | remplace PPT n°46 + M8 §2.1 |
-| 187 | 8.2 | Tester un composant `@StepScope` | code | M8 §2.1 |
-| 188 | 8.2 | Comment `@SpringBatchTest` fonctionne | texte | M8 §3.1 |
-| 189 | 8.3 | Les valeurs, un total, les exclusions, deux lancements | code | M8 §2.2 |
-| 190 | 8.4 | Les métriques de Spring Batch avec Micrometer | tableau | M8 §2.3 |
-| 191 | 8.4 | Des compteurs et des timers métier | code | M8 §2.3 |
-| 192 | 8.4 | Pull ou push : un job de 20 secondes | schéma | M8 §2.3 · nouveau S38 |
-| 193 | 8.5 | Les événements JFR de Spring Batch | schéma | M8 §3.2 · nouveau S37 |
-| 194 | 8.5 | Des journaux structurés : MDC et paires clé-valeur | code | M8 §2.4 |
-| 195 | 8.6 | Les douze facteurs appliqués au batch | tableau | M8 §1.3 |
-| 196 | 8.7 | Exécuteur applicatif ou `TaskExecutorJobOperator` | tableau | M8 §2.7 |
-| 197 | 8.7 | Configuration d'un lanceur asynchrone | code | M8 §2.7 |
-| 198 | 8.8 | `Job` ou `CronJob` ? | tableau | M8 §1.5 |
-| 199 | 8.8 | Un `CronJob` ligne par ligne | code | M8 §2.5 |
-| 200 | 8.8 | Comment Kubernetes gère un batch | schéma | M8 §3.5 · nouveau S36 |
-| 201 | 8.8 | Lancer et superviser | schéma | PPT n°48 (màj) |
-| 202 | 8.9 | Quand utiliser Data Flow et Spring Cloud Task ? | tableau | M8 §1.4 |
-| 203 | 8.9 | Enregistrer, définir, lancer, superviser | code | M8 §2.6 |
-| 204 | 8.10 | Top 10 des pièges (1/2) | tableau | M8 §5 |
-| 205 | 8.10 | Top 10 des pièges (2/2) | tableau | M8 §5 |
-| 206 | 8.10 | Les sept modules en une page | récapitulatif | M8 §1.6 · nouveau S35 |
-| 207 | 8.10 | Bonnes pratiques (1/2) | tableau | PPT n°61 (màj) |
-| 208 | 8.10 | Bonnes pratiques (2/2) | tableau | PPT n°62 (màj) |
-| 209 | 8.10 | Questions d'entretien | tableau | PPT n°66 (màj) |
-| 210 | 8.10 | Exercices du Module 8 | texte | M8 §7 |
+| 185 | 8.2 | Tester un job et un step : `JobOperatorTestUtils` | code | remplace PPT n°46 + M8 §2.1 |
+| 186 | 8.2 | Tester un composant `@StepScope` | code | M8 §2.1 |
+| 187 | 8.2 | Comment `@SpringBatchTest` fonctionne | texte | M8 §3.1 |
+| 188 | 8.3 | Les valeurs, un total, les exclusions, deux lancements | code | M8 §2.2 |
+| 189 | 8.4 | Les métriques de Spring Batch avec Micrometer | tableau | M8 §2.3 |
+| 190 | 8.4 | Des compteurs et des timers métier | code | M8 §2.3 |
+| 191 | 8.4 | Pull ou push : un job de 20 secondes | schéma | M8 §2.3 · nouveau S38 |
+| 192 | 8.5 | Les événements JFR de Spring Batch | schéma | M8 §3.2 · nouveau S37 |
+| 193 | 8.5 | Des journaux structurés : MDC et paires clé-valeur | code | M8 §2.4 |
+| 194 | 8.6 | Les douze facteurs appliqués au batch | tableau | M8 §1.3 |
+| 195 | 8.7 | Exécuteur applicatif ou `TaskExecutorJobOperator` | tableau | M8 §2.7 |
+| 196 | 8.7 | Configuration d'un lanceur asynchrone | code | M8 §2.7 |
+| 197 | 8.8 | `Job` ou `CronJob` ? | tableau | M8 §1.5 |
+| 198 | 8.8 | Un `CronJob` ligne par ligne | code | M8 §2.5 |
+| 199 | 8.8 | Comment Kubernetes gère un batch | schéma | M8 §3.5 · nouveau S36 |
+| 200 | 8.8 | Lancer et superviser | schéma | PPT n°48 (màj) |
+| 201 | 8.9 | Quand utiliser Data Flow et Spring Cloud Task ? | tableau | M8 §1.4 |
+| 202 | 8.9 | Enregistrer, définir, lancer, superviser | code | M8 §2.6 |
+| 203 | 8.10 | Top 10 des pièges (1/2) | tableau | M8 §5 |
+| 204 | 8.10 | Top 10 des pièges (2/2) | tableau | M8 §5 |
+| 205 | 8.10 | Les sept modules en une page | récapitulatif | M8 §1.6 · nouveau S35 |
+| 206 | 8.10 | Bonnes pratiques (1/2) | tableau | PPT n°61 (màj) |
+| 207 | 8.10 | Bonnes pratiques (2/2) | tableau | PPT n°62 (màj) |
+| 208 | 8.10 | Questions d'entretien | tableau | PPT n°66 (màj) |
+| 209 | 8.10 | Exercices du Module 8 | texte | M8 §7 |
 
 ### Clôture et annexes
 
 | N° | Titre de la diapositive | Type | Source |
 |---|---|---|---|
-| 211 | Ce qu'il faut retenir | récapitulatif | remplace PPT n°68 + M8 §1.6 |
-| 212 | Annexe : migrer de Spring Batch 5 à 6 | tableau | PPT n°65 (màj) |
-| 213 | Le TP fil rouge (nouvelle pile) | texte | remplace PPT n°67 : nouveau TP à venir |
-| 214 | À toi de jouer | texte | PPT n°69 (màj) |
+| 210 | Ce qu'il faut retenir | récapitulatif | remplace PPT n°68 + M8 §1.6 |
+| 211 | Annexe : migrer de Spring Batch 5 à 6 | tableau | PPT n°65 (màj) |
+| 212 | Le TP fil rouge (nouvelle pile) | texte | remplace PPT n°67 : nouveau TP à venir |
+| 213 | À toi de jouer | texte | PPT n°69 (màj) |
 
 ## 4. Schémas personnalisés à créer
 
@@ -441,7 +440,6 @@ La colonne « Prio. » renvoie à la priorité de `VISUELS.md` §3 ; ⭐ = sché
 | Id | Module | Schéma | Prio. | Description | Diapositive(s) du plan |
 |---|---|---|---|---|---|
 | S01 | 1 | ERD des 6 tables BATCH_* avec les colonnes `version` | #12 | entité-relation annoté PostgreSQL ; `version` en évidence | n°26 |
-| S02 | 1 | Les trois questions de production | — | tableau en 3 icônes (intégré à la diapositive « Trois questions ») | n°11 |
 | S03 | 1 | Séquence du verrouillage optimiste (serveurs A et B) | #5 | `UPDATE … WHERE version = ?` : 1 ligne puis 0 ligne ; version en rouge | n°28 |
 | S04 | 1 | La nuit interrompue : crash à 3 h 12 et reprise | — | frise temporelle (cas d'usage M1 §4.1) | n°12 |
 | S05 | 2 | Tasklet contre chunk | — | deux colonnes : une action, une boucle lire-traiter-écrire | n°37 |
@@ -472,12 +470,11 @@ La colonne « Prio. » renvoie à la priorité de `VISUELS.md` §3 ; ⭐ = sché
 | S30 | 7 | Livraison en double et `OptimisticLockingFailureException` | — | deux workers sur la même partition | n°177 |
 | S31 | 7 | Quel reader est thread-safe ? | — | tableau en pastilles vertes et rouges | n°163 |
 | S32 | 7 | Débit contre nombre de threads | — | courbe qui plafonne quand l'I/O sature | n°178 |
-| S33 | 8 | Frise de la nuit d'un batch | — | CronJob → pod → job → métriques → alerte, modules 1 à 7 placés | n°185 |
 | S34 | 8 | Les trois piliers | — | tests / monitoring / déploiement | n°183 |
-| S35 | 8 | Récapitulatif : les 8 modules et leur piège phare | — | carte de la formation | n°206 |
-| S36 | 8 | Machine à états Kubernetes d'un batch | — | ⭐ `restartPolicy`, `backoffLimit`, `activeDeadlineSeconds` | n°200 |
-| S37 | 8 | Événements JFR sur le déroulé d'un chunk et d'un partitionnement | — | 11 événements placés sur le schéma | n°193 |
-| S38 | 8 | Pull contre push des métriques | — | job de 20 secondes, scrape de 30 secondes | n°192 |
+| S35 | 8 | Récapitulatif : les 8 modules et leur piège phare | — | carte de la formation | n°205 |
+| S36 | 8 | Machine à états Kubernetes d'un batch | — | ⭐ `restartPolicy`, `backoffLimit`, `activeDeadlineSeconds` | n°199 |
+| S37 | 8 | Événements JFR sur le déroulé d'un chunk et d'un partitionnement | — | 11 événements placés sur le schéma | n°192 |
+| S38 | 8 | Pull contre push des métriques | — | job de 20 secondes, scrape de 30 secondes | n°191 |
 
 ## 5. Schémas officiels à insérer
 
@@ -504,20 +501,20 @@ Titres **vérifiés** (extrait de documentation fourni). Les autres schémas off
 | 5 · Flux et orchestration | 20 | 116–135 | 55 min | 2.8 | Essentiel |
 | 6 · Fiabilité : skip, retry, restart, arrêt gracieux | 19 | 136–154 | 60 min | 3.2 | Essentiel |
 | 7 · Mise à l'échelle et multi-instance | 27 | 155–181 | 70 min | 2.6 | Complet : Optionnel / Avancé |
-| 8 · Production : tests, monitoring, déploiement, cloud | 29 | 182–210 | 73 min | 2.5 | Complet : Optionnel / Avancé |
+| 8 · Production : tests, monitoring, déploiement, cloud | 28 | 182–209 | 73 min | 2.6 | Complet : Optionnel / Avancé |
 | Ouverture et clôture | 7 | | | | |
-| **Total** | **214** | 1–214 | 504 min | 2.4 | Essentiel : 141 diapositives · Complet : 214 |
+| **Total** | **213** | 1–213 | 504 min | 2.4 | Essentiel : 141 diapositives · Complet : 213 |
 
 **Intégrité (contrôle automatique) :** chaque diapositive d'origine marquée « garder », « mettre à jour » ou « remplacer » figure dans le nouveau plan avec la notation correspondante ; aucune diapositive « supprimer » n'y figure ; chaque schéma `Sxx` cité est défini et chaque schéma défini est cité au moins une fois.
 
-## 7. Points ouverts pour validation
+## 7. Décisions validées
 
-| # | Question | Proposition |
+| # | Point | Décision |
 |---|---|---|
-| 1 | **Volume** : le nouveau PPT compte 214 diapositives (≈ 2.4 min chacune), contre 69 pour l'original. Convient-il ? | oui : les modules sont de 40 à 73 min, avec code construit ligne par ligne |
-| 2 | **Format du plan** : message coupé ; le format de §1 convient-il ? | à confirmer ; ajouter une colonne « Animation (Phase 2) » si besoin |
-| 3 | **Diapositive n°25 (XML)** : supprimer ou annexe ? | supprimer ; une annexe XML peut venir après le TP |
-| 4 | **Diapositive n°10** (verrouillage logique) : Module 7 plutôt que Module 1 ? | Module 7 (verrouillage et partitionnement) |
-| 5 | **Séparateurs** : un par module, avec le badge de parcours ? | oui |
-| 6 | **Schémas officiels « à confirmer »** : qui relève les titres exacts sur la documentation en ligne ? | l'équipe, avant la Phase 2 |
-| 7 | **Le nouveau TP** (dernier) : les diapositives de TP sont-elles à prévoir dans ce PPT ? | un seul emplacement réservé en clôture |
+| 1 | Volume du nouveau PPT | **validé** : support de cours dense (≈ 25 diapositives par heure) |
+| 2 | Diapositive n°25 (XML) | **supprimée** (configuration XML dépréciée, suppression prévue en v7) |
+| 3 | Diapositive n°10 (verrouillage logique) | **déplacée vers le Module 7** (concept multi-instance) |
+| 4 | TP fil rouge | **un seul emplacement**, en clôture |
+| 5 | Module 1 dense (31 diapositives) | **validé** : module d'introduction |
+| 6 | Schémas S02 et S33 | **retirés** (orphelins, non nécessaires) ; la diapositive « Trois questions de production » reste, sans schéma dédié |
+| 7 | Titres de schémas officiels « à confirmer » | **validé** : vérification à l'insertion |
