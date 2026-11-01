@@ -40,6 +40,7 @@ Les renvois d'un module du parcours Essentiel vers un module optionnel sont marq
 | Document | Contenu |
 |---|---|
 | [`REVUE_CROISEE.md`](REVUE_CROISEE.md) | cartographie des concepts, redondances, contradictions, flashbacks, références au PPT, état d'application des décisions |
+| [`PPT_PLAN.md`](PPT_PLAN.md) | plan du PPT final (Phase 1) : inventaire des 69 diapositives d'origine, 214 diapositives du nouveau PPT par module, schémas à créer ; généré et contrôlé par `pptx/plan_tools/gen_plan.py` |
 | [`support/modules/VISUELS.md`](support/modules/VISUELS.md) | méthode des « Références visuelles », schémas officiels identifiés, schémas à créer, correspondance avec les diapositives du PPT |
 
 ## Code de référence
