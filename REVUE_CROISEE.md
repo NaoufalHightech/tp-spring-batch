@@ -1,4 +1,4 @@
-# Revue croisée de la formation (Modules 1 à 8, plus 3B)
+# Revue croisée de la formation (Modules 1 à 8, dont le 3B lu entre le 3 et le 4)
 
 **Décisions validées le 1er novembre 2026.** Les 11 décisions ont été appliquées dans les modules (voir §9) ; les statuts ci-dessous sont à jour au même jour.
 
