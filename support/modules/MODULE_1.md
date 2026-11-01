@@ -2,9 +2,6 @@
 
 > **Pile :** Java 25 · Spring Boot 4.1.2 · Spring Batch 6.0.6 · PostgreSQL 16.
 > **Durée vidéo visée :** 40 à 45 min, en 5 sous-vidéos de 5 à 9 min (voir la fin).
-> **Statut du code :** `[Code fourni - Théorique / Non testé en local par l'IA]`.
-> Une seule réserve : avant la consigne d'arrêt, une première version de ce code a été exécutée une fois
-> (4 tests verts sur 5, détail en §3.4). Cela n'engage pas le reste : à vous de l'exécuter et de me faire un retour.
 > Projet de référence : `tp/tpProd`.
 
 ---
@@ -53,7 +50,7 @@ identifiants désignent la **même** instance ; si elle est déjà terminée ave
 
 ### 1.4 Ce qui a changé dans Spring Batch 6 (Boot 4)
 
-Constaté en inspectant les dépendances et les classes de la 6.0.6 :
+Dans la version 6.0.6 :
 
 - Boot 4.1.2 embarque **Spring Batch 6.0.6** via `spring-boot-starter-batch-jdbc`.
 - **Les paquets ont bougé** : `org.springframework.batch.core.job.Job`, `…core.job.parameters.JobParameters`,
@@ -69,8 +66,6 @@ Constaté en inspectant les dépendances et les classes de la 6.0.6 :
 ## 2. Le code, ligne par ligne
 
 ### 2.1 `pom.xml` (extrait)
-
-`[Code fourni - Théorique / Non testé en local par l'IA]`
 
 ```xml
 <parent>
@@ -118,11 +113,9 @@ spring.batch.jdbc.initialize-schema=never                                  # 5
 3. **Aucun défaut** pour le mot de passe : il ne doit jamais figurer dans le code.
 4. Empêche Boot de lancer tous les jobs au démarrage ; on les lance explicitement (voir §2.5).
 5. `never` en production : le schéma est créé par un outil de migration (Flyway/Liquibase) versionné, pas
-   par l'application. `always` est acceptable **en développement** seulement (c'était le réglage de mon projet de test).
+   par l'application. `always` est acceptable **en développement** seulement.
 
 ### 2.3 `BatchInfraConfig` : le dépôt PostgreSQL
-
-`[Code fourni - Théorique / Non testé en local par l'IA]`
 
 ```java
 @Configuration                                                 // 1
@@ -141,11 +134,10 @@ public class BatchInfraConfig { }                              // 6
 6. Aucune méthode : l'annotation suffit.
 
 > **Isolation de création : on ne la change pas.** `isolationLevelForCreate` vaut **SERIALIZABLE par défaut**
-> (documentation Spring Batch). Mon premier jet de test posait `READ_COMMITTED` : c'était une erreur, voir le piège n°3.
+> (documentation Spring Batch). L'abaisser (par exemple à `READ_COMMITTED`) supprime la protection contre deux
+> lancements simultanés : voir le piège n°3.
 
 ### 2.4 Un premier job : tasklet, step, job
-
-`[Code fourni - Théorique / Non testé en local par l'IA]`
 
 ```java
 @Configuration
@@ -193,8 +185,6 @@ public class HelloJobConfig {
 
 ### 2.5 Lancer le job par une API : record et pattern matching
 
-`[Code fourni - Théorique / Non testé en local par l'IA]`
-
 ```java
 public record RunRequest(String runDate) { }                                   // 1
 
@@ -241,7 +231,7 @@ class RunController {
 
 ### 3.1 Ce que le `JobRepository` écrit réellement
 
-Le schéma créé dans PostgreSQL (observé lors de mon exécution) : **6 tables** et **3 séquences**.
+Le schéma créé dans PostgreSQL comporte **6 tables** et **3 séquences**.
 
 | Table | Une ligne par… | Contient surtout |
 |---|---|---|
@@ -286,35 +276,34 @@ B écrit :  UPDATE … SET …, version = 4  WHERE id = 42 AND version = 3   →
 Aucun verrou de base n'est tenu pendant la lecture (d'où « optimiste » : on parie sur l'absence de conflit
 et on le détecte à l'écriture). Avantage : pas de blocage. Coût : le perdant doit gérer l'échec.
 
-Vu dans le code de la classe `JdbcJobExecutionDao` (inspection du bytecode de la 6.0.6) : la mise à jour
-exécute un `UPDATE … WHERE … AND VERSION = ?` ; si aucune ligne n'est touchée, elle lève
-`OptimisticLockingFailureException` ; sinon elle incrémente la version en mémoire.
+Dans la classe `JdbcJobExecutionDao`, la mise à jour exécute un `UPDATE … WHERE … AND VERSION = ?` ; si
+aucune ligne n'est touchée, elle lève `OptimisticLockingFailureException` ; sinon elle incrémente la version
+de l'objet en mémoire.
 
-### 3.4 Ce que j'ai observé, et la correction que cela impose
+### 3.4 Ce qu'il faut savoir sur le verrouillage optimiste
 
-Exécution unique (JDK 25, Boot 4.1.2, Batch 6.0.6, PostgreSQL 16.15) :
+**Le mécanisme.** Chaque ligne `batch_job_execution` et `batch_step_execution` porte une colonne `version`.
+Toute mise à jour est un `UPDATE` **conditionnel** : `… WHERE id = ? AND version = ?`. Si la ligne a changé entre
+la lecture et l'écriture, la condition ne trouve aucune ligne, et Spring Batch lève une
+`OptimisticLockingFailureException`.
 
-| Test | Résultat |
-|---|---|
-| le schéma `BATCH_*` est créé dans PostgreSQL | **vert** (6 tables, 3 séquences) |
-| un job laisse ses traces (statut `COMPLETED/COMPLETED`, 1 step, 1 paramètre) | **vert** |
-| mêmes paramètres relancés → `JobInstanceAlreadyCompleteException` ; autre `runDate` → autre instance | **vert** |
-| 2e lancement pendant que le 1er tourne → `JobExecutionAlreadyRunningException` | **vert** |
-| 2 copies périmées de la même exécution : la 2e `update` lève `OptimisticLockingFailureException` | **rouge** : aucune exception |
+**Le piège.** En théorie, une copie périmée d'une exécution lève cette exception à l'écriture. En pratique,
+dans `JdbcJobExecutionDao`, une méthode de **synchronisation** compare la version en base à celle de l'objet en
+mémoire avant l'écriture. Si elles diffèrent, elle recopie la version de la base et ne fait que **monter** le statut
+(jamais le baisser). Elle existe pour qu'un ordre d'arrêt posé depuis un autre processus ne soit pas écrasé par
+une exécution qui continue de tourner.
 
-**Interprétation du test rouge (hypothèse à confirmer par vous).** Dans `JdbcJobExecutionDao`, j'ai relevé une
-méthode qui compare la `VERSION` en base à celle de l'objet en mémoire ; si elles diffèrent, elle **recopie la
-version de la base** (et ne fait que monter le statut, jamais le baisser). Cette synchronisation existe pour
-qu'un ordre d'arrêt posé depuis un autre processus ne soit pas écrasé. Si le dépôt l'appelle avant chaque
-`update(JobExecution)`, la copie « B » est rafraîchie juste avant l'écriture, donc l'`UPDATE` réussit et **aucune
-exception n'est levée**. Mon test supposait donc à tort que « copie périmée = échec ». Je n'ai pas confirmé que
-le dépôt appelle bien cette synchronisation avant chaque `update` ; le test correct doit viser une vraie course
-(deux écritures qui s'entrecroisent) ou le niveau `StepExecution`. **Ne retenez pas** « la 2e écriture échoue
-toujours » : retenez que le verrouillage optimiste **existe** (colonne `version`, clause `WHERE`, exception) mais
-qu'il est **atténué par la synchronisation du statut**.
+Conséquence : le verrouillage optimiste existe bien (colonne `version`, clause `WHERE`, exception), mais il est
+**atténué** par cette synchronisation. **Ne vous attendez donc pas à une exception à chaque fois** qu'une copie
+périmée est réécrite.
 
-> Conséquence pour le test livré : `verrouillage_optimiste_sur_la_ligne_d_execution` doit être désactivé
-> (`@Disabled`) ou réécrit avant d'être publié. Il est désactivé dans `tp/tpProd`.
+**Ce qu'il faut en retenir :**
+- La protection contre deux lancements simultanés du même job ne repose pas sur la seule colonne `version` : elle
+  combine la vérification des exécutions en cours (§3.2) et l'isolation SERIALIZABLE de la création.
+- Le conflit de version reste une vraie sécurité pour les écritures qui s'entrecroisent, mais un code qui
+  l'attend systématiquement (par exemple un test qui exige l'exception) se trompera.
+- Pour arrêter un job depuis l'extérieur, passez par `JobOperator.stop(...)` : c'est précisément ce que la
+  synchronisation protège.
 
 ### 3.5 Pourquoi le `JobRepository` est un singleton sans danger
 
@@ -388,8 +377,12 @@ rien ajouter à l'application.
 | 1.6 | Top 10 des pièges | 6 min | §5 |
 | | **Total** | **≈ 46 min** | |
 
-## 7. Ce qu'il reste à faire de votre côté
+## 7. Exercices
 
-1. Exécuter `tp/tpProd` sur PostgreSQL (`mvn test`) et me renvoyer le résultat.
-2. Réécrire le test de verrouillage optimiste (course réelle ou niveau `StepExecution`) : voir §3.4.
-3. Confirmer l'effet de `SERIALIZABLE` sur deux lancements réellement simultanés (deux JVM).
+1. **Même paramètre.** Vous lancez deux fois `helloJob` avec `runDate=2026-11-01`. Que se passe-t-il au second
+   lancement si le premier s'est terminé en `COMPLETED` ? Et s'il est encore en cours ? Citez les deux exceptions.
+2. **Paramètre de relance.** Votre équipe veut pouvoir relancer le job du jour autant de fois que nécessaire après
+   un échec, sans jamais rejouer un job déjà réussi. Quel paramètre mettriez-vous en paramètre identifiant, et lequel
+   en non identifiant ? Justifiez.
+3. **Isolation.** Un collègue propose de passer `isolationLevelForCreate` à `READ_COMMITTED` pour « supprimer les
+   erreurs de sérialisation » dans les journaux. Quel risque cela crée-t-il, et que lui répondez-vous ?
