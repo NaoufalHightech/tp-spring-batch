@@ -58,3 +58,22 @@ Règles :
 | 6 · Fiabilité | schémas de *Configuring a Step* sur skip/retry (à repérer) | le **mode « scan »** du chunk après un échec d'écriture ; chronologie **crash puis restart** (position lue dans `batch_step_execution_context`) ; arbre de décision skip / retry / abandon ; **graceful shutdown** (`stop` puis `STOPPED`, reprise) |
 | 7 · Multi-instance | ✔ « Partitioned Process » ; pages *Scaling and Parallel Processing* (partitionnement, remote chunking) | `SKIP LOCKED` : deux instances et leurs lignes réservées ; partitionnement local contre distribué ; comparaison **remote chunking / remote partitioning** |
 | 8 · Production | schémas Micrometer/observabilité de la doc (à repérer) | architecture **Kubernetes** (job fini, `CronJob`) ; chaîne scheduler → API → `JobOperator` asynchrone ; migration **5 → 6** (avant / après) |
+
+## 5. Correspondance avec les diapositives du PPT du cours
+
+Le PPT `pptx/Spring_Batch_cours_complet.pptx` (69 diapositives) contient déjà des schémas en blocs colorés et flèches. Convention d'écriture dans les modules :
+`> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive « … » (n°…) du PPT du cours.`
+
+| Module | Diapositives réutilisables (titre, n°) |
+|---|---|
+| 1 | « Architecture en trois couches » (12), « Le schéma de référence » (13), « Job, JobInstance, JobExecution » (14), « JobInstance = Job + paramètres identifiants » (15), « Step et StepExecution » (16), « ExecutionContext et JobRepository » (17) |
+| 2 | « Premier job : la Tasklet » (22), « Configurer le Step et le Job » (23), « Lancer un job » (24), « Tasklet ou chunk ? » (27) |
+| 3 | « Le chunk : lire un par un, écrire par blocs » (28), « L'algorithme du chunk et ses interfaces » (29), « Le reader CSV » (31), « Base de données : reader et writer JDBC » (36) |
+| 3B | « Lire et écrire : les formats » (32) |
+| 4 | « Processors : transformer, filtrer, composer » (34), « Valider les données » (35), « Enchaîner deux processors : le composite » (57), « Le piège : relancer double les totaux » (58) |
+| 5 | « Enchaîner les steps » (38), « Le decider » (39), « Flows en parallèle (split) » (40) |
+| 6 | « Skip » (43), « Retry » (44), « Restart » (45), « ExecutionContext et JobRepository » (17) |
+| 7 | « Partitions : le même step, des plages différentes » (41) |
+
+> Le PPT a été construit sur **Spring Batch 5.1 / Boot 3.2.4** : ses schémas sont réutilisables, mais **le code affiché doit être remplacé** par celui des modules
+> (Spring Batch 6.0.6 : `chunk(n)` sans gestionnaire de transactions en argument, `retryPolicy(...)`, paquets `core.job.*` et `infrastructure.item.*`).
