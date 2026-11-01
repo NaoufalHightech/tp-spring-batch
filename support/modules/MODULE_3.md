@@ -1,6 +1,7 @@
 # Module 3 · Le chunk : lire, traiter, écrire
 
 > **Pile :** Java 25 · Spring Boot 4.1.2 · Spring Batch 6.0.6 · PostgreSQL 16.
+> **Parcours :** Essentiel. (Parcours *Essentiel* : modules 1 à 6 ; parcours *Complet* : tous les modules.)
 > **Durée vidéo visée :** 50 à 55 min, en 7 sous-vidéos de 5 à 9 min (voir la fin).
 > **Prérequis :** Module 1 (`ExecutionContext`, `JobRepository`), Module 2 (tasklet, `@StepScope`).
 > Projet de référence : `tp/tpProd`. Cas fil rouge : charger un fichier de transactions bancaires dans PostgreSQL.

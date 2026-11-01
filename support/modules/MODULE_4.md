@@ -1,6 +1,7 @@
 # Module 4 · Processors, scopes et proxys
 
 > **Pile :** Java 25 · Spring Boot 4.1.2 · Spring Batch 6.0.6 · PostgreSQL 16.
+> **Parcours :** Essentiel. (Parcours *Essentiel* : modules 1 à 6 ; parcours *Complet* : tous les modules.)
 > **Durée vidéo visée :** 55 à 60 min, en 7 sous-vidéos de 5 à 10 min (voir la fin).
 > **Prérequis :** Module 2 (cycle de vie des beans, singleton, `@StepScope`), Module 3 (chunk, `return null`).
 > Projet de référence : `tp/tpProd`. C'est le module du bug le plus vicieux de Spring Batch : le **double comptage**.

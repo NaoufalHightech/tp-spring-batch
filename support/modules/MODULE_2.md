@@ -1,6 +1,7 @@
 # Module 2 · Premier job et cycle de vie
 
 > **Pile :** Java 25 · Spring Boot 4.1.2 · Spring Batch 6.0.6 · PostgreSQL 16.
+> **Parcours :** Essentiel. (Parcours *Essentiel* : modules 1 à 6 ; parcours *Complet* : tous les modules.)
 > **Durée vidéo visée :** 42 à 48 min, en 6 sous-vidéos de 5 à 9 min (voir la fin).
 > **Prérequis :** Module 1 (JobRepository, JobInstance, paramètres identifiants).
 > Projet de référence : `tp/tpProd`.

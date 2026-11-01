@@ -1,6 +1,7 @@
 # Module 3 (complément) · Le catalogue des readers
 
 > **Pile :** Java 25 · Spring Boot 4.1.2 · Spring Batch 6.0.6 · PostgreSQL 16.
+> **Parcours :** Complet : **Optionnel / Avancé**. (Parcours *Essentiel* : modules 1 à 6 ; parcours *Complet* : tous les modules.)
 > **Durée vidéo visée :** 35 à 40 min, en 5 sous-vidéos de 5 à 9 min.
 > **Prérequis :** Module 3 (chunk, `ItemStream`, `ExecutionContext`).
 > **Source :** chapitre 7 (« ItemReaders ») de *The Definitive Guide to Spring Batch* de Michael T. Minella,

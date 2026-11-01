@@ -1,6 +1,7 @@
 # Module 5 · Flux et orchestration
 
 > **Pile :** Java 25 · Spring Boot 4.1.2 · Spring Batch 6.0.6 · PostgreSQL 16.
+> **Parcours :** Essentiel. (Parcours *Essentiel* : modules 1 à 6 ; parcours *Complet* : tous les modules.)
 > **Durée vidéo visée :** 50 à 55 min, en 7 sous-vidéos de 5 à 9 min (voir la fin).
 > **Prérequis :** Module 1 (`JobRepository`, statuts en base), Module 2 (singletons, scopes), Module 4 (état partagé).
 > Projet de référence : `tp/tpProd`.

@@ -1,6 +1,7 @@
 # Module 7 · Mise à l'échelle et multi-instance
 
 > **Pile :** Java 25 · Spring Boot 4.1.2 · Spring Batch 6.0.6 · PostgreSQL 16.
+> **Parcours :** Complet : **Optionnel / Avancé**. (Parcours *Essentiel* : modules 1 à 6 ; parcours *Complet* : tous les modules.)
 > **Durée vidéo visée :** 65 à 70 min, en 9 sous-vidéos de 5 à 9 min (voir la fin).
 > **Prérequis :** Module 1 (`JobRepository`, colonne `version`), Module 3 (reader, `ItemStream`), Module 4 (état partagé), Module 5 (`Split`, pools), Module 6 (restart).
 > Projet de référence : `tp/tpProd`.

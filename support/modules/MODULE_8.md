@@ -1,6 +1,7 @@
 # Module 8 · Production : tests, monitoring, déploiement et cloud
 
 > **Pile :** Java 25 · Spring Boot 4.1.2 · Spring Batch 6.0.6 · PostgreSQL 16.
+> **Parcours :** Complet : **Optionnel / Avancé**. (Parcours *Essentiel* : modules 1 à 6 ; parcours *Complet* : tous les modules.)
 > **Durée vidéo visée :** 65 à 70 min, en 9 sous-vidéos de 5 à 9 min (voir la fin).
 > **Prérequis :** tous les modules précédents : ce dernier module les rassemble.
 > Projet de référence : `tp/tpProd`.
@@ -381,6 +382,10 @@ spec:
                   valueFrom: { secretKeyRef: { name: bank-db, key: password } }
                 - name: SPRING_MAIN_WEBAPPLICATIONTYPE
                   value: "none"                                                    # 11
+                - name: SPRING_BATCH_JOB_ENABLED
+                  value: "true"                                                    # 12
+                - name: SPRING_BATCH_JOB_NAME
+                  value: "bankJob"                                                 # 13
 ```
 
 1. Horaire au format cron.
@@ -394,10 +399,14 @@ spec:
 9. Le délai accordé à l'arrêt gracieux (Module 6) : **supérieur à la durée d'un chunk**.
 10. Les secrets viennent de l'environnement (facteur *Config*) et jamais de l'image.
 11. Un batch **n'embarque pas de serveur web** : sinon le processus ne se termine pas et le `Job` n'est jamais « terminé » (piège n°6).
+12. **Le lancement automatique est réactivé ici.** Le Module 2 le désactive (`spring.batch.job.enabled=false`) pour lancer les jobs par une API ; un `Job` Kubernetes, lui, **doit** démarrer le traitement dès le démarrage du conteneur. Sans cette variable, le conteneur démarre, ne fait rien et se termine avec le code 0 : le `Job` est « réussi » sans avoir rien traité.
+13. Le nom du job à lancer, puisque l'application en contient plusieurs.
+
+> **Deux manières de déclencher un batch.** (a) **Par un conteneur dédié** (ce manifeste) : le pod exécute le job puis disparaît. (b) **Par une API** (Module 2) : un `CronJob` appelle `POST /jobs/...` sur une application qui reste vivante. La première est la plus simple pour un traitement de nuit ; la seconde convient quand l'application sert aussi d'autres usages.
 
 **Code de sortie.** Kubernetes décide d'une nouvelle tentative **d'après le code de sortie du processus**. Spring Boot fournit un générateur de code de sortie pour les jobs (`JobExecutionExitCodeGenerator`) : un job en échec doit provoquer un code **non nul**.
 
-**La reprise est automatique grâce au `JobRepository`.** Après un échec, la nouvelle tentative relance l'application **avec les mêmes paramètres** : le job reprend l'instance échouée là où elle s'était arrêtée (Modules 1, 3, 6). Selon l'API de lancement utilisée, une relance avec les mêmes paramètres reprend l'instance ou exige un `restart` explicite : *à tester sur votre version*.
+**La reprise est automatique grâce au `JobRepository`.** Après un échec, la nouvelle tentative relance l'application **avec les mêmes paramètres** : le job reprend l'instance échouée là où elle s'était arrêtée (Modules 1, 3, 6). La documentation indique que `start(...)` appelé avec les mêmes paramètres sur une instance `FAILED` effectue un **restart implicite** (et `restart(executionId)` reste disponible pour être explicite) : *à tester sur votre version*.
 
 ### 2.6 Spring Cloud Data Flow **(Théorique)**
 
@@ -575,4 +584,5 @@ Un `CronJob` démarre à 2 h. Le pod charge 5 millions de lignes, publie ses mé
 | 6 | Fiabilité | ≈ 60 min |
 | 7 | Mise à l'échelle et multi-instance | ≈ 70 min |
 | 8 | Production | ≈ 67 min |
-| | **Total** | **≈ 8 h 20** |
+| | **Total « Complet »** | **498 min ≈ 8 h 18** |
+| | dont **« Essentiel »** (modules 1 à 6) | **321 min ≈ 5 h 21** |

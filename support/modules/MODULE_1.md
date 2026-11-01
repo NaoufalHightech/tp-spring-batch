@@ -1,7 +1,8 @@
 # Module 1 · Fondations et environnement de production
 
 > **Pile :** Java 25 · Spring Boot 4.1.2 · Spring Batch 6.0.6 · PostgreSQL 16.
-> **Durée vidéo visée :** 40 à 45 min, en 5 sous-vidéos de 5 à 9 min (voir la fin).
+> **Parcours :** Essentiel. (Parcours *Essentiel* : modules 1 à 6 ; parcours *Complet* : tous les modules.)
+> **Durée vidéo visée :** 45 à 50 min, en 6 sous-vidéos de 6 à 9 min (voir la fin).
 > Projet de référence : `tp/tpProd`.
 
 ---
