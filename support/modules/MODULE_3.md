@@ -340,6 +340,8 @@ Au redémarrage (Module 6), `open(...)` relit `read.count = 200`, saute 200 él�
 
 Condition : écrire dans **la même base** que le `JobRepository` (ou gérer une transaction globale). Écrire les données dans une autre base sans transaction commune brise cette garantie.
 
+**Le réglage `saveState`.** Les readers de fichier et de base sauvegardent leur position tant que `saveState` vaut `true` (valeur par défaut). C'est ce réglage qui rend la reprise possible (Module 6). Le désactiver (`saveState(false)`) supprime toute écriture dans l'`ExecutionContext` : le reader n'a plus besoin de nom, mais un restart repart **du début**. Le Module 3B (§3.1) et le Module 7 (§2.1) expliquent le seul cas où l'on s'y résout : un step multithread.
+
 ### 3.3 Qui détient la transaction
 
 Le `PlatformTransactionManager` ouvre une transaction par chunk. Le reader, le processor et le writer s'exécutent **dans** cette transaction ; les écritures du writer et celles du `JobRepository` (compteurs, contexte) partagent la même connexion et le même commit. Une exception dans le processor ou le writer provoque un **rollback de tout le chunk** : aucune ligne des 100 n'est écrite, la position n'avance pas, et le step échoue (ou applique skip/retry, Module 6).
@@ -528,6 +530,8 @@ assertThat(jdbc.queryForObject("SELECT SUM(amount) FROM bank_transaction", BigDe
 | 3.6 | Sous le capot : `ItemStream`, `ExecutionContext`, transaction | 10 min | §3.1-3.3, §3.6 |
 | 3.7 | Top 10 des pièges et test correct | 7 min | §5, §3.5 |
 | | **Total** | **≈ 55 min** | |
+
+> *« À ce stade, vous connaissez le chunk standard (fichier CSV → PostgreSQL). Le Module 3B (optionnel) explore les readers avancés : fichiers multi-formats, control break, pagination avancée, readers custom. Si vous suivez le parcours Essentiel, passez directement au Module 4. »*
 
 ## 7. Exercices
 

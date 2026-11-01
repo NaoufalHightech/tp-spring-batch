@@ -12,9 +12,9 @@
 | Résultat | Détail |
 |---|---|
 | **Structure** | 9 fichiers sur 9 ont les 5 sections attendues (Concept, Code, Sous le capot, Cas d'usage, Pièges), exactement 10 pièges, deux sous-sections « Références visuelles », un tableau de sous-vidéos dont la somme est exacte (après correction du Module 1) |
-| **Renvois** | 14 renvois explicites « piège n°X du Module Y » ou « Module Y, §x.y » : **14 sur 14 pointent sur une cible qui existe et qui traite bien du concept cité** |
+| **Renvois** | 26 renvois explicites « piège n°X du Module Y » ou « Module Y, §x.y » (contrôle **refait après le déplacement du 3B** et l'ajout de M8 §2.7) : **26 sur 26 pointent sur une cible qui existe** ; les 7 renvois « Module 3B » pointent vers du **contenu**, pas vers une position |
 | **Diapositives citées dans les modules** | 17 sur 17 correctes (numéro et titre) |
-| **Contradictions** | **12 relevées** : 3 corrigées et **vérifiées** (C3, C8, C12) ; 3 **en cours** (C2, C9, R4) ; 6 **appliquées**, à valider (C1, C4, C5, C6, C7, C10) ; C11 clarifiée (§3) |
+| **Contradictions** | **13 relevées** (C13 ajoutée lors du contrôle des renvois au 3B) : 3 corrigées et **vérifiées** (C3, C8, C12) ; 3 **en cours** (C2, C9, R4) ; 6 **appliquées**, à valider (C1, C4, C5, C6, C7, C10) ; C11 clarifiée ; C13 **corrigée**, à valider (§3) |
 | **Lacune** | la promesse des Modules 1 et 2 (« lancement asynchrone, Module 8 ») est **tenue** par la nouvelle section **Module 8, §2.7** (C9, en cours de validation) |
 | **Parcours** | *Essentiel* (modules 1 à 6) = **321 min ≈ 5 h 21** ; *Complet* = **504 min ≈ 8 h 24** (le Module 8 passe à 73 min avec la nouvelle §2.7). Les renvois de l'Essentiel vers l'optionnel sont étiquetés « (parcours Complet) » (§6) |
 
@@ -102,6 +102,7 @@
 | C10 | Moyenne | **`EmptyInputFailer` (M3B §2.5) : `ExitStatus` `FAILED` mais `BatchStatus` `COMPLETED`.** M5 §3.2 dit que la reprise s'appuie sur le `BatchStatus` et M6 que seuls `FAILED`/`STOPPED` sont reprenables : un step « échoué » par son code de sortie serait **non reprenable**. Le comportement du job dans ce cas n'est expliqué nulle part | M3B, M5, M6 | **Appliqué, à valider.** Note « Cas à tester » dans M5 §3.2 ; le test lui-même reste à faire |
 | C11 | Basse | **M2 §4.1** présente un `CronJob` qui appelle `POST /jobs/hello` ; **M8** montre un `CronJob` qui lance directement le conteneur | M2, M8 | **Clarifié** dans M8 (encadré) ; aucun changement dans M2 |
 | C12 | Basse | **Restart implicite.** M6 ne mentionnait que `restart(executionId)` alors que `start(...)` avec les mêmes paramètres reprend aussi une instance `FAILED` (confirmé par la documentation) | M6 §2.4, M8 §2.5 | **Vérifié** (encadré « Restart implicite » dans M6 §2.4, formulation dans M8 §2.5) |
+| C13 | Moyenne | **Renvoi vers du vide.** M7 §2.1 renvoie au **Module 3B** pour `saveState(false)`, mais ni le 3B ni le Module 3 ne définissaient `saveState` ; le Module 6 (parcours Essentiel) emploie aussi le terme sans l'avoir défini | M3, M3B, M6, M7 | **Corrigé, à valider.** Définition ajoutée en **M3 §3.2** (valeur par défaut, effet sur la reprise) et en **M3B §3.1** (cas du step multithread, vers lequel M7 renvoie) |
 
 **Cohérences vérifiées sans écart :** `BatchStatus`/`ExitStatus` (M5, M6, M8) ; `chunk(n)` contre `chunk(n, tx)` déprécié (M3, M6, M7, M8) ; retry de Spring Framework 7 (M6, M8) ; verrouillage optimiste `JobExecution`/`StepExecution` (M1, M7) ; clé de position `read.count` (M3, M6) ; thread-safety des readers (M3, M3B, M7) ; exécution orpheline (M1, M6, M8) ; durées (somme des sous-vidéos = total annoncé dans les 9 modules après correction de M1).
 
@@ -150,10 +151,30 @@ Sections « Flashback » dédiées : M2 §1.1, M3 §1.3, M4 §1.2-1.3, M5 §1.5,
 
 ## 6. Parcours et dépendances
 
+**Ordre de lecture.** Le Module 3B est un complément direct du Module 3 : il se lit **entre le 3 et le 4**, bien qu'il porte le nom « 3B » et reste **optionnel**. L'ordre des fichiers (`MODULE_3.md`, `MODULE_3B_READERS.md`, `MODULE_4.md`) est déjà celui du tri alphabétique ; il est fixé dans `README.md`.
+
+```
+1 → 2 → 3 → [3B : optionnel] → 4 → 5 → 6 → [7 : optionnel] → [8 : optionnel]
+```
+
+| Transition | Texte | Où |
+|---|---|---|
+| fin du Module 3 | « Le Module 3B (optionnel) explore les readers avancés […] Si vous suivez le parcours Essentiel, passez directement au Module 4. » | M3, entre §6 et §7 |
+| fin du Module 3B | « Le Module 4 (processors) vous attend pour transformer les données que vous venez d'apprendre à lire. » | M3B, dernière ligne |
+| en tête du Module 4 | « Prérequis de parcours : Module 3 (obligatoire) et Module 3B (optionnel, si vous l'avez suivi). » | M4, en-tête |
+
+**Dépendances du 3B.** Aucun module du parcours Essentiel ne **dépend** du 3B pour être compris ; trois renvois pointent vers son contenu, tous étiquetés *(parcours Complet)* ou situés dans un module lui-même optionnel :
+
+| Renvoi | Contenu visé dans le 3B | Étiquette |
+|---|---|---|
+| M5 §3.2 (note « Cas à tester ») | `EmptyInputFailer` (§2.5) | *(parcours Complet)* ajouté |
+| M6 piège 9 | répertoire par exécution (§3.4) | *(Module 3B, parcours Complet)* |
+| M7 §2.1 et §2.3 | `saveState(false)` (§3.1), pagination à clé unique (§2.3) | module 7 déjà optionnel |
+
 | Parcours | Modules | Durée |
 |---|---|---|
 | **Essentiel** | 1, 2, 3, 4, 5, 6 | 46 + 45 + 55 + 60 + 55 + 60 = **321 min ≈ 5 h 21** |
-| **Complet** | + 3B (40), 7 (70), 8 (67) | **498 min ≈ 8 h 18** |
+| **Complet** | + 3B (40), 7 (70), 8 (73) | **504 min ≈ 8 h 24** |
 
 **Le parcours Essentiel renvoie à du contenu optionnel.** Un élève qui s'arrête au Module 6 rencontre ces annonces ; **toutes sont maintenant étiquetées « (parcours Complet) »** (dernière colonne) :
 

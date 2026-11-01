@@ -328,7 +328,7 @@ Ce que fait chaque état :
 Sans code personnalisé, le step prend un `ExitStatus` **équivalent à son `BatchStatus`** : `COMPLETED` pour un succès, `FAILED` après une exception, `STOPPED` après un arrêt. C'est pourquoi `.on("COMPLETED")` fonctionne dans la plupart des exemples.
 Dès qu'un listener (`afterStep`, §2.2) remplace le code, **le `BatchStatus` reste `COMPLETED`** (le step a bien réussi techniquement) alors que l'`ExitStatus` devient `COMPLETED_WITH_REJECTS`. La reprise se base sur le `BatchStatus`, l'aiguillage sur l'`ExitStatus` : les deux ne se mélangent jamais.
 
-> **Cas à tester :** un `ExitStatus` à `FAILED` avec un `BatchStatus` à `COMPLETED` (comme dans `EmptyInputFailer` du Module 3B). Le comportement de reprise dans ce cas est à vérifier sur votre version.
+> **Cas à tester :** un `ExitStatus` à `FAILED` avec un `BatchStatus` à `COMPLETED` (comme dans `EmptyInputFailer` du Module 3B *(parcours Complet)*). Le comportement de reprise dans ce cas est à vérifier sur votre version.
 
 ### 3.3 Où s'exécute un decider, et pourquoi pas de `@StepScope`
 

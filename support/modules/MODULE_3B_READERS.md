@@ -303,6 +303,8 @@ Les readers fournis ouvrent et ferment leur ressource et sauvegardent leur posit
 Si vous écrivez un reader qui **enveloppe** un autre reader (§2.2), c'est à vous de **retransmettre** `open`, `update` et `close`. Oublier
 `update` ne casse pas le premier lancement, mais **aucune position n'est sauvegardée** : la reprise rejouera tout.
 
+**`saveState(false)` : désactiver la sauvegarde de position.** Tous les readers fournis le proposent (`true` par défaut, Module 3 §3.2). Avec `false`, plus rien n'est écrit dans l'`ExecutionContext` : le nom du reader devient facultatif, mais un restart **repart du début**. On l'emploie dans un step **multithread** (Module 7, §2.1) : les chunks s'y terminent dans le désordre, et une position de lecture n'a plus de sens ; un reader partagé entre threads ne doit pas conserver un état que plusieurs threads se disputent.
+
 ### 3.2 Un fragment, pas l'arbre : XML et JSON
 
 Un parseur DOM charge tout le document en mémoire : impossible sur un gros fichier. Spring Batch utilise StAX, un parseur **à
@@ -399,3 +401,7 @@ de base rend la reprise automatique.
 2. **Chunk.** Avec un chunk de 100, combien de **lignes** du fichier peuvent être traitées dans une seule transaction ? Pourquoi la réponse n'est-elle pas 100 ?
 3. **Pagination.** Un collègue trie les pages sur `transaction_date`. Plusieurs transactions partagent la même date. Que risque-t-il de se passer, et comment corriger ?
 4. **Restart.** Un job lit tous les fichiers d'un répertoire partagé avec `MultiResourceItemReader`. Il échoue au deuxième fichier ; un troisième fichier arrive avant la reprise. Que traite la reprise ? Quelle organisation évite le problème ?
+
+---
+
+> *« Vous avez maintenant une vision complète des readers de Spring Batch. Le Module 4 (processors) vous attend pour transformer les données que vous venez d'apprendre à lire. »*

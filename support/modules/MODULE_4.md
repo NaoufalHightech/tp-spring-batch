@@ -4,6 +4,7 @@
 > **Parcours :** Essentiel. (Parcours *Essentiel* : modules 1 à 6 ; parcours *Complet* : tous les modules.)
 > **Durée vidéo visée :** 55 à 60 min, en 7 sous-vidéos de 5 à 10 min (voir la fin).
 > **Prérequis :** Module 2 (cycle de vie des beans, singleton, `@StepScope`), Module 3 (chunk, `return null`).
+> **Prérequis de parcours :** Module 3 (obligatoire) et Module 3B (optionnel, si vous l'avez suivi).
 > Projet de référence : `tp/tpProd`. C'est le module du bug le plus vicieux de Spring Batch : le **double comptage**.
 
 ---
