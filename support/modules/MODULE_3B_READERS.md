@@ -49,6 +49,8 @@ Vérifié dans les jars de la 6.0.6 :
 | Tout magasin Spring Data | `RepositoryItemReader` | méthode paginée du repository |
 | Service Java existant | `ItemReaderAdapter` | la méthode doit retourner `null` à la fin |
 
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Lire et écrire : les formats »** (n°32) du PPT du cours.
+
 ### Références visuelles (§1 Concept)
 
 > Légende : « ✔ vérifié » = titre relevé dans l'extrait de documentation officielle fourni ; « ◻ à confirmer » = page citée, titre exact du schéma à contrôler sur la page avant d'insérer l'image.
@@ -217,6 +219,8 @@ SqlPagingQueryProviderFactoryBean queryProvider(DataSource dataSource) {
 8. Les clauses sont fournies **par morceaux** ; le reader assemble une requête par page.
 9. **Clé de tri unique** : le reader s'en sert pour repérer la page suivante. Une clé non unique ou modifiée pendant la lecture fait **sauter ou répéter** des lignes (piège n°6 du Module 3).
 
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Base de données : reader et writer JDBC »** (n°36) du PPT du cours. (lecture JDBC)
+
 ### 2.4 Un reader personnalisé qui sait reprendre
 
 Pour une source sans reader prêt à l'emploi (ici, une liste de comptes fournie par un service), on étend la classe de base
@@ -281,38 +285,13 @@ public class EmptyInputFailer implements StepExecutionListener {                
 
 ### 2.6 Ignorer certaines erreurs de lecture
 
-```java
-.faultTolerant()
-.skip(FlatFileParseException.class)                                                  // 1
-.skipLimit(10)                                                                       // 2
-.listener(new SkippedLinesLogger())                                                  // 3
-```
-
-1. On ignore uniquement les erreurs de **format de ligne**.
-2. Au-delà de 10 lignes ignorées, le step échoue : au-delà d'un seuil, c'est le fichier qui est mauvais.
-3. Un listener consigne la ligne fautive. `FlatFileParseException` expose le **numéro de ligne** et le **texte brut** : de quoi écrire un rapport de rejets.
-
-Pour une règle plus fine, on implémente `SkipPolicy` :
+Le skip est traité en détail au Module 6 (§2.1 : listener de rejets, `SkipPolicy`, pièges) ; voici juste un aperçu :
 
 ```java
-public class FileSkipPolicy implements SkipPolicy {
-  @Override
-  public boolean shouldSkip(Throwable t, long skipCount) {                           // 1
-    return switch (t) {                                                              // 2
-      case FileNotFoundException e -> false;                                         // 3
-      case FlatFileParseException e -> skipCount < 10;                               // 4
-      default -> false;
-    };
-  }
-}
+.faultTolerant().skip(FlatFileParseException.class).skipLimit(10)   // ignorer au plus 10 lignes mal formées
 ```
 
-1. Reçoit l'exception et le nombre d'éléments déjà ignorés.
-2. `switch` avec *pattern matching* sur le type de l'exception (Java 21+).
-3. Un fichier manquant n'est **jamais** ignorable.
-4. Une ligne mal formée l'est tant que le seuil n'est pas atteint.
-
-(Le skip est approfondi au Module 6.)
+Au-delà de 10 lignes ignorées, le step échoue : à ce stade, c'est le fichier qui est mauvais.
 
 ---
 

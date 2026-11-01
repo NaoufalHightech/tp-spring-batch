@@ -15,20 +15,22 @@
 Jusqu'ici, un job était une suite : step A, puis step B. Un vrai traitement de nuit se **ramifie** :
 
 ```
-                    ┌────────────────┐
-                    │  loadStep      │  charger le fichier
-                    └───────┬────────┘
-                            │ (quelle est l'issue ?)
-        ┌───────────────────┼────────────────────┐
-        ▼                   ▼                    ▼
-   COMPLETED            COMPLETED avec        FAILED
-        │               trop de rejets            │
-        ▼                   │                     ▼
-  ┌────────────┐            ▼               ┌────────────┐
-  │ reportStep │      ┌────────────┐        │ alertStep  │
-  └────────────┘      │ alertStep  │        └────────────┘
-                      └────────────┘
+                    ┌──────────────────┐
+                    │  loadBankStep    │  charger le fichier
+                    └────────┬─────────┘
+                             │ (quelle est l'issue ?)
+        ┌────────────────────┼─────────────────────┐
+        ▼                    ▼                     ▼
+   COMPLETED            COMPLETED avec          FAILED
+        │               trop de rejets              │
+        ▼                    │                      ▼
+ ┌────────────────┐          ▼               ┌────────────┐
+ │ bankReportStep │    ┌────────────┐        │ alertStep  │
+ └────────────────┘    │ alertStep  │        └────────────┘
+                       └────────────┘
 ```
+
+`bankReportStep` produit le rapport de rapprochement ; `alertStep` **prévient l'équipe financière**.
 
 Un job est un **graphe d'états** (des steps, des décisions, des groupes parallèles) relié par des **transitions**.
 
@@ -39,6 +41,8 @@ Un job est un **graphe d'états** (des steps, des décisions, des groupes parall
 | Écriture | `.start(a).next(b).next(c)` | `.start(a).on("COMPLETED").to(b).from(a).on("FAILED").to(c)` |
 | Comportement | si `a` échoue, **le job s'arrête** | on choisit la suite **selon l'issue** de `a` |
 | Quand | traitement linéaire | alertes, chemins d'erreur, branches métier |
+
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Enchaîner les steps : séquence et conditions »** (n°38) du PPT du cours.
 
 ### 1.3 `BatchStatus` et `ExitStatus` : la distinction cruciale
 
@@ -75,7 +79,7 @@ coïncident (un step réussi a `ExitStatus` `COMPLETED`), ce qui entretient la c
 - ◻ à confirmer : page *Configuring a Job*, section *Controlling Step Flow* (flux conditionnels, `on`/`to`/`from`) : repérer les schémas de flux de la page. Remarque : l'exemple « Job State Machine » de l'URL `…/step/chunk-oriented-processing.html` n'est pas vérifié ; cette page traite du chunk, pas de la machine à états du job.
 
 **2. Schéma ASCII à garder (script vidéo)**
-- §1.1 : le graphe `loadStep` → `reportStep` / `alertStep` : **à garder dans le PPT**.
+- §1.1 : le graphe `loadBankStep` → `bankReportStep` / `alertStep` : **à garder dans le PPT**.
 - §1.3 : le tableau `BatchStatus` / `ExitStatus`.
 
 **3. Schéma personnalisé à créer pour le PPT**
@@ -90,14 +94,14 @@ coïncident (un step réussi a `ExitStatus` `COMPLETED`), ce qui entretient la c
 ```java
 @Bean
 Job bankFlowJob(JobRepository jobRepository,
-                Step loadStep, Step reportStep, Step alertStep) {
+                Step loadBankStep, Step bankReportStep, Step alertStep) {
   return new JobBuilder("bankFlowJob", jobRepository)                       // 1
-      .start(loadStep)                                                      // 2
-        .on("COMPLETED").to(reportStep)                                     // 3
-      .from(loadStep)                                                       // 4
+      .start(loadBankStep)                                                      // 2
+        .on("COMPLETED").to(bankReportStep)                                     // 3
+      .from(loadBankStep)                                                       // 4
         .on("FAILED").to(alertStep)                                         // 5
           .on("*").fail()                                                   // 6
-      .from(loadStep)                                                       // 7
+      .from(loadBankStep)                                                       // 7
         .on("*").fail()                                                     // 8
       .end()                                                                // 9
       .build();                                                             // 10
@@ -106,14 +110,49 @@ Job bankFlowJob(JobRepository jobRepository,
 
 1. Le builder de job, comme au Module 2.
 2. Premier step. Son retour est un builder de **flux** (et non plus un `Job` linéaire).
-3. Si l'`ExitStatus` de `loadStep` vaut `COMPLETED`, on va à `reportStep`.
-4. On **reprend** depuis `loadStep` pour déclarer une autre transition.
-5. Si `loadStep` a pour code `FAILED`, on va à `alertStep` (envoyer l'alerte).
+3. Si l'`ExitStatus` de `loadBankStep` vaut `COMPLETED`, on va à `bankReportStep`.
+4. On **reprend** depuis `loadBankStep` pour déclarer une autre transition.
+5. Si `loadBankStep` a pour code `FAILED`, on va à `alertStep` (prévenir l'équipe financière).
 6. Après `alertStep`, quelle que soit l'issue (`*`), le job se termine en **échec** (`.fail()`). Sans cela, un job dont le chargement a échoué pourrait finir « réussi » parce que l'alerte, elle, a réussi (§3.4).
-7. Encore une reprise depuis `loadStep`.
+7. Encore une reprise depuis `loadBankStep`.
 8. **Filet de sécurité** : tout **autre** code (un code personnalisé oublié, `STOPPED`, `UNKNOWN`) échoue explicitement au lieu de laisser le flux sans issue (piège n°1).
 9. `.end()` termine la définition du flux.
 10. `.build()` produit le `Job`.
+
+**Le step d'alerte, côté bancaire.** `alertStep` envoie à l'équipe financière un message qui indique **le lot, le nombre de lignes rejetées et le nombre de lignes lues** :
+
+```java
+@Component
+public class FinanceAlertTasklet implements Tasklet {
+
+  private final AlertSender alertSender;                                           // 1
+
+  public FinanceAlertTasklet(AlertSender alertSender) { this.alertSender = alertSender; }
+
+  @Override
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
+    JobExecution job = contribution.getStepExecution().getJobExecution();          // 2
+    StepExecution load = job.getStepExecutions().stream()
+        .filter(step -> step.getStepName().equals("loadBankStep"))                 // 3
+        .findFirst().orElseThrow();
+
+    alertSender.toFinanceTeam("Chargement du %s : %d lignes rejetées sur %d lues"
+        .formatted(job.getJobParameters().getString("runDate"),
+                   load.getFilterCount(), load.getReadCount()));                   // 4
+    return RepeatStatus.FINISHED;
+  }
+}
+
+@Bean
+Step alertStep(JobRepository jobRepository, PlatformTransactionManager tx, FinanceAlertTasklet tasklet) {
+  return new StepBuilder("alertStep", jobRepository).tasklet(tasklet, tx).build();
+}
+```
+
+1. `AlertSender` est une interface applicative (courriel, messagerie d'équipe) : le composant reste **sans état** (Module 4).
+2. Une tasklet retrouve l'exécution du job en cours à partir de sa contribution.
+3. On y cherche l'exécution du step de chargement : ses compteurs sont déjà enregistrés.
+4. `runDate` (identifiant, Module 3) désigne le lot concerné.
 
 **Les motifs de transition.** Le texte de `.on("…")` est un motif : `*` remplace n'importe quelle suite de caractères, `?` un seul caractère. Quand plusieurs motifs correspondent, **le plus précis l'emporte**
 (`COMPLETED` avant `COMP*`, avant `*`) : l'ordre d'écriture ne compte pas.
@@ -182,11 +221,11 @@ Le branchement :
 
 ```java
 return new JobBuilder("bankDecisionJob", jobRepository)
-    .start(loadStep)
+    .start(loadBankStep)
     .next(rejectsDecider)                                                    // 1
-      .on("NO_REJECTS").to(reportStep)                                       // 2
+      .on("NO_REJECTS").to(bankReportStep)                                       // 2
     .from(rejectsDecider)
-      .on("FEW_REJECTS").to(reportStep)
+      .on("FEW_REJECTS").to(bankReportStep)
     .from(rejectsDecider)
       .on("TOO_MANY_REJECTS").to(alertStep)                                  // 3
     .from(rejectsDecider)
@@ -195,12 +234,14 @@ return new JobBuilder("bankDecisionJob", jobRepository)
     .build();
 ```
 
-1. Après `loadStep`, on passe **par la décision** (elle n'écrit rien en base : ce n'est pas un step).
+1. Après `loadBankStep`, on passe **par la décision** (elle n'écrit rien en base : ce n'est pas un step).
 2. Chaque code renvoyé par le decider a sa transition.
 3. Beaucoup de rejets : on alerte au lieu de rapporter.
 4. Filet de sécurité, comme au §2.1.
 
 **Decider ou code de sortie ?** Le code de sortie (§2.2) convient à une règle **simple et propre au step**. Le decider convient quand la décision **combine** plusieurs sources ou doit rester **testable seule**, sans lancer de step.
+
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Le decider : aiguiller selon un résultat »** (n°39) du PPT du cours.
 
 ### 2.4 Un `Split` : deux flux en parallèle
 
@@ -247,6 +288,8 @@ Job parallelJob(JobRepository jobRepository, TaskExecutor flowExecutor,
 8. Le groupe parallèle est un **état** du job comme un autre.
 9. **`consolidateStep` ne démarre qu'après la fin des deux flux** : le `Split` est une barrière de synchronisation.
 
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Flows en parallèle (split) »** (n°40) du PPT du cours.
+
 ---
 
 ## 3. Plongée « sous le capot »
@@ -256,12 +299,12 @@ Job parallelJob(JobRepository jobRepository, TaskExecutor flowExecutor,
 Un `Job` construit avec les flux est une `SimpleFlow` : un ensemble d'**états** (`StepState`, `DecisionState`, `SplitState`, `FlowState`, `EndState`) et une table de **transitions**.
 
 ```
-état courant : loadStep
+état courant : loadBankStep
    1. exécuter l'état           → le step tourne, laisse sa StepExecution en base (Module 1)
    2. produire un statut        → code de l'ExitStatus du step : "COMPLETED"
    3. chercher la transition    → parmi celles déclarées pour cet état, quelle correspond à "COMPLETED" ?
         motifs candidats : COMPLETED, COMP*, *       → le plus précis gagne
-   4. état suivant              → reportStep
+   4. état suivant              → bankReportStep
    5. recommencer, jusqu'à un état de fin (end / fail / stop)
 ```
 
@@ -285,6 +328,8 @@ Ce que fait chaque état :
 Sans code personnalisé, le step prend un `ExitStatus` **équivalent à son `BatchStatus`** : `COMPLETED` pour un succès, `FAILED` après une exception, `STOPPED` après un arrêt. C'est pourquoi `.on("COMPLETED")` fonctionne dans la plupart des exemples.
 Dès qu'un listener (`afterStep`, §2.2) remplace le code, **le `BatchStatus` reste `COMPLETED`** (le step a bien réussi techniquement) alors que l'`ExitStatus` devient `COMPLETED_WITH_REJECTS`. La reprise se base sur le `BatchStatus`, l'aiguillage sur l'`ExitStatus` : les deux ne se mélangent jamais.
 
+> **Cas à tester :** un `ExitStatus` à `FAILED` avec un `BatchStatus` à `COMPLETED` (comme dans `EmptyInputFailer` du Module 3B). Le comportement de reprise dans ce cas est à vérifier sur votre version.
+
 ### 3.3 Où s'exécute un decider, et pourquoi pas de `@StepScope`
 
 Un `@StepScope` (Modules 2 et 4) n'existe **que pendant** l'exécution d'un step : le contexte de scope « step » est ouvert au début du step et fermé à sa fin. Un `JobExecutionDecider` est appelé **entre** deux steps, quand aucun contexte de step n'est actif.
@@ -298,7 +343,7 @@ Que faire de la « portée » d'un decider ?
 ### 3.4 BatchStatus du job : qui décide de l'échec ?
 
 Quand un step échoue et qu'une transition mène à `alertStep`, le **job** ne « sait » plus qu'il y a eu un échec : c'est la **façon dont le flux se termine** qui fixe l'état final du job (`end`, `fail`, `stopAndRestart`).
-Si l'alerte réussit et que le flux se termine par `.end()`, le job apparaît comme **réussi** alors que le chargement a échoué. Règle : **une branche d'erreur se termine par `.fail()`** quand la panne doit rester visible dans `batch_job_execution` (et pour la supervision, Module 8).
+Si l'alerte réussit et que le flux se termine par `.end()`, le job apparaît comme **réussi** alors que le chargement a échoué. Règle : **une branche d'erreur se termine par `.fail()`** quand la panne doit rester visible dans `batch_job_execution` (et pour la supervision, Module 8 *(parcours Complet)*).
 
 ### 3.5 Comment le `TaskExecutor` lance les flux en parallèle
 
@@ -330,7 +375,7 @@ Points clés :
 4. Les **singletons** utilisés dans plusieurs flux sont partagés entre threads : tout état modifiable dedans est une **course** (Module 4).
 5. Le **pool de threads et le pool de connexions** sont deux limites distinctes. Avec 2 threads qui ouvrent chacun un curseur, une transaction et le `JobRepository`, il faut **plus de connexions** que de threads (par exemple 3 à 4 par flux). Un pool de 5 connexions avec 4 flux qui s'accaparent chacun 2 connexions se **bloque** : chaque flux attend une connexion que les autres ne rendront pas.
 
-> Un `Split` parallélise des **steps différents**. Pour accélérer **un même step** sur de gros volumes, on utilise le multithread ou le partitionnement (Module 7).
+> Un `Split` parallélise des **steps différents**. Pour accélérer **un même step** sur de gros volumes, on utilise le multithread ou le partitionnement (Module 7 *(parcours Complet)*).
 
 ### 3.6 Le `Split` et la reprise
 
@@ -340,7 +385,7 @@ Si un flux du `Split` échoue et l'autre réussit, le `SplitState` produit le st
 
 **1. Schéma officiel de la documentation Spring Batch**
 - ◻ à confirmer : page *Scaling and Parallel Processing* (parallèle, `Split`) pour les schémas de parallélisation.
-- ✔ vérifié : « Partitioned Process » (extrait d'architecture fourni) : à réserver au Module 7, pas au `Split`.
+- ✔ vérifié : « Partitioned Process » (extrait d'architecture fourni) : à réserver au Module 7 *(parcours Complet)*, pas au `Split`.
 
 **2. Schéma ASCII à garder (script vidéo)**
 - §3.1 : la machine à états en 5 temps (exécuter / produire un statut / chercher la transition / état suivant / fin) : à garder pour la narration.
@@ -403,7 +448,7 @@ Un job de fin de mois exécute une étape de clôture supplémentaire seulement 
 
 ## 7. Exercices
 
-1. **Statuts.** Un step `loadStep` réussit, mais son listener remplace le code par `COMPLETED_WITH_REJECTS`. Que valent son `BatchStatus` et son `ExitStatus` ? Vers quel step le flux du §2.1 va-t-il ? Que se passe-t-il si l'on retire la transition `.on("*").fail()` ?
+1. **Statuts.** Un step `loadBankStep` réussit, mais son listener remplace le code par `COMPLETED_WITH_REJECTS`. Que valent son `BatchStatus` et son `ExitStatus` ? Vers quel step le flux du §2.1 va-t-il ? Que se passe-t-il si l'on retire la transition `.on("*").fail()` ?
 2. **Decider.** Pourquoi un `JobExecutionDecider` ne peut-il pas être `@StepScope` ? Citez deux façons correctes de lui fournir ce dont il a besoin.
 3. **Split.** Deux flux parallèles utilisent chacun 3 connexions, plus 1 pour le `JobRepository`. Quel est le minimum de connexions du pool pour éviter le blocage ? Pourquoi un pool de threads à 20 n'accélère-t-il pas un `Split` de 2 flux ?
-4. **Terminaison.** Un job dont la branche d'erreur se termine par `.end()` est « réussi » alors que `loadStep` a échoué. Comment le détecter dans `batch_job_execution`, et comment le corriger ?
+4. **Terminaison.** Un job dont la branche d'erreur se termine par `.end()` est « réussi » alors que `loadBankStep` a échoué. Comment le détecter dans `batch_job_execution`, et comment le corriger ?

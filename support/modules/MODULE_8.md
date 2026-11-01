@@ -2,7 +2,7 @@
 
 > **Pile :** Java 25 · Spring Boot 4.1.2 · Spring Batch 6.0.6 · PostgreSQL 16.
 > **Parcours :** Complet : **Optionnel / Avancé**. (Parcours *Essentiel* : modules 1 à 6 ; parcours *Complet* : tous les modules.)
-> **Durée vidéo visée :** 65 à 70 min, en 9 sous-vidéos de 5 à 9 min (voir la fin).
+> **Durée vidéo visée :** 70 à 75 min, en 10 sous-vidéos de 5 à 9 min (voir la fin).
 > **Prérequis :** tous les modules précédents : ce dernier module les rassemble.
 > Projet de référence : `tp/tpProd`.
 >
@@ -141,7 +141,8 @@ class BankJobIT {
   @Test
   void le_job_charge_les_bonnes_donnees() throws Exception {
     var params = jobTestUtils.getUniqueJobParametersBuilder()                       // 6
-        .addString("inputFile", "src/test/resources/transactions.csv")
+        .addString("runDate", "2026-10-01")                                         // identifiant (Module 3)
+        .addString("inputFile", "src/test/resources/transactions.csv", false)       // non identifiant
         .toJobParameters();
 
     JobExecution execution = jobTestUtils.startJob(params);                         // 7
@@ -160,7 +161,7 @@ class BankJobIT {
 3. L'utilitaire qui lance un job ou un step.
 4. Avec plusieurs jobs dans le contexte, on désigne explicitement celui à tester.
 5. **Un état de départ connu** : un test qui dépend du test précédent est un test faux.
-6. Des paramètres **uniques** : chaque test crée une nouvelle `JobInstance` (Module 1) et ne bute pas sur « déjà terminée ».
+6. Des paramètres **uniques** : le builder ajoute un paramètre aléatoire, donc chaque test crée une nouvelle `JobInstance` (Module 1) et ne bute pas sur « déjà terminée ». On y ajoute les deux paramètres du fil rouge : `runDate` (identifiant) et `inputFile` (non identifiant, Module 3).
 7. Lance le job **et attend** sa fin.
 8. Le statut technique du job.
 9. Les **compteurs** de la `StepExecution` : lus 5, filtrés 1, écrits 4 (Module 3).
@@ -198,7 +199,7 @@ assertThat(rows).hasSize(5);
 
 ### 2.2 Le test de contenu : vérifier les **valeurs**, pas le nombre de lignes
 
-C'est le piège n°9, récurrent depuis le Module 3. Un test qui ne vérifie que `COMPLETED` et `count = 4` reste vert avec une base remplie de données fausses.
+C'est le piège récurrent (n°9 des Modules 3 et 4). Un test qui ne vérifie que `COMPLETED` et `count = 4` reste vert avec une base remplie de données fausses.
 
 ```java
 @Test
@@ -224,9 +225,9 @@ void les_valeurs_en_base_sont_exactes() throws Exception {
 @Test
 void deux_lancements_ne_doublent_pas_les_totaux() throws Exception {                // Module 4
   jobTestUtils.startJob(uniqueParamsFor("transactions.csv"));
-  var first = analytics.compute();
+  var first = analyticsService.totals();
   jobTestUtils.startJob(uniqueParamsFor("transactions.csv"));
-  assertThat(analytics.compute()).isEqualTo(first);
+  assertThat(analyticsService.totals()).isEqualTo(first);
 }
 ```
 
@@ -420,6 +421,58 @@ Les étapes, d'après le chapitre 12 du livre (commandes du *shell* Data Flow, �
 
 Deux bases de données entrent en jeu : celle du **serveur Data Flow** (ses propres définitions et exécutions) et celle du **`JobRepository`** de votre batch ; pour que l'onglet *Jobs* fonctionne, **le serveur doit lire le même `JobRepository`** que le batch (piège n°4).
 
+### 2.7 Lancer sans bloquer en production **(Théorique)**
+
+Au Module 2 (§2.4), le contrôleur confie le lancement à un **exécuteur applicatif** (`executor.submit(...)`) et rend la main tout de suite. Spring Batch 6 offre une seconde voie : un **lanceur qui crée lui-même le thread**, le `TaskExecutorJobOperator`.
+
+| | Exécuteur applicatif (Module 2, §2.4) | `TaskExecutorJobOperator` |
+|---|---|---|
+| **Qui crée le thread** | votre code (`executor.submit(...)`) | le lanceur |
+| **Où se trouve la règle** | dans chaque contrôleur ou service qui lance | **à un seul endroit** : tout lancement par ce `JobOperator` est asynchrone |
+| **Ce que `start(...)` retourne** | rien d'utile : l'appel est dans la tâche, l'identifiant d'exécution n'est pas connu tout de suite | la `JobExecution`, **immédiatement**, avec son identifiant |
+| **Erreurs de lancement** (instance déjà terminée, déjà en cours) | perdues dans le thread si on ne les journalise pas | levées **avant** le lancement du thread, comme avec le lanceur synchrone (comportement des versions précédentes, à tester) |
+| **Suivi** | `GET` par paramètres (`getLastJobExecution`) | idem, ou par identifiant |
+
+```java
+@Bean
+ThreadPoolTaskExecutor jobLaunchExecutor() {
+  var pool = new ThreadPoolTaskExecutor();
+  pool.setThreadNamePrefix("job-");                                              // 1
+  pool.setCorePoolSize(2);
+  pool.setMaxPoolSize(2);                                                        // 2
+  pool.setQueueCapacity(10);                                                     // 3
+  pool.setWaitForTasksToCompleteOnShutdown(true);                                // 4
+  pool.setAwaitTerminationSeconds(120);                                          // 5
+  return pool;
+}
+
+@Bean
+TaskExecutorJobOperator asyncJobOperator(JobRepository jobRepository, JobRegistry jobRegistry,
+                                         ThreadPoolTaskExecutor jobLaunchExecutor) {
+  var operator = new TaskExecutorJobOperator();
+  operator.setJobRepository(jobRepository);                                      // 6
+  operator.setJobRegistry(jobRegistry);
+  operator.setTaskExecutor(jobLaunchExecutor);                                   // 7
+  return operator;
+}
+```
+
+1. Un nom de thread : les journaux montrent quel job tourne sur quel thread.
+2. **Nombre de jobs simultanés** (et non de threads par job) : ici deux. Chaque job occupe des connexions de base (Module 5, §3.5) : ce chiffre se règle avec la taille du pool de connexions.
+3. Les lancements en trop **attendent** dans une file bornée ; au-delà, ils sont **refusés** : une erreur nette vaut mieux qu'une attente sans fin.
+4. À l'arrêt de l'application, on **laisse finir** les jobs en cours…
+5. …pendant 120 secondes au plus. Ce délai doit rester **inférieur** au `terminationGracePeriodSeconds` de l'orchestrateur (§2.5) et se combine avec l'arrêt gracieux du Module 6.
+6. Le lanceur écrit dans le même `JobRepository` que tout le reste (Module 1).
+7. Le pool qui exécute **les jobs entiers**.
+
+> **À ne pas confondre avec le Module 7.** Le `taskExecutor` d'un **step** (Module 7, §2.1) parallélise les **chunks d'un même job**. Celui du lanceur exécute **des jobs entiers** les uns à côté des autres. Un job lancé de façon asynchrone peut très bien avoir un step multithread, avec **deux pools** à dimensionner.
+
+*Points à vérifier avant de l'adopter : le nom du bean (`jobOperator`) peut entrer en conflit avec celui que Spring Boot déclare par défaut ; Spring Boot transmet à sa configuration par défaut un bean `TaskExecutor` s'il en trouve, et le choix entre plusieurs beans de ce type est à contrôler.*
+
+**Quand rester synchrone.** Pour un conteneur `Job` Kubernetes (§2.5), on garde le lanceur **synchrone** : le code de sortie du processus doit refléter **le résultat du job**. Avec un lanceur asynchrone, l'application peut terminer son démarrage (et calculer un code de sortie) **avant** la fin du traitement. Le lancement asynchrone convient aux applications qui **restent vivantes** (API de lancement, Module 2).
+
+**Piège.** Un `SimpleAsyncTaskExecutor` sans limite comme exécuteur de lancement : un thread **par demande**, sans plafond. Toujours un pool **borné** et **nommé**.
+
 ---
 
 ## 3. Plongée « sous le capot »
@@ -536,7 +589,7 @@ Un `CronJob` démarre à 2 h. Le pod charge 5 millions de lignes, publie ses mé
 
 | # | Piège | Ce qui se passe | Parade |
 |---|---|---|---|
-| **1** | **Test vert avec des données fausses** (piège n°9, récurrent) | `COMPLETED` et `count = 4` : la base contient des dates fausses et des montants à zéro | assertions sur les **valeurs**, un **total**, les **exclusions**, **deux lancements** (§2.2) |
+| **1** | **Test vert avec des données fausses** (piège récurrent (n°9 des Modules 3 et 4)) | `COMPLETED` et `count = 4` : la base contient des dates fausses et des montants à zéro | assertions sur les **valeurs**, un **total**, les **exclusions**, **deux lancements** (§2.2) |
 | **2** | **Aucun monitoring** : ni métriques, ni alertes | l'échec est découvert par un utilisateur, à 9 h | métriques, alerte « pas de succès avant l'heure », alerte sur `FAILED` (§2.3) |
 | **3** | **Un batch déployé comme un `Deployment`**, ou un `Job` mal réglé : pas de `activeDeadlineSeconds`, `backoffLimit` trop haut | le processus **redémarre après chaque fin**, même réussie ; ou boucle d'échecs pendant des heures | `Job`/`CronJob` avec `backoffLimit` et `activeDeadlineSeconds` bornés ; `restartPolicy` : `OnFailure` ou `Never` |
 | **4** | **Spring Cloud Data Flow mal configuré** : serveur sans base de données dédiée, ou ne lisant pas le `JobRepository` du batch | métadonnées du serveur perdues au redémarrage ; onglet *Jobs* vide | une base **persistante** pour le serveur ; le serveur pointe sur **le même** `JobRepository` |
@@ -559,10 +612,11 @@ Un `CronJob` démarre à 2 h. Le pod charge 5 millions de lignes, publie ses mé
 | 8.4 | Les métriques : celles du framework et les vôtres | 8 min | §2.3, §3.3 |
 | 8.5 | JFR et journaux structurés | 8 min | §2.4, §3.2 |
 | 8.6 | Un batch cloud native : les douze facteurs | 6 min | §1.3 |
-| 8.7 | Kubernetes : `Job`, `CronJob`, reprise | 9 min | §1.5, §2.5, §3.5 |
-| 8.8 | Spring Cloud Data Flow et Spring Cloud Task | 6 min | §1.4, §2.6, §3.4 |
-| 8.9 | Top 10 et bilan de la formation | 8 min | §1.6, §5 |
-| | **Total** | **≈ 67 min** | |
+| 8.7 | Lancer sans bloquer en production | 6 min | §2.7 |
+| 8.8 | Kubernetes : `Job`, `CronJob`, reprise | 9 min | §1.5, §2.5, §3.5 |
+| 8.9 | Spring Cloud Data Flow et Spring Cloud Task | 6 min | §1.4, §2.6, §3.4 |
+| 8.10 | Top 10 et bilan de la formation | 8 min | §1.6, §5 |
+| | **Total** | **≈ 73 min** | |
 
 ## 7. Exercices
 
@@ -583,6 +637,6 @@ Un `CronJob` démarre à 2 h. Le pod charge 5 millions de lignes, publie ses mé
 | 5 | Flux et orchestration | ≈ 55 min |
 | 6 | Fiabilité | ≈ 60 min |
 | 7 | Mise à l'échelle et multi-instance | ≈ 70 min |
-| 8 | Production | ≈ 67 min |
-| | **Total « Complet »** | **498 min ≈ 8 h 18** |
+| 8 | Production | ≈ 73 min |
+| | **Total « Complet »** | **504 min ≈ 8 h 24** |
 | | dont **« Essentiel »** (modules 1 à 6) | **321 min ≈ 5 h 21** |

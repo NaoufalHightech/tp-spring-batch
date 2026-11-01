@@ -68,11 +68,11 @@ Le PPT `pptx/Spring_Batch_cours_complet.pptx` (69 diapositives) contient déjà 
 |---|---|
 | 1 | « Architecture en trois couches » (12), « Le schéma de référence » (13), « Job, JobInstance, JobExecution » (14), « JobInstance = Job + paramètres identifiants » (15), « Step et StepExecution » (16), « ExecutionContext et JobRepository » (17) |
 | 2 | « Premier job : la Tasklet » (22), « Configurer le Step et le Job » (23), « Lancer un job » (24), « Tasklet ou chunk ? » (27) |
-| 3 | « Le chunk : lire un par un, écrire par blocs » (28), « L'algorithme du chunk et ses interfaces » (29), « Le reader CSV » (31), « Base de données : reader et writer JDBC » (36) |
+| 3 | « Le chunk : lire un par un, écrire par blocs » (28), « L'algorithme du chunk et ses interfaces » (29), « Le reader CSV (FlatFileItemReader) » (31), « Base de données : reader et writer JDBC » (36) |
 | 3B | « Lire et écrire : les formats » (32) |
 | 4 | « Processors : transformer, filtrer, composer » (34), « Valider les données » (35), « Enchaîner deux processors : le composite » (57), « Le piège : relancer double les totaux » (58) |
-| 5 | « Enchaîner les steps » (38), « Le decider » (39), « Flows en parallèle (split) » (40) |
-| 6 | « Skip » (43), « Retry » (44), « Restart » (45), « ExecutionContext et JobRepository » (17) |
+| 5 | « Enchaîner les steps : séquence et conditions » (38), « Le decider : aiguiller selon un résultat » (39), « Flows en parallèle (split) » (40) |
+| 6 | « Skip : ignorer certaines erreurs » (43), « Retry : retenter les erreurs transitoires » (44), « Restart : reprendre là où ça s'est arrêté » (45), « ExecutionContext et JobRepository » (17) |
 | 7 | « Partitions : le même step, des plages différentes » (41) |
 
 > Le PPT a été construit sur **Spring Batch 5.1 / Boot 3.2.4** : ses schémas sont réutilisables, mais **le code affiché doit être remplacé** par celui des modules

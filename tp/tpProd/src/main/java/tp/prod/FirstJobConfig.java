@@ -16,15 +16,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-public class HelloJobConfig {
-  private static final Logger log = LoggerFactory.getLogger(HelloJobConfig.class);
+public class FirstJobConfig {
+  private static final Logger log = LoggerFactory.getLogger(FirstJobConfig.class);
 
   /** Compteur et verrou partagés : uniquement pour les démonstrations des tests. */
   public static final AtomicInteger EXECUTIONS = new AtomicInteger();
   public static volatile CountDownLatch gate = new CountDownLatch(0);
 
   @Bean
-  Tasklet helloTasklet() {
+  Tasklet firstTasklet() {
     return (contribution, chunkContext) -> {
       EXECUTIONS.incrementAndGet();
       log.info("Bonjour depuis le step {}", contribution.getStepExecution().getStepName());
@@ -34,12 +34,12 @@ public class HelloJobConfig {
   }
 
   @Bean
-  Step helloStep(JobRepository jobRepository, PlatformTransactionManager tx, Tasklet helloTasklet) {
-    return new StepBuilder("helloStep", jobRepository).tasklet(helloTasklet, tx).build();
+  Step firstStep(JobRepository jobRepository, PlatformTransactionManager tx, Tasklet firstTasklet) {
+    return new StepBuilder("firstStep", jobRepository).tasklet(firstTasklet, tx).build();
   }
 
   @Bean
-  Job helloJob(JobRepository jobRepository, Step helloStep) {
-    return new JobBuilder("helloJob", jobRepository).start(helloStep).build();
+  Job firstJob(JobRepository jobRepository, Step firstStep) {
+    return new JobBuilder("firstJob", jobRepository).start(firstStep).build();
   }
 }

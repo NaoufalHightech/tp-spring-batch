@@ -22,6 +22,8 @@ Entre le reader et le writer, le processor est l'endroit des **règles métier**
 
 Le contrat : `O process(I item)`. Il peut changer de type : `ItemProcessor<RawTransaction, BankTransaction>`.
 
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Processors : transformer, filtrer, composer »** (n°34) du PPT du cours.
+
 ### 1.2 Flashback sur le Module 3
 
 Le `return null` du processor est la manière de **filtrer** : l'élément ne rejoint pas le chunk, la position de lecture avance quand même, et la
@@ -68,6 +70,8 @@ Dépendance (en plus de `spring-boot-starter-batch-jdbc`) :
 </dependency>
 ```
 
+Il s'agit de la version enrichie du record `RawTransaction` du Module 3, avec les annotations de validation ajoutées.
+
 ```java
 public record RawTransaction(
     @Positive long id,                                          // 2
@@ -93,6 +97,8 @@ ValidatingItemProcessor<RawTransaction> validationProcessor() {
 5. Montant obligatoire et positif ou nul.
 6. `BeanValidatingItemProcessor` applique ces règles à chaque élément.
 7. **Filtrer au lieu de rejeter.** Par défaut, un élément invalide **lève une `ValidationException`** : le chunk est annulé et le step échoue. Avec `setFilter(true)`, il est **filtré** (comme un `return null`) et `filterCount` augmente. Choisissez selon la règle métier : une ligne invalide doit-elle arrêter le lot, ou être écartée et comptée ? *(Pour la consigner, voir les listeners au Module 6.)*
+
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Valider les données »** (n°35) du PPT du cours.
 
 ### 2.2 Le processor de transformation : sans état
 
@@ -142,6 +148,8 @@ Règle de fonctionnement : **si un maillon retourne `null`, la chaîne s'arrête
 
 > Les types génériques sont **effacés à l'exécution** : le compilateur ne vérifie pas que la sortie d'un maillon correspond à l'entrée du suivant. Une erreur d'ordre ne se voit qu'à l'exécution (`ClassCastException`, piège n°4).
 
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Enchaîner deux processors : le composite »** (n°57) du PPT du cours.
+
 ### 2.4 Le processor qui a un état : le piège
 
 On veut, pour un rapport, le **total des débits** et le **total des crédits** du fichier. Première idée, naturelle et fausse :
@@ -175,7 +183,7 @@ public class AnalyticsProcessor
 4. On distingue débit et crédit.
 5. On **accumule** dans le champ. Au premier lancement, tout va bien.
 6. Le processor ne modifie pas l'élément : il l'observe et le laisse passer.
-7. Une API REST (`/analytics`) lit ces totaux pour les afficher.
+7. Une API REST (`/analytics`) lit ces totaux pour les afficher, par l'intermédiaire de `analyticsService.totals()`.
 
 Ce code **compile, s'exécute sans erreur et passe un test qui ne lance le job qu'une fois**.
 
@@ -185,15 +193,17 @@ Ce code **compile, s'exécute sans erreur et passe un test qui ne lance le job q
 @Test
 void les_totaux_ne_doublent_pas_au_deuxieme_lancement() throws Exception {
   jobOperator.start(bankJob, params("2026-10-01"));                        // 1er lancement
-  var first = analyticsController.analytics();                             // lit les totaux
+  var first = analyticsService.totals();                             // lit les totaux
 
   jobOperator.start(bankJob, params("2026-10-02"));                        // 2e lancement, même JVM
-  var second = analyticsController.analytics();
+  var second = analyticsService.totals();
 
   assertThat(second.totalDebit()).isEqualByComparingTo(first.totalDebit());   // doit rester égal
   assertThat(second.totalCredit()).isEqualByComparingTo(first.totalCredit());
 }
 ```
+
+(`params(runDate)` construit les deux paramètres du fil rouge : `runDate` identifiant et `inputFile` non identifiant, voir Module 3, §2.3.)
 
 Avec le singleton du §2.4, **ce test échoue**. Il passe dès qu'un des correctifs du §3.4 est appliqué.
 
@@ -260,6 +270,8 @@ Aucune exception, aucun message d'erreur, `COMPLETED` à chaque fois : le job «
 
 Après un **redémarrage** de l'application, le compteur repart à zéro et tout semble de nouveau normal : c'est ce qui rend le bug si difficile à diagnostiquer.
 
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Le piège : relancer double les totaux »** (n°58) du PPT du cours.
+
 ### 3.4 Les trois solutions
 
 **Solution 1 (la meilleure) : pas d'état dans le composant ; l'état va dans l'`ExecutionContext`.**
@@ -313,7 +325,7 @@ Elle fonctionne tant que **personne ne l'oublie** et qu'**un seul step** utilise
 
 ### 3.5 Pourquoi `SimpleDateFormat` partagé est un bug
 
-`SimpleDateFormat` **garde un état interne** (un calendrier de travail) modifié à chaque `parse` : deux threads qui l'utilisent en même temps **se marchent dessus**. Les résultats sont des dates **fausses**, parfois sans exception. Dans un step multithread (Module 7) ou avec plusieurs steps parallèles, un champ partagé de ce type est un piège classique.
+`SimpleDateFormat` **garde un état interne** (un calendrier de travail) modifié à chaque `parse` : deux threads qui l'utilisent en même temps **se marchent dessus**. Les résultats sont des dates **fausses**, parfois sans exception. Dans un step multithread (Module 7, *parcours Complet*) ou avec plusieurs steps parallèles, un champ partagé de ce type est un piège classique.
 
 `DateTimeFormatter` est **immuable** : il ne change jamais, il peut être partagé à volonté, y compris dans un champ `static final`. C'est le remplaçant à utiliser. (La démo d'origine créait un `SimpleDateFormat` à chaque appel : sûr, mais coûteux.)
 

@@ -45,6 +45,10 @@ fin du step
 **Un chunk = une transaction.** Le *commit interval* (la taille du chunk) est donc aussi la taille de ce qu'on
 perd si un chunk échoue : un rollback annule les 100 éléments du lot, pas les chunks déjà validés.
 
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Le chunk : lire un par un, écrire par blocs »** (n°28) du PPT du cours.
+
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« L'algorithme du chunk et ses interfaces »** (n°29) du PPT du cours.
+
 ### 1.3 Flashback sur le Module 1
 
 L'`ExecutionContext` du Module 1 est la « sauvegarde de partie » du step, stockée dans
@@ -171,6 +175,22 @@ public class BankReaderConfig {
 12. `RecordFieldSetMapper` remplit le record à partir des champs, **par nom**.
 13. `build()` assemble et configure le reader.
 
+**Les deux paramètres de `bankJob`.** Le job du fil rouge reçoit deux paramètres, de nature différente :
+
+```java
+var params = new JobParametersBuilder()
+    .addString("runDate", "2026-10-01")                                  // 1
+    .addString("inputFile", "data/transactions.csv", false)              // 2
+    .toJobParameters();
+```
+
+1. **`runDate` est identifiant** : il définit la `JobInstance` (Module 1). Deux lancements de la même date désignent le même lot.
+2. **`inputFile` est non identifiant** (troisième argument `false`) : il n'entre pas dans l'identité de l'instance et peut donc changer sans créer un nouveau lot.
+
+> **`runDate` identifie le lot ; `inputFile` est un paramètre d'entrée qui peut varier.** Conséquence pratique : si le fichier est corrigé et que l'on relance le lot du même jour après un échec, c'est bien **la même instance** qui reprend (Module 6) ; si le lot est déjà `COMPLETED`, le relancement est refusé, quel que soit le fichier.
+
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Le reader CSV (FlatFileItemReader) »** (n°31) du PPT du cours.
+
 ### 2.4 Le processor
 
 ```java
@@ -241,6 +261,8 @@ public class BankWriterConfig {
 
 > Réglage PostgreSQL : ajouter `reWriteBatchedInserts=true` à l'URL JDBC permet au pilote de regrouper les
 > insertions d'un lot en moins de requêtes : gain mesurable sur les gros chargements.
+
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Base de données : reader et writer JDBC »** (n°36) du PPT du cours. (partie writer JDBC)
 
 ### 2.6 Le step
 

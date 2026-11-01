@@ -1,5 +1,7 @@
 # Revue croisée de la formation (Modules 1 à 8, plus 3B)
 
+**Décisions validées le 1er novembre 2026.** Les 11 décisions ont été appliquées dans les modules (voir §9) ; les statuts ci-dessous sont à jour au même jour.
+
 > **Périmètre :** `support/modules/MODULE_1.md` à `MODULE_8.md`, `MODULE_3B_READERS.md`, `VISUELS.md`.
 > **Méthode :** lecture automatisée des 9 fichiers (extraction des renvois, des numéros de pièges, des sections, des sous-vidéos, des noms de classes, des citations de diapositives)
 > puis lecture des passages signalés. Les diapositives citées ont été comparées au fichier `pptx/Spring_Batch_cours_complet.pptx` (69 diapositives).
@@ -12,11 +14,13 @@
 | **Structure** | 9 fichiers sur 9 ont les 5 sections attendues (Concept, Code, Sous le capot, Cas d'usage, Pièges), exactement 10 pièges, deux sous-sections « Références visuelles », un tableau de sous-vidéos dont la somme est exacte (après correction du Module 1) |
 | **Renvois** | 14 renvois explicites « piège n°X du Module Y » ou « Module Y, §x.y » : **14 sur 14 pointent sur une cible qui existe et qui traite bien du concept cité** |
 | **Diapositives citées dans les modules** | 17 sur 17 correctes (numéro et titre) |
-| **Contradictions** | **12 relevées** : 3 sont corrigées dans cette passe, 9 restent à décider ou à traiter (§3) |
-| **Lacune** | une promesse du Module 1 et du Module 2 (« lancement asynchrone, Module 8 ») n'est **tenue nulle part** (§3, C9) |
-| **Parcours** | *Essentiel* (modules 1 à 6) = **321 min ≈ 5 h 21** ; *Complet* = **498 min ≈ 8 h 18**. Le parcours Essentiel renvoie à des modules optionnels : voir §6 |
+| **Contradictions** | **12 relevées** : 3 corrigées et **vérifiées** (C3, C8, C12) ; 3 **en cours** (C2, C9, R4) ; 6 **appliquées**, à valider (C1, C4, C5, C6, C7, C10) ; C11 clarifiée (§3) |
+| **Lacune** | la promesse des Modules 1 et 2 (« lancement asynchrone, Module 8 ») est **tenue** par la nouvelle section **Module 8, §2.7** (C9, en cours de validation) |
+| **Parcours** | *Essentiel* (modules 1 à 6) = **321 min ≈ 5 h 21** ; *Complet* = **504 min ≈ 8 h 24** (le Module 8 passe à 73 min avec la nouvelle §2.7). Les renvois de l'Essentiel vers l'optionnel sont étiquetés « (parcours Complet) » (§6) |
 
-**Corrigé dans cette passe :** en-tête du Module 1 (5 sous-vidéos annoncées, 6 listées) ; manifeste Kubernetes du Module 8 (qui ne lançait aucun job avec la configuration du Module 1) ; formulation du restart implicite (Modules 6 et 8) ; étiquette de parcours dans chaque module ; total chiffré du Module 8.
+**Corrigé lors de la première passe, puis vérifié :** en-tête du Module 1 ; manifeste Kubernetes du Module 8 ; formulation du restart implicite (Modules 6 et 8) ; étiquettes de parcours.
+
+**Appliqué lors de la seconde passe (décisions du 1er novembre 2026) :** voir §9.
 
 ---
 
@@ -60,7 +64,7 @@
 **Lecture.** Aucun concept n'est utilisé avant son introduction **sauf trois** :
 1. **`ExitStatus`** est utilisé au **Module 3B** (`EmptyInputFailer`) alors que sa définition est au Module 5 : le renvoi « (Module 5) » existe, mais la notion n'y est pas expliquée.
 2. **Le skip** est montré au **Module 3B** (§2.6) avant le Module 6 (voir R4).
-3. **`TaskExecutorJobOperator`** et le lancement asynchrone sont annoncés au Module 8 (Modules 1 et 2) mais **ne sont pas traités** (C9).
+3. **`TaskExecutorJobOperator`** et le lancement asynchrone, annoncés au Module 8 par les Modules 1 et 2, **n'étaient pas traités** : c'est le rôle de la nouvelle section **M8 §2.7** (C9, en cours).
 
 ---
 
@@ -71,7 +75,7 @@
 | R1 | Cycle de vie du bean en 8 étapes | M2 §3.1 et M4 §3.1 (identiques) | **Justifié** (directive : « ré-explique ») mais quasi mot pour mot | M4 : rappel en 3 lignes + renvoi à M2 §3.1, puis seulement ce qui est nouveau |
 | R2 | Singleton contre `@StepScope` : les 4 temps du proxy et le schéma mémoire | M2 §3.2 et M4 §3.2 | **Partiellement justifié** : même explication, même schéma | M2 : version courte (idée + schéma) ; M4 : le détail (CGLIB, limites) |
 | R3 | Démonstration du double comptage | M2 §3.3 (100 → 200) et M4 §3.3 (135,50 → 271,00 → 406,50) | **Justifié** : progression voulue (tasklet puis processor) | Conserver ; M2 annonce déjà M4 |
-| R4 | Skip : `faultTolerant().skip(...)` | **M3B §2.6** et M6 §2.1 | **À corriger** : le skip y est enseigné deux fois, et M3B est **optionnel** alors que M6 est « Essentiel » | Déplacer l'exemple `SkipPolicy` de M3B vers M6 (encadré) ; M3B garde 3 lignes et un renvoi |
+| R4 | Skip : `faultTolerant().skip(...)` | **M3B §2.6** et M6 §2.1 | **En cours** : le skip était enseigné deux fois, et M3B est **optionnel** alors que M6 est « Essentiel » | **Appliqué** : `SkipPolicy` (avec le `switch`) déplacée dans M6 §2.1 ; M3B §2.6 réduit à un aperçu de 3 lignes et un renvoi |
 | R5 | `SimpleDateFormat` | M3 §2.4 + piège 5 ; M4 §3.5 + piège 5 | **Justifié** : mention (M3) puis explication (M4) | Conserver |
 | R6 | Verrouillage optimiste | M1 §3.3-3.4 ; M7 §3.1 | **Justifié** : complémentaires (`JobExecution` atténué / `StepExecution` strict) | Conserver (le renvoi explicite existe) |
 | R7 | Exécution orpheline (`STARTED`) | M1 piège 7 ; M6 §3.4 | **Justifié** et croisé | Conserver |
@@ -86,18 +90,18 @@
 
 | # | Gravité | Constat | Où | Statut / suggestion |
 |---|---|---|---|---|
-| **C1** | **Haute** | **Paramètres du job du fil rouge incohérents.** Le job reçoit `inputFile` (M3, M3B, M8), mais le service de reprise (M6 §2.4) reconstruit les paramètres avec **`runDate` seul**, et M4/M6 identifient les lancements par `runDate`. Un `restartFor("2026-10-01")` retrouverait une autre instance que celle lancée avec `inputFile` | M3 §2.3, M4 §2.5, M6 §2.4, M8 §2.1 | **À décider.** Proposition : le job `bankJob` a deux paramètres : **`runDate`** (identifiant) et **`inputFile`** (non identifiant), présentés dès M3 |
-| **C2** | **Haute** | **Deux classes `HelloJobConfig` et deux `POST /jobs/hello`** : M1 §2.4-2.5 (package `tp.prod`) et M2 §2.2/2.4 (package `tp.prod.hello`, avec un autre step). Si l'élève conserve les deux : beans `helloJob` en double, deux contrôleurs sur la même route | M1, M2 | **À décider.** Proposition : M2 indique « remplace la classe du Module 1 », ou renommer celle du M1 (`FirstJobConfig`, route `/jobs/first`) |
-| C3 | **Haute** | **Le manifeste Kubernetes (M8) ne lançait aucun traitement** : le Module 1 pose `spring.batch.job.enabled=false`, le manifeste n'y revenait pas ; le conteneur démarrait, ne faisait rien, sortait avec le code 0 | M8 §2.5 | **Corrigé** (variables `SPRING_BATCH_JOB_ENABLED` et `SPRING_BATCH_JOB_NAME`, et un encadré « deux manières de déclencher un batch ») |
-| C4 | Moyenne | **Noms du fil rouge** : M5 utilise `loadStep`, `reportStep`, `alertStep` (génériques) alors que M3, M6, M7, M8 utilisent `loadBankStep`. M5 ne manipule aucun objet bancaire (0 occurrence de `BankTransaction`) | M5 §2.1-2.4 | **À décider.** Proposition : `loadBankStep`, `reportStep` → `bankReportStep`, et un `alertStep` au contenu bancaire |
-| C5 | Moyenne | **API de test des totaux différente** : M4 §2.5 appelle `analyticsController.analytics()`, M8 §2.2 appelle `analytics.compute()` | M4, M8 | **À décider.** Proposition : un seul nom (`analyticsService.totals()`) |
-| C6 | Moyenne | **`RawTransaction` défini deux fois** : M3 §2.2 (sans annotations), M4 §2.1 (avec règles de validation). L'évolution est voulue mais **jamais signalée** | M3, M4 | **À corriger** : une phrase dans M4 : « version enrichie du record du Module 3 » |
-| C7 | Moyenne | **Numérotation du piège « test vert »** : « piège n°9 » en M3 et M4, mais en M8 il est la ligne **n°1** tout en étant libellé « piège n°9, récurrent » | M8 §5 | **À corriger** : « piège récurrent (n°9 des Modules 3 et 4) », ou renuméroter (voir §5) |
-| C8 | Basse | En-tête du Module 1 : « 5 sous-vidéos de 5 à 9 min », « 40 à 45 min » ; le tableau en liste **6** (total 46 min) | M1 | **Corrigé** |
-| **C9** | **Haute** | **Promesse non tenue.** M1 (§2.5 point 7, pièges 6 et 10), M2 (§2.4, variante) renvoient au **Module 8** pour le lancement asynchrone et le choix du nombre de threads ; le Module 8 **ne le traite pas** (aucune occurrence de `TaskExecutorJobOperator` hors du tableau récapitulatif) | M1, M2, M8 | **À décider.** Option A (recommandée) : ajouter à M8 une section « §2.7 Lancer sans bloquer en production » (≈ 6 min). Option B : réécrire les renvois de M1 et M2 vers M2 §2.4 et M7 §3.5 |
-| C10 | Moyenne | **`EmptyInputFailer` (M3B §2.5) : `ExitStatus` `FAILED` mais `BatchStatus` `COMPLETED`.** M5 §3.2 dit que la reprise s'appuie sur le `BatchStatus` et M6 que seuls `FAILED`/`STOPPED` sont reprenables : un step « échoué » par son code de sortie serait **non reprenable**. Le comportement du job dans ce cas n'est expliqué nulle part | M3B, M5, M6 | **À tester** puis à documenter (une phrase dans M5 §3.2) |
+| **C1** | **Haute** | **Paramètres du job du fil rouge incohérents.** Le job reçoit `inputFile` (M3, M3B, M8), mais le service de reprise (M6 §2.4) reconstruit les paramètres avec **`runDate` seul**, et M4/M6 identifient les lancements par `runDate`. Un `restartFor("2026-10-01")` retrouverait une autre instance que celle lancée avec `inputFile` | M3 §2.3, M4 §2.5, M6 §2.4, M8 §2.1 | **Appliqué, à valider.** `bankJob` : `runDate` identifiant + `inputFile` non identifiant ; note et code dans M3 §2.3 ; M4 §2.5, M6 §2.4 et M8 §2.1 alignés |
+| **C2** | **Haute** | **Deux classes `HelloJobConfig` et deux `POST /jobs/hello`** : M1 §2.4-2.5 (package `tp.prod`) et M2 §2.2/2.4 (package `tp.prod.hello`, avec un autre step). Si l'élève conserve les deux : beans `helloJob` en double, deux contrôleurs sur la même route | M1, M2 | **En cours.** M1 : `FirstJobConfig`, `firstJob`, `POST /jobs/first` (code `tp/tpProd` renommé) ; M2 garde `HelloJobConfig` / `/jobs/hello` avec la phrase de transition |
+| C3 | **Haute** | **Le manifeste Kubernetes (M8) ne lançait aucun traitement** : le Module 1 pose `spring.batch.job.enabled=false`, le manifeste n'y revenait pas ; le conteneur démarrait, ne faisait rien, sortait avec le code 0 | M8 §2.5 | **Vérifié** (variables `SPRING_BATCH_JOB_ENABLED` et `SPRING_BATCH_JOB_NAME`, encadré « deux manières de déclencher un batch ») |
+| C4 | Moyenne | **Noms du fil rouge** : M5 utilise `loadStep`, `reportStep`, `alertStep` (génériques) alors que M3, M6, M7, M8 utilisent `loadBankStep`. M5 ne manipule aucun objet bancaire (0 occurrence de `BankTransaction`) | M5 §2.1-2.4 | **Appliqué, à valider.** M5 : `loadBankStep`, `bankReportStep` ; `alertStep` enrichi (`FinanceAlertTasklet`, alerte à l'équipe financière) |
+| C5 | Moyenne | **API de test des totaux différente** : M4 §2.5 appelle `analyticsController.analytics()`, M8 §2.2 appelle `analytics.compute()` | M4, M8 | **Appliqué, à valider.** `analyticsService.totals()` dans M4 et M8 |
+| C6 | Moyenne | **`RawTransaction` défini deux fois** : M3 §2.2 (sans annotations), M4 §2.1 (avec règles de validation). L'évolution est voulue mais **jamais signalée** | M3, M4 | **Appliqué, à valider.** Phrase ajoutée dans M4 §2.1 |
+| C7 | Moyenne | **Numérotation du piège « test vert »** : « piège n°9 » en M3 et M4, mais en M8 il est la ligne **n°1** tout en étant libellé « piège n°9, récurrent » | M8 §5 | **Appliqué, à valider.** « piège récurrent (n°9 des Modules 3 et 4) » dans M8 §2.2 et §5 |
+| C8 | Basse | En-tête du Module 1 : « 5 sous-vidéos de 5 à 9 min », « 40 à 45 min » ; le tableau en liste **6** (total 46 min) | M1 | **Vérifié** (45 à 50 min, 6 sous-vidéos, somme 46) |
+| **C9** | **Haute** | **Promesse non tenue.** M1 (§2.5 point 7, pièges 6 et 10), M2 (§2.4, variante) renvoient au **Module 8** pour le lancement asynchrone et le choix du nombre de threads ; le Module 8 **ne le traite pas** (aucune occurrence de `TaskExecutorJobOperator` hors du tableau récapitulatif) | M1, M2, M8 | **En cours.** Nouvelle section **M8 §2.7** (`TaskExecutorJobOperator`, comparaison avec l'exécuteur du M2, configuration) + sous-vidéo 8.7 ; renvois de M1 (§2.5 pt 7, pièges 6 et 10) et M2 (§2.4) mis à jour |
+| C10 | Moyenne | **`EmptyInputFailer` (M3B §2.5) : `ExitStatus` `FAILED` mais `BatchStatus` `COMPLETED`.** M5 §3.2 dit que la reprise s'appuie sur le `BatchStatus` et M6 que seuls `FAILED`/`STOPPED` sont reprenables : un step « échoué » par son code de sortie serait **non reprenable**. Le comportement du job dans ce cas n'est expliqué nulle part | M3B, M5, M6 | **Appliqué, à valider.** Note « Cas à tester » dans M5 §3.2 ; le test lui-même reste à faire |
 | C11 | Basse | **M2 §4.1** présente un `CronJob` qui appelle `POST /jobs/hello` ; **M8** montre un `CronJob` qui lance directement le conteneur | M2, M8 | **Clarifié** dans M8 (encadré) ; aucun changement dans M2 |
-| C12 | Basse | **Restart implicite.** M6 ne mentionnait que `restart(executionId)` alors que `start(...)` avec les mêmes paramètres reprend aussi une instance `FAILED` (confirmé par la documentation) | M6 §2.4, M8 §2.5 | **Corrigé** (encadré « Restart implicite », « à tester sur votre version ») |
+| C12 | Basse | **Restart implicite.** M6 ne mentionnait que `restart(executionId)` alors que `start(...)` avec les mêmes paramètres reprend aussi une instance `FAILED` (confirmé par la documentation) | M6 §2.4, M8 §2.5 | **Vérifié** (encadré « Restart implicite » dans M6 §2.4, formulation dans M8 §2.5) |
 
 **Cohérences vérifiées sans écart :** `BatchStatus`/`ExitStatus` (M5, M6, M8) ; `chunk(n)` contre `chunk(n, tx)` déprécié (M3, M6, M7, M8) ; retry de Spring Framework 7 (M6, M8) ; verrouillage optimiste `JobExecution`/`StepExecution` (M1, M7) ; clé de position `read.count` (M3, M6) ; thread-safety des readers (M3, M3B, M7) ; exécution orpheline (M1, M6, M8) ; durées (somme des sous-vidéos = total annoncé dans les 9 modules après correction de M1).
 
@@ -151,18 +155,18 @@ Sections « Flashback » dédiées : M2 §1.1, M3 §1.3, M4 §1.2-1.3, M5 §1.5,
 | **Essentiel** | 1, 2, 3, 4, 5, 6 | 46 + 45 + 55 + 60 + 55 + 60 = **321 min ≈ 5 h 21** |
 | **Complet** | + 3B (40), 7 (70), 8 (67) | **498 min ≈ 8 h 18** |
 
-**Le parcours Essentiel renvoie à du contenu optionnel.** Un élève qui s'arrête au Module 6 rencontre ces annonces :
+**Le parcours Essentiel renvoie à du contenu optionnel.** Un élève qui s'arrête au Module 6 rencontre ces annonces ; **toutes sont maintenant étiquetées « (parcours Complet) »** (dernière colonne) :
 
-| Module Essentiel | Renvoi | Cible optionnelle | Traitement proposé |
+| Module Essentiel | Renvoi | Cible optionnelle | Traitement appliqué |
 |---|---|---|---|
-| M1 §2.5 point 7 | « exécuteur asynchrone (Module 8) » | M8 (absent, C9) | Réécrire : renvoi à M2 §2.4 |
-| M1 §5, pièges 6 et 10 | « (Module 8) » | M8 | idem |
-| M2 §2.4 (variante) | `TaskExecutorJobOperator`, « on y revient au Module 8 » | M8 (absent, C9) | Phrase autonome + « (parcours Complet) » |
-| M4 §3.5 | `SimpleDateFormat` en multithread (Module 7) | M7 | Ajouter « (parcours Complet) » |
-| M5 §3.4 | « supervision (Module 8) » | M8 | Ajouter « (parcours Complet) » |
-| M5 §3.5 et références visuelles | `Split` contre partitionnement (Module 7) | M7 | Ajouter « (parcours Complet) » |
-| M6 piège 9 | répertoire par exécution (Module 3B) | M3B | Rappeler l'idée en une phrase (déjà dans M6) + « (3B, Complet) » |
-| M6 | le **skip** est aussi montré en 3B (R4) | M3B | Déplacer `SkipPolicy` dans M6 |
+| M1 §2.5 point 7 | lancement asynchrone | M8 §2.7 | première version indiquée au M2 §2.4 ; M8 §2.7 *(parcours Complet)* |
+| M1 §5, pièges 6 et 10 | lancement explicite / asynchrone | M8 §2.7 | idem, étiqueté |
+| M2 §2.4 (variante) | `TaskExecutorJobOperator` | M8 §2.7 | étiqueté *(parcours Complet)* |
+| M4 §3.5 | `SimpleDateFormat` en multithread | M7 | étiqueté *(parcours Complet)* |
+| M5 §3.4 | supervision | M8 | étiqueté *(parcours Complet)* |
+| M5 §3.5 et références visuelles | `Split` contre partitionnement | M7 | étiqueté *(parcours Complet)* (2 renvois) |
+| M6 piège 9 | répertoire par exécution | M3B | étiqueté *(Module 3B, parcours Complet)* |
+| M6 | le **skip** montré aussi en 3B | M3B | **résolu** : le skip complet est dans M6 (R4) |
 
 ---
 
@@ -175,11 +179,11 @@ Sections « Flashback » dédiées : M2 §1.1, M3 §1.3, M4 §1.2-1.3, M5 §1.5,
 | M6 | 43 « Skip : ignorer certaines erreurs », 44 « Retry : retenter les erreurs transitoires », 45 « Restart : reprendre là où ça s'est arrêté » (×2), 17 « ExecutionContext et JobRepository » (×2), 16 « Step et StepExecution », 29 « L'algorithme du chunk et ses interfaces » | **vérifié** (numéro et titre) |
 | M7 | 40 « Flows en parallèle (split) », 41 « Partitions : le même step, des plages différentes » (×2) | **vérifié** |
 | M8 | 46 « Tester un job et un step », 47 « Composants personnalisés, logs et patterns », 48 « Lancer et superviser », 64 « Spring Batch 6 : les nouveautés », 65 « Impact sur notre TP (Spring Batch 5 → 6) » | **vérifié** |
-| M1 à M5, M3B | **aucune ligne `🖼️ [RÉFÉRENCE PPT]`** | **à compléter** : la directive est postérieure ; la correspondance existe dans `VISUELS.md` §5 |
+| M1 (6), M2 (4), M3 (4), M3B (2), M4 (4), M5 (3) | **lignes `🖼️ [RÉFÉRENCE PPT]` ajoutées**, avec les **titres complets** | **vérifié** : 39 citations numéro + titre, **0 écart** (contrôle automatique) |
 
 ### 7.2 Correspondance `VISUELS.md` §5 (27 renvois)
 
-**21 titres exacts, 6 titres abrégés** (même numéro, titre complété sur la diapositive) : n°31 « Le reader CSV » (réel : « … (FlatFileItemReader) »), n°38 « Enchaîner les steps » (réel : « … : séquence et conditions »), n°39 « Le decider » (réel : « … : aiguiller selon un résultat »), n°43, 44, 45 (titres sans la suite). **Aucun numéro faux.** À reprendre avec les titres complets lors de l'insertion des lignes `🖼️`.
+**27 titres, tous complets après correction** (6 titres abrégés complétés dans cette passe) : n°31 « Le reader CSV » (réel : « … (FlatFileItemReader) »), n°38 « Enchaîner les steps » (réel : « … : séquence et conditions »), n°39 « Le decider » (réel : « … : aiguiller selon un résultat »), n°43, 44, 45 (titres sans la suite). **Aucun numéro faux.** À reprendre avec les titres complets lors de l'insertion des lignes `🖼️`.
 
 ### 7.3 Contenu des diapositives à mettre à jour (écarts avec les modules)
 
@@ -211,15 +215,20 @@ Sections « Flashback » dédiées : M2 §1.1, M3 §1.3, M4 §1.2-1.3, M5 §1.5,
 
 ---
 
-## 9. Décisions attendues, par ordre de priorité
+## 9. Décisions validées le 1er novembre 2026 : état d'application
 
-| # | Décision | Impact |
+| # | Décision | Statut |
 |---|---|---|
-| 1 | **C9** : ajouter une section « lancer sans bloquer en production » à M8 (option A), ou réécrire les renvois de M1/M2 (option B) | lacune réelle |
-| 2 | **C1** : fixer les paramètres du fil rouge (`runDate` identifiant + `inputFile` non identifiant) et les présenter dès M3 | cohérence du code de M3, M4, M6, M8 |
-| 3 | **C2** : sort de `HelloJobConfig` et de la route `/jobs/hello` (M1 contre M2) | le code du projet `tp/tpProd` |
-| 4 | **R4** : déplacer `SkipPolicy` de M3B vers M6 | cohérence du parcours Essentiel |
-| 5 | **C4, C5, C6, C7** : harmoniser noms et libellés (fil rouge, API des totaux, record `RawTransaction`, numérotation du piège n°9) | confort de lecture |
-| 6 | **C10** : tester puis documenter le cas `ExitStatus` `FAILED` avec `BatchStatus` `COMPLETED` | exactitude |
-| 7 | Renvois du parcours Essentiel vers l'optionnel (§6) : étiqueter « (parcours Complet) » | parcours en deux niveaux |
-| 8 | Insérer les lignes `🖼️ [RÉFÉRENCE PPT]` dans M1 à M5 et M3B (correspondance dans `VISUELS.md` §5) | préparation de la mise à jour du PPT |
+| 1 | **C9** : section « Lancer sans bloquer en production » dans M8 + renvois de M1 et M2 | **En cours** (M8 §2.7 rédigée, sous-vidéo 8.7, durées recalculées) |
+| 2 | **C1** : `runDate` (identifiant) + `inputFile` (non identifiant) | **Appliqué** (M3, M4, M6, M8) |
+| 3 | **C2** : `FirstJobConfig` / `POST /jobs/first` (M1), `HelloJobConfig` / `POST /jobs/hello` (M2) | **En cours** (modules et projet `tp/tpProd` renommés ; code non exécuté) |
+| 4 | **R4** : `SkipPolicy` déplacée vers M6, aperçu de 3 lignes en M3B | **En cours** (appliqué) |
+| 5 | **C4** : `loadBankStep`, `bankReportStep`, `alertStep` enrichi | **Appliqué** |
+| 6 | **C5** : `analyticsService.totals()` | **Appliqué** (M4, M8) |
+| 7 | **C6** : phrase « version enrichie du record `RawTransaction` » | **Appliqué** (M4 §2.1) |
+| 8 | **C7** : « piège récurrent (n°9 des Modules 3 et 4) » | **Appliqué** (M8 §2.2 et §5) |
+| 9 | **C10** : note « Cas à tester » (`ExitStatus` `FAILED`, `BatchStatus` `COMPLETED`) | **Appliqué** (M5 §3.2) ; test à faire |
+| 10 | Étiquette « (parcours Complet) » sur les 8 renvois Essentiel vers optionnel | **Appliqué** (§6) |
+| 11 | Lignes `🖼️ [RÉFÉRENCE PPT]` dans M1 à M5 et M3B, titres complets | **Appliqué** et **vérifié** (39 citations, 0 écart) |
+
+**Durées après modification :** Module 8 : 73 min (10 sous-vidéos) ; **Complet : 504 min ≈ 8 h 24** ; **Essentiel : 321 min ≈ 5 h 21**.

@@ -31,6 +31,8 @@ Un step fait l'une de deux choses :
 
 Une tasklet s'exécute **dans une transaction**. Si elle retourne `RepeatStatus.CONTINUABLE`, Spring Batch la rappelle dans une **nouvelle** transaction ; avec `FINISHED`, le step est terminé.
 
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Tasklet ou chunk ? »** (n°27) du PPT du cours.
+
 ### 1.3 Qui lance quoi, et quand ?
 
 ```
@@ -115,6 +117,8 @@ public class PrintMessageTasklet implements Tasklet {                           
 8. `getStepExecution()` donne accès au nom du step, aux compteurs et à l'`ExecutionContext`.
 9. `FINISHED` : fin du step. `CONTINUABLE` rappellerait `execute` dans une nouvelle transaction.
 
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Premier job : la Tasklet »** (n°22) du PPT du cours.
+
 ### 2.2 Le step et le job avec les builders de la version 6
 
 ```java
@@ -163,6 +167,10 @@ public class HelloJobConfig {
 11. `.start(...)` désigne le premier step. On enchaînera ensuite avec `.next(...)` (Module 5).
 12. `.build()` produit le `Job`.
 
+> Cette classe remplace celle du Module 1 ; nous passons d'un job minimal à un job avec `@StepScope`. (Les deux ont des noms différents, `FirstJobConfig` et `HelloJobConfig` : vous pouvez garder la première comme exemple, mais c'est `helloJob` qui sert de base à la suite.)
+
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Configurer le Step et le Job »** (n°23) du PPT du cours.
+
 ### 2.3 Le lancement par `JobOperator`
 
 ```java
@@ -203,6 +211,8 @@ public class HelloJobService {
 6. `runDate` est identifiant par défaut : il définit la `JobInstance` (flashback Module 1).
 7. `toJobParameters()` fige l'objet.
 8. `start(Job, JobParameters)` lance, **attend la fin** et renvoie la `JobExecution` terminée : appel **synchrone**.
+
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Lancer un job »** (n°24) du PPT du cours.
 
 ### 2.4 Une API de lancement qui ne bloque pas
 
@@ -256,7 +266,7 @@ class HelloJobController {
 8. `getLastJobExecution(nom, paramètres)` interroge le dépôt (donc PostgreSQL) : le suivi survit à un redémarrage.
 9. Pattern matching du `switch` avec `case null` : traite explicitement l'absence d'exécution.
 
-> Variante : en version 6, un lanceur peut lui-même être asynchrone si on lui fournit un `TaskExecutor` (classe `TaskExecutorJobOperator`). On y revient au Module 8 avec le choix du nombre de threads.
+> Variante : en version 6, un lanceur peut lui-même être asynchrone si on lui fournit un `TaskExecutor` (classe `TaskExecutorJobOperator`). Sa configuration de production et la comparaison avec l'exécuteur ci-dessus sont au Module 8, §2.7 *(parcours Complet)*.
 
 ### 2.5 La configuration de démarrage
 

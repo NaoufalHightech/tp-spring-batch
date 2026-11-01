@@ -143,6 +143,30 @@ public class RejectedLineLogger implements SkipListener<RawTransaction, BankTran
 4. En lecture, on n'a **pas** d'élément (la lecture a échoué) ; en traitement, on a l'élément d'entrée.
 5. En écriture, on a l'élément de sortie.
 
+#### Une règle de skip sur mesure : `SkipPolicy`
+
+Quand « telle exception, jusqu'à N fois » ne suffit pas, on écrit sa propre règle :
+
+```java
+public class FileSkipPolicy implements SkipPolicy {
+  @Override
+  public boolean shouldSkip(Throwable t, long skipCount) {                           // 1
+    return switch (t) {                                                              // 2
+      case FileNotFoundException e -> false;                                         // 3
+      case FlatFileParseException e -> skipCount < 10;                               // 4
+      default -> false;
+    };
+  }
+}
+```
+
+1. Reçoit l'exception et le nombre d'éléments déjà ignorés.
+2. `switch` avec *pattern matching* sur le type de l'exception (Java 21+).
+3. Un fichier manquant n'est **jamais** ignorable.
+4. Une ligne mal formée l'est tant que le seuil n'est pas atteint.
+
+On la branche avec `.skipPolicy(new FileSkipPolicy())`, à la place de `.skip(...)` et `.skipLimit(...)`. Elle convient quand la décision dépend de **plusieurs critères** (type, seuil, contexte) que l'écriture déclarative ne sait pas exprimer.
+
 ### 2.2 Retry : réessayer une erreur transitoire
 
 ```java
@@ -203,7 +227,7 @@ public class BankRestartService {
   }
 
   public long restartFor(String runDate) throws Exception {
-    var params = new JobParametersBuilder().addString("runDate", runDate).toJobParameters();  // 1
+    var params = new JobParametersBuilder().addString("runDate", runDate).toJobParameters();  // 1 : l'identifiant suffit
     JobExecution last = jobRepository.getLastJobExecution("bankJob", params);                  // 2
     if (last == null) {
       throw new IllegalArgumentException("Aucune exécution pour " + runDate);
@@ -217,7 +241,7 @@ public class BankRestartService {
 }
 ```
 
-1. **Les mêmes paramètres** identifiants : c'est ce qui désigne **la même `JobInstance`** (Module 1). Avec d'autres paramètres, ce serait une **nouvelle** instance, donc un nouveau lot, pas une reprise.
+1. **Le paramètre identifiant `runDate`** désigne **la même `JobInstance`** (Module 1, Module 3 §2.3). `inputFile`, non identifiant, n'entre pas dans l'identité de l'instance : il n'est pas nécessaire pour la retrouver, et `restart` rejoue l'exécution avec les paramètres déjà enregistrés. Avec un autre `runDate`, ce serait une **nouvelle** instance, donc un nouveau lot, pas une reprise.
 2. On retrouve la dernière exécution de cette instance, dans PostgreSQL.
 3. `switch` sur l'énumération `BatchStatus` : le comportement est **explicite** pour chaque statut.
 4. Seuls **`FAILED`** et **`STOPPED`** autorisent un restart. `restart(long)` crée une **nouvelle `JobExecution`** de la même instance et retourne son identifiant.
@@ -423,7 +447,7 @@ Un verrou de quelques secondes sur la table de référence fait échouer un chun
 | 6 | Skip en **écriture** sans y penser | le chunk est rejoué élément par élément (mode « scan ») : le débit chute | valider **en amont** (Module 4) pour que l'écriture n'échoue pas |
 | 7 | Retry avec **effets de bord** ou **totaux** dans le processor | e-mail envoyé deux fois, compteur doublé après rejeu (Module 4, §3.6) | processor **pur** ; écritures idempotentes ; agrégats par `SUM` SQL |
 | 8 | Retry **sans pause** ni plafond | on martèle une base déjà en difficulté (« effet de troupeau ») | `delay` + `multiplier` + `jitter` + `maxDelay` |
-| 9 | Reader **non reprenable** : pas de `name`, `saveState` désactivé, ou fichier remplacé entre-temps | le restart repart de **zéro**, ou lit un autre fichier | nom unique, `saveState` actif ; fichier **figé** par répertoire d'exécution (Module 3B) |
+| 9 | Reader **non reprenable** : pas de `name`, `saveState` désactivé, ou fichier remplacé entre-temps | le restart repart de **zéro**, ou lit un autre fichier | nom unique, `saveState` actif ; fichier **figé** par répertoire d'exécution (Module 3B, *parcours Complet*) |
 | 10 | **Arrêt non gracieux** : pas de hook, ou `terminationGracePeriod` plus court qu'un chunk | JVM tuée au milieu : exécution **orpheline** (`STARTED`), restart refusé | hook + délai d'arrêt supérieur à la durée d'un chunk ; procédure `recover` documentée |
 
 **Comment tester la fiabilité.** Trois tests qu'un job de production doit avoir :

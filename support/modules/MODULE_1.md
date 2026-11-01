@@ -35,6 +35,14 @@ Job ───────────── la recette (nom + liste de steps)
 Règle d'or : **JobInstance = Job + JobParameters identifiants.** Deux lancements avec les mêmes paramètres
 identifiants désignent la **même** instance ; si elle est déjà terminée avec succès, Spring Batch refuse de la rejouer.
 
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Job, JobInstance, JobExecution »** (n°14) du PPT du cours.
+
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« JobInstance = Job + paramètres identifiants »** (n°15) du PPT du cours.
+
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Step et StepExecution »** (n°16) du PPT du cours.
+
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« ExecutionContext et JobRepository »** (n°17) du PPT du cours.
+
 ### 1.3 Les trois couches
 
 ```
@@ -48,6 +56,10 @@ identifiants désignent la **même** instance ; si elle est déjà terminée ave
 │                 fichiers, transactions        │
 └───────────────────────────────────────────────┘
 ```
+
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Architecture en trois couches »** (n°12) du PPT du cours.
+
+> 🖼️ [RÉFÉRENCE PPT] : Utiliser la diapositive **« Le schéma de référence »** (n°13) du PPT du cours.
 
 ### 1.4 Ce qui a changé dans Spring Batch 6 (Boot 4)
 
@@ -158,12 +170,12 @@ public class BatchInfraConfig { }                              // 6
 
 ```java
 @Configuration
-public class HelloJobConfig {
+public class FirstJobConfig {
 
-  private static final Logger log = LoggerFactory.getLogger(HelloJobConfig.class);   // 1
+  private static final Logger log = LoggerFactory.getLogger(FirstJobConfig.class);   // 1
 
   @Bean
-  Tasklet helloTasklet() {                                                           // 2
+  Tasklet firstTasklet() {                                                           // 2
     return (contribution, chunkContext) -> {                                         // 3
       log.info("Bonjour depuis {}", contribution.getStepExecution().getStepName());  // 4
       return RepeatStatus.FINISHED;                                                  // 5
@@ -171,16 +183,16 @@ public class HelloJobConfig {
   }
 
   @Bean
-  Step helloStep(JobRepository repo, PlatformTransactionManager tx, Tasklet helloTasklet) {  // 6
-    return new StepBuilder("helloStep", repo)                                        // 7
-        .tasklet(helloTasklet, tx)                                                   // 8
+  Step firstStep(JobRepository repo, PlatformTransactionManager tx, Tasklet firstTasklet) {  // 6
+    return new StepBuilder("firstStep", repo)                                        // 7
+        .tasklet(firstTasklet, tx)                                                   // 8
         .build();                                                                    // 9
   }
 
   @Bean
-  Job helloJob(JobRepository repo, Step helloStep) {                                 // 10
-    return new JobBuilder("helloJob", repo)                                          // 11
-        .start(helloStep)                                                            // 12
+  Job firstJob(JobRepository repo, Step firstStep) {                                 // 10
+    return new JobBuilder("firstJob", repo)                                          // 11
+        .start(firstStep)                                                            // 12
         .build();                                                                    // 13
   }
 }
@@ -196,7 +208,7 @@ public class HelloJobConfig {
 8. La tasklet s'exécute dans **une transaction** gérée par `tx`.
 9. `build()` produit le `Step` immuable.
 10. Les paramètres du bean sont résolus par injection : pas de `new`.
-11. Le **nom du job** (`helloJob`) identifie la recette dans `BATCH_JOB_INSTANCE`.
+11. Le **nom du job** (`firstJob`) identifie la recette dans `BATCH_JOB_INSTANCE`.
 12. `start(...)` désigne le premier step.
 13. `build()` produit le `Job`.
 
@@ -216,16 +228,16 @@ public record RunResult(long executionId, String status) {                    //
 }
 
 @RestController
-class RunController {
-  private final JobOperator jobOperator; private final Job helloJob;
-  RunController(JobOperator jobOperator, Job helloJob) { this.jobOperator = jobOperator; this.helloJob = helloJob; }
+class FirstJobController {
+  private final JobOperator jobOperator; private final Job firstJob;
+  FirstJobController(JobOperator jobOperator, Job firstJob) { this.jobOperator = jobOperator; this.firstJob = firstJob; }
 
-  @PostMapping("/jobs/hello")                                                  // 4
+  @PostMapping("/jobs/first")                                                  // 4
   RunResult run(@RequestBody RunRequest req) throws Exception {
     var params = new JobParametersBuilder()                                    // 5
         .addString("runDate", req.runDate())                                   // 6
         .toJobParameters();
-    return RunResult.of(jobOperator.start(helloJob, params));                  // 7
+    return RunResult.of(jobOperator.start(firstJob, params));                  // 7
   }
 }
 ```
@@ -238,7 +250,7 @@ class RunController {
 5. `JobParametersBuilder` : fabrique des paramètres typés.
 6. `runDate` est un paramètre **identifiant** : c'est lui qui définit la `JobInstance`.
 7. `JobOperator.start(Job, JobParameters)` lance de façon synchrone et renvoie la `JobExecution` terminée.
-   Pour un job long, on utilisera un exécuteur asynchrone (Module 8) : sinon la requête HTTP reste bloquée.
+   Pour un job long, on utilisera un lancement asynchrone : sinon la requête HTTP reste bloquée. Une première version est donnée au Module 2 (§2.4) ; la configuration de production est au Module 8, §2.7 *(parcours Complet)*.
 
 *(Dépendance `spring-boot-starter-web` à ajouter pour cet extrait.)*
 
@@ -359,7 +371,7 @@ Sans `JobRepository` persistant, ce scénario signifie : « on rejoue 10 Go depu
 
 ### 4.2 Deux serveurs, un seul traitement
 
-Deux instances de l'application tournent derrière un répartiteur. Une tâche planifiée déclenche `helloJob` sur
+Deux instances de l'application tournent derrière un répartiteur. Une tâche planifiée déclenche `firstJob` sur
 les deux à 2 h 00 avec le même `runDate`. Grâce à la vérification de §3.2 et à l'isolation de création, **une**
 exécution démarre ; l'autre échoue proprement. Sans cela : deux traitements concurrents, données en double.
 
@@ -383,11 +395,11 @@ rien ajouter à l'application.
 | 3 | Abaisser `isolationLevelForCreate` pour « éviter les erreurs de sérialisation » | **deux lancements concurrents possibles** : on a supprimé la protection | garder SERIALIZABLE, **gérer** l'erreur (nouvelle tentative, alerte) |
 | 4 | Relancer avec les mêmes paramètres | `JobInstanceAlreadyCompleteException` | un paramètre identifiant qui change (date métier) ou `startNextInstance` |
 | 5 | Mettre l'horodatage courant en paramètre identifiant « pour que ça marche » | chaque relance est une **nouvelle** instance : plus de reprise possible | paramètre métier stable (`runDate`) ; horodatage en paramètre **non identifiant** |
-| 6 | `spring.batch.job.enabled` laissé à `true` | tous les jobs partent au démarrage de l'application | `false` + lancement explicite (Module 8) |
+| 6 | `spring.batch.job.enabled` laissé à `true` | tous les jobs partent au démarrage de l'application | `false` + lancement explicite (Module 2, §2.4 ; asynchrone en production : Module 8, §2.7 *(parcours Complet)*) |
 | 7 | Exécution restée `STARTED` après un crash | le job refuse de repartir (`AlreadyRunning`) | `abandon` / `recover` après vérification que rien ne tourne vraiment |
 | 8 | Ne jamais purger les `BATCH_*` | tables énormes, requêtes lentes | purge planifiée (par date de fin) |
 | 9 | Imports copiés de Spring Batch 4/5 | erreurs de compilation (`core.Job` → `core.job.Job`) | utiliser les paquets 6.x (§1.4) |
-| 10 | Lancer un job long dans la requête HTTP | requête bloquée, délai dépassé | exécuteur asynchrone (Module 8) |
+| 10 | Lancer un job long dans la requête HTTP | requête bloquée, délai dépassé | lancement asynchrone (Module 2, §2.4 ; Module 8, §2.7 *(parcours Complet)*) |
 
 **Bug silencieux typique :** un test qui passe sur H2 parce que le comportement de verrouillage n'existe pas
 (ou est trivial) en mémoire. Tout test de **concurrence ou de reprise** doit tourner sur PostgreSQL.
@@ -408,7 +420,7 @@ rien ajouter à l'application.
 
 ## 7. Exercices
 
-1. **Même paramètre.** Vous lancez deux fois `helloJob` avec `runDate=2026-11-01`. Que se passe-t-il au second
+1. **Même paramètre.** Vous lancez deux fois `firstJob` avec `runDate=2026-11-01`. Que se passe-t-il au second
    lancement si le premier s'est terminé en `COMPLETED` ? Et s'il est encore en cours ? Citez les deux exceptions.
 2. **Paramètre de relance.** Votre équipe veut pouvoir relancer le job du jour autant de fois que nécessaire après
    un échec, sans jamais rejouer un job déjà réussi. Quel paramètre mettriez-vous en paramètre identifiant, et lequel
