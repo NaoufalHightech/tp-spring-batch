@@ -609,52 +609,70 @@ A("| 7 | Titres de schémas officiels « à confirmer » | **validé** : vérifi
 A("")
 open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','..','PPT_PLAN.md'),'w').write("\n".join(out))
 
-APPROACH = {  # S -> (approche, état)
- "S01":("Manim","placeholder dans M1 (bandeau sous le tableau)"),"S03":("Manim","placeholder dans M1"),"S04":("natif python-pptx","**réalisé** nativement dans M1 (4 boîtes)"),
- "S05":("natif python-pptx","à faire (M2)"),"S06":("Manim","à faire (animé en 4 temps)"),"S07":("natif python-pptx","à faire (M2)"),
- "S08":("Manim","à faire"),"S09":("natif python-pptx","à faire (M3)"),"S10":("Manim","à faire"),"S11":("Manim","à faire"),"S12":("Manim","à faire"),"S13":("Manim","à faire"),
- "S14":("natif python-pptx","à faire (M4)"),"S15":("Manim","à faire : priorité n°1"),"S16":("Manim","à faire"),"S17":("natif python-pptx","à faire (tableau coloré)"),
- "S18":("natif python-pptx","à faire (M5)"),"S19":("Manim","à faire : priorité"),"S20":("Manim","à faire"),"S21":("natif python-pptx","à faire"),
- "S22":("natif python-pptx","à faire (M6)"),"S23":("Manim","à faire : priorité"),"S24":("Manim","à faire"),"S25":("Manim","à faire"),
- "S26":("Manim","à faire"),"S27":("natif python-pptx","à faire (M7)"),"S28":("Manim","à faire : priorité"),"S29":("natif python-pptx","à faire"),
- "S30":("natif python-pptx","à faire"),"S31":("natif python-pptx","à faire (tableau)"),"S32":("Manim","à faire"),
- "S34":("natif python-pptx","à faire (M8)"),"S35":("Manim","à faire"),"S36":("Manim","à faire : priorité"),"S37":("Manim","à faire"),"S38":("Manim","à faire"),
+VISUAL = {  # S -> (état, description visuelle : formes, couleurs, disposition ; couleurs = palette du PPT d'origine)
+ "S01":("**réalisé** (Module 1, diapo n°26)","six entités (bandeau coloré + corps clair) sur 2 rangées de 3 ; flèches 1 → * ; colonnes `version` en rouge"),
+ "S03":("**réalisé** (Module 1, diapo n°28)","diagramme de séquence : 3 participants (bleu, vert, violet), lignes de vie en pointillés, messages fléchés ; retour vert (1 ligne) et rouge (0 ligne)"),
+ "S04":("**réalisé** (Module 1, diapo n°12)","4 boîtes en ligne reliées par des flèches : 2 h 00 (vert), crash 3 h 12 (rouge), orphelin (orange), reprise (vert)"),
+ "S05":("à faire (Module 2)","deux cartes côte à côte : à gauche une boîte verte « une action » ; à droite une boucle de 3 boîtes bleues lire → traiter → écrire avec flèche de retour"),
+ "S06":("à faire (Modules 2 et 4)","gauche : une grande boîte rouge « singleton » à compteur ; droite : une boîte `forest` « proxy » (permanente) reliée par des flèches pointillées à 3 boîtes bleue / verte / lime (instances éphémères)"),
+ "S07":("à faire (Module 2)","3 boîtes bleues « lancement 1, 2, 3 » en ligne ; au-dessus, compteur : 100 → « 200 » en rouge"),
+ "S08":("à faire (Module 3)","3 rectangles verts (chunks) côte à côte ; sous chacun, un petit rectangle lime « position » ; le chunk 3 en rouge avec ovale « crash »"),
+ "S09":("à faire (Module 3)","5 boîtes en ligne : open → read ×N → update → commit → close ; boucle de retour autour des 3 centrales ; vert et orange"),
+ "S10":("à faire (Module 3)","deux panneaux : curseur (base bleue → 3 petits paquets lime `fetchSize` → JVM verte) et pagination (3 requêtes séparées) ; en bas, 4 ovales verts / rouges pour les conditions PostgreSQL"),
+ "S11":("à faire (Module 3B)","ovale central vert « Readers » + 6 ovales satellites reliés par des traits (fichier, base, Spring Data, service, personnalisé, disparus en `forest`)"),
+ "S12":("à faire (Module 3B)","colonne de 5 rectangles ACC / OP / OP / ACC / OP (bleu et vert) → flèche → deux cartes « Account » regroupées ; flèche orange `peek`"),
+ "S13":("à faire (Module 3B)","deux lignes de temps : lancement 1 (fichiers 1 à 3, verts) puis restart (fichier 4 ajouté en rouge) ; en dessous, version « répertoire par exécution » en vert"),
+ "S14":("à faire (Module 4)","boîte orange « processor » au centre ; trois flèches sortantes : vers le chunk (vert), vers la corbeille `null` (`forest`), vers le rollback (rouge) avec compteurs"),
+ "S15":("à faire (Module 4) : priorité 1","trois boîtes bleues (lancements) alimentant une boîte rouge « singleton » à compteur 135,50 → 271,00 → 406,50 ; à droite, `@StepScope` : trois instances vertes à 135,50"),
+ "S16":("à faire (Module 4)","rangée de petits carrés (chunk), l'élément 37 rouge ; flèche de rollback puis rejeu vert ; deux totaux : « processor » rouge (faux) et « SUM SQL » vert (juste)"),
+ "S17":("à faire (Module 4)","tableau à 3 colonnes colorées (vert, bleu, rouge pour le reset manuel) avec 4 critères et ovales verts / rouges"),
+ "S18":("à faire (Module 5)","deux rails horizontaux : `BatchStatus` (bleu : STARTED → COMPLETED) et `ExitStatus` (orange : COMPLETED_WITH_REJECTS) reliés par une flèche"),
+ "S19":("à faire (Module 5) : priorité","étapes (boîtes bleues), décision (ovale orange), fins (vert, rouge) ; flèches étiquetées par motif ; chemin rouge pointillé « Next state not found »"),
+ "S20":("à faire (Module 5)","un step → deux branches (flux 1 bleu, flux 2 vert) sur deux lignes → barrière rouge verticale → step final"),
+ "S21":("à faire (Module 5)","rectangle « pool de connexions » divisé en 5 cases ; 2 flux × 3 connexions + repository : cases orange et rouges, pool saturé"),
+ "S22":("à faire (Module 6)","arbre de décision : ovale « d'où vient l'erreur ? » → 3 branches → boîtes skip (orange), retry (bleue), restart (verte)"),
+ "S23":("à faire (Module 6) : priorité","34 chunks verts (condensés) puis un chunk 35 rouge (crash à 3 450) ; flèche verte de reprise à la 3 401e ligne"),
+ "S24":("à faire (Module 6)","rangée de 100 carrés, le 37e rouge ; rollback ; ovale orange « pause 200 / 400 / 800 ms » ; rejeu vert"),
+ "S25":("à faire (Module 6)","deux frises : haut vert (SIGTERM → hook → chunk fini → STOPPED), bas rouge (kill -9 → STARTED orphelin)"),
+ "S26":("à faire (Module 7)","ovale « goulot ? » → trois boîtes : I/O (partitionnement, vert), traitement (remote chunking, bleu), attente (multithread, orange)"),
+ "S27":("à faire (Module 7)","deux colonnes : éviter les doublons (2 serveurs → un vert, un rouge) ; se partager le travail (2 serveurs → 2 moitiés)"),
+ "S28":("à faire (Module 7) : priorité","colonne de 8 cases : bleues (réservées par A), vertes (par B), grises (verrouillées, sautées) ; deux flèches A et B"),
+ "S29":("à faire (Module 7)","barre 1 à 10 000 en 4 couleurs sans chevauchement ; dessous, cas fautif avec zone de recouvrement rouge"),
+ "S30":("à faire (Module 7)","un message → deux workers → même StepExecution ; la 2e écriture en rouge (exception)"),
+ "S31":("à faire (Module 7)","tableau de 5 lignes de readers avec ovales verts / rouges (thread-safe ou non)"),
+ "S32":("à faire (Module 7)","axes en traits ; courbe en 6 segments qui plafonne ; plateau en rouge"),
+ "S34":("à faire (Module 8)","trois cartes (tests vert, monitoring bleu, déploiement orange) avec 2 ou 3 boîtes chacune"),
+ "S35":("à faire (Module 8)","grille 2 × 4 de cartes numérotées, une par module, avec le piège phare"),
+ "S36":("à faire (Module 8) : priorité","CronJob → Job → Pod ; sorties code 0 / ≠ 0 ; `restartPolicy` (OnFailure, Never), compteur `backoffLimit`, `activeDeadlineSeconds` en rouge"),
+ "S37":("à faire (Module 8)","rangée chunk (read, process, write, transaction) en boîtes lime et orange ; 11 ovales d'événements placés au-dessus ; split / aggregate pour les partitions"),
+ "S38":("à faire (Module 8)","ligne de temps 0 à 60 s ; bloc vert « job 20 s » ; deux traits rouges de scrape à 30 s qui le ratent ; flèche verte de push à la fin"),
 }
 B=[]; Bp=B.append
 Bp("# Schémas à créer\n")
-Bp("> Généré avec `PPT_PLAN.md` par `pptx/plan_tools/gen_plan.py`. Règle de `pptx/generate_pptx.py` : un schéma **personnalisé** de **plus de 5 formes** devient un **placeholder** (rectangle en pointillés) dans le PPT ; il est à créer en **Manim**.")
-Bp("> Un schéma de **5 formes ou moins** est dessiné nativement (`python-pptx`).\n")
-Bp("## 1. Schémas personnalisés S01 à S38\n")
-Bp("S02 et S33 sont **retirés** (décision validée).\n")
-Bp("| Id | Module | Schéma | Approche | État | Description | Diapositive(s) du plan |")
-Bp("|---|---|---|---|---|---|---|")
+Bp("> Généré avec `PPT_PLAN.md` par `pptx/plan_tools/gen_plan.py`.\n")
+Bp("**Stratégie (décision validée) : tout en formes natives PowerPoint**, comme le PPT d'origine. Pas d'image, pas de Manim. Chaque schéma est dessiné par `pptx/generate_pptx.py` avec `python-pptx` : rectangles arrondis, ovales, connecteurs fléchés, tableaux, texte. Palette : celle du PPT d'origine (`1D3B2A`, `10211A`, `EEF5EF`, `2E7D4F`, `6DB33F`, `E9A23B`, `D4503F`, `3F7CAC`, `8A63D2`).\n")
+Bp("Outils déjà écrits dans le script : `add_box`, `add_arrow`, `add_line`, `add_schema`, `add_entity` (entité d'un schéma entité-relation), `add_sequence` (diagramme de séquence), `add_cards`, `add_table`, `add_callouts`.\n")
+Bp("## 1. Schémas S01 à S38\n")
+Bp("S02 et S33 sont **retirés** (décision validée). Reste **36 schémas**, dont **3 réalisés** (Module 1) : **33 à créer**.\n")
+Bp("| Id | Module | Schéma | État | Description visuelle (formes, couleurs, disposition) | Diapositive(s) du plan |")
+Bp("|---|---|---|---|---|---|")
 for sid,(mod,t,prio,desc) in CUSTOM.items():
-    ap,et=APPROACH[sid]
+    et,vis=VISUAL[sid]
     where=", ".join(f"n°{x}" for x in pos.get(sid,[]))
-    Bp(f"| {sid} | {mod} | {esc(t)} | {ap} | {et} | {esc(desc)} | {where} |")
+    Bp(f"| {sid} | {mod} | {esc(t)} | {et} | {esc(vis)} | {where} |")
 Bp("")
 Bp("## 2. Schémas officiels à insérer (titres vérifiés)\n")
-Bp("L'insertion d'images officielles est manuelle : le script place une légende « Schéma officiel à insérer » sur les diapositives concernées.\n")
+Bp("Ce sont des **images** de la documentation officielle : leur insertion reste **manuelle**. Le script place une légende « Schéma officiel à insérer » sur les diapositives concernées.\n")
 Bp("| Titre officiel | Page | Où l'insérer |")
 Bp("|---|---|---|")
 for t,pg,w in OFFICIAL: Bp(f"| « {t} » | {pg} | {w} |")
 Bp("")
 Bp("## 3. Schémas du PPT d'origine\n")
-Bp("Le PPT d'origine **ne contient aucune image** (0 balise `p:pic`, dossier média vide) : tous ses schémas sont des **formes natives**. L'extraction d'images est donc impossible (voir `pptx/assets/EXTRACTION.md`). Les schémas d'origine **simples** (jusqu'à 8 formes) sont redessinés nativement dans le script ; les autres sont des placeholders listés ici.\n")
-Bp("| Diapositive d'origine | Schéma | Traitement dans le nouveau PPT |")
+Bp("Le PPT d'origine **ne contient aucune image** (0 balise `p:pic`, dossier média vide) : tous ses schémas sont déjà des formes natives (voir `pptx/assets/EXTRACTION.md`). Ils sont **redessinés** avec les mêmes outils, au fil des modules.\n")
+Bp("| Diapositive d'origine | Schéma | Traitement |")
 Bp("|---|---|---|")
-Bp("| n°4 | lire, traiter, écrire | **redessiné** nativement (Module 1) |")
-Bp("| n°9 | cinq stratégies | **redessiné** nativement (Module 1) |")
-Bp("| n°12 | trois couches | **redessiné** nativement (Module 1) |")
-Bp("| n°13 | schéma de référence (6 formes) | **redessiné** nativement (Module 1) |")
-Bp("| n°14 | Job, JobInstance, JobExecution | **redessiné** nativement + légende du schéma officiel (Module 1) |")
+Bp("| n°4, 9, 12, 13, 14 | lire-traiter-écrire, cinq stratégies, trois couches, schéma de référence, hiérarchie du job | **redessinés** (Module 1) |")
 Bp("| n°27, 28, 29, 38, 39, 40, 41, 58 | tasklet/chunk, chunk, algorithme, flux, decider, split, partitions, double comptage | **à redessiner** dans les modules concernés (M2, M3, M5, M7, M4) |")
-Bp("")
-Bp("## 4. Placeholders présents dans le Module 1\n")
-Bp("| Diapositive du plan | Placeholder | Contenu à créer |")
-Bp("|---|---|---|")
-Bp(f"| n°{pos['S01'][0]} | S01 | ERD des 6 tables `BATCH_*` avec les colonnes `version` en évidence |")
-Bp(f"| n°{pos['S03'][0]} | S03 | séquence A / B / base du verrouillage optimiste |")
 open(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','..','ASSETS_A_CREER.md'),'w').write("\n".join(B)+"\n")
 print("PPT_PLAN.md écrit :",len(slides),"diapositives;",collections.Counter(v[1] for v in INV.values()))
 for mid,(a,b,c,p,mi) in per_module.items(): print(mid,c,f"{mi/c:.1f} min/diapo")

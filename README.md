@@ -41,7 +41,7 @@ Les renvois d'un module du parcours Essentiel vers un module optionnel sont marq
 |---|---|
 | [`REVUE_CROISEE.md`](REVUE_CROISEE.md) | cartographie des concepts, redondances, contradictions, flashbacks, références au PPT, état d'application des décisions |
 | [`pptx/generate_pptx.py`](pptx/generate_pptx.py) | génère le PPT module par module (Module 1 pour l'instant) ; sortie dans `pptx/build/` ; **non exécuté par l'équipe de rédaction** |
-| [`ASSETS_A_CREER.md`](ASSETS_A_CREER.md) | schémas S01 à S38 à créer (Manim ou natif), schémas officiels à insérer, placeholders du Module 1 |
+| [`ASSETS_A_CREER.md`](ASSETS_A_CREER.md) | les 36 schémas S01 à S38 (tous en formes natives) avec leur description visuelle et leur état, schémas officiels à insérer |
 | [`PPT_PLAN.md`](PPT_PLAN.md) | plan du PPT final (Phase 1) : inventaire des 69 diapositives d'origine, 214 diapositives du nouveau PPT par module, schémas à créer ; généré et contrôlé par `pptx/plan_tools/gen_plan.py` |
 | [`support/modules/VISUELS.md`](support/modules/VISUELS.md) | méthode des « Références visuelles », schémas officiels identifiés, schémas à créer, correspondance avec les diapositives du PPT |
 

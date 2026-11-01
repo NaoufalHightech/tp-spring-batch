@@ -11,9 +11,9 @@ Besoin :  pip install python-pptx
 Choix de conception
 - Une fonction par module (`build_module_N`) ; les utilitaires sont communs. Ajouter un module = ajouter
   une fonction et l'enregistrer dans BUILDERS.
-- Le PPT d'origine ne contient AUCUNE image (tous ses schémas sont des formes natives) : on ne peut rien
-  extraire. Les schémas d'origine simples sont donc redessinés ici ; les schémas personnalisés (S01-S38)
-  de plus de MAX_CUSTOM_SHAPES formes deviennent des placeholders, listés dans ASSETS_A_CREER.md (Manim).
+- Le PPT d'origine ne contient AUCUNE image : tous ses schémas sont des formes natives. On fait pareil :
+  TOUS les schémas (d'origine et S01-S38) sont dessinés en formes natives python-pptx (rectangles arrondis,
+  ovales, connecteurs fléchés, tableaux). Pas d'image, pas de Manim ; ASSETS_A_CREER.md liste ceux qui restent à écrire.
 - Les diapositives utilisent la disposition « Titre seul » : le titre reste un vrai titre (plan, accessibilité).
 - Toute la charte tient dans PAL, FONT et MONO : la changer ne demande aucune modification des diapositives.
 """
@@ -32,23 +32,28 @@ from pptx.oxml.ns import qn
 from pptx.util import Inches, Pt
 
 # --------------------------------------------------------------------------- charte graphique
-# Valeurs demandées pour cette passe. Elles diffèrent légèrement de la palette du PPT d'origine
-# (vert 1D3B2A / 2E7D4F, bleu 3F7CAC, orange E9A23B, violet 8A63D2, rouge D4503F).
+# Palette EXACTE du PPT d'origine (thème « SpringBatchCours » relevé dans pptx/Spring_Batch_cours_complet.pptx
+# et couleurs du code relevées dans pptx/lib.js). Changer la palette = modifier ce dictionnaire seulement.
 PAL = {
-    "forest": "1F4E3D", "green": "3B7D54", "blue": "2E6DA4", "orange": "E89C1C",
-    "purple": "7B4CAF", "red": "C0392B", "bg": "F4F8F4", "code_bg": "1E1E1E",
-    "text": "1B2B24", "muted": "5F6F66", "white": "FFFFFF", "zebra": "E6EEE7",
-    "warn_bg": "FFF4DD", "code_fg": "D4D4D4",
+    "forest": "1D3B2A",   # dk2     : séparateurs, bordure du code, texte secondaire
+    "text": "10211A",     # dk1     : texte et fond des panneaux de code
+    "white": "FFFFFF",    # lt1     : fond des diapositives
+    "light": "EEF5EF",    # lt2     : fond des cartes, lignes paires des tableaux
+    "green": "2E7D4F",    # accent2 : couleur principale (en-têtes de tableaux, boîtes)
+    "lime": "6DB33F",     # accent1 : nom de fichier et chaînes dans le code
+    "orange": "E9A23B",   # accent3
+    "red": "D4503F",      # accent4
+    "blue": "3F7CAC",     # accent5
+    "purple": "8A63D2",   # accent6
+    "code_fg": "E8F0EA", "code_comment": "8FA89A", "code_kw": "C3A6F5", "code_type": "7FC1EE",
 }
-FONT, MONO = "Calibri", "Consolas"
+PAL["bg"], PAL["code_bg"], PAL["muted"] = PAL["white"], PAL["text"], PAL["forest"]
+# Polices : celles demandées pour cette passe. Le PPT d'origine utilise Cambria (titres) et Courier New (code).
+FONT, FONT_TITLE, MONO = "Calibri", "Calibri", "Consolas"
 SW, SH = 13.333, 7.5            # 16:9, en pouces
 MX = 0.6                        # marge horizontale
 CW = SW - 2 * MX                # largeur utile
 STACK = "Spring Boot 4.1.2 · Spring Batch 6.0.6 · PostgreSQL 16 · Java 25"
-MAX_CUSTOM_SHAPES = 5           # au-delà : placeholder pour un schéma personnalisé (consigne)
-MAX_PPT_SHAPES = 8              # schémas d'origine redessinés : un peu plus tolérant (ils existent déjà)
-
-PLACEHOLDERS: list[tuple[str, str, int]] = []   # (id, description, n° de diapositive)
 OFFICIALS: list[tuple[str, int]] = []           # (titre officiel, n° de diapositive)
 
 
@@ -109,7 +114,7 @@ def add_title(slide, text, dark=False):
     size = 34 if len(clean) <= 45 else 30 if len(clean) <= 62 else 26
     p = tf.paragraphs[0]
     p.alignment = PP_ALIGN.LEFT
-    _run(p, clean, size, "white" if dark else "forest", True)
+    _run(p, clean, size, "white" if dark else "text", True, font=FONT_TITLE)
 
 
 def add_bullets(slide, items, x=MX, y=1.6, w=CW, h=4.8, size=20, numbered=False, color="text"):
@@ -148,7 +153,7 @@ def add_table(slide, headers, rows, x=MX, y=1.55, w=CW, col_w=None, size=None, r
             cell.margin_left = cell.margin_right = Inches(0.1)
             cell.vertical_anchor = MSO_ANCHOR.MIDDLE
             cell.fill.solid()
-            cell.fill.fore_color.rgb = rgb("forest" if r == 0 else "white" if r % 2 else "zebra")
+            cell.fill.fore_color.rgb = rgb("green" if r == 0 else "light" if r % 2 else "white")
             tf = cell.text_frame
             tf.word_wrap = True
             text = headers[c] if r == 0 else rows[r - 1][c]
@@ -168,8 +173,8 @@ def add_cards(slide, cards, x=MX, y=1.6, w=CW, h=4.6, cols=3, size=15, gap=0.25,
         sh = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(cx), Inches(cy), Inches(cw), Inches(ch))
         sh.adjustments[0] = 0.05
         sh.shadow.inherit = False
-        sh.fill.solid(); sh.fill.fore_color.rgb = rgb("white")
-        sh.line.color.rgb = rgb(col); sh.line.width = Pt(2.25)
+        sh.fill.solid(); sh.fill.fore_color.rgb = rgb("light")
+        sh.line.color.rgb = rgb(col); sh.line.width = Pt(1.25)
         tf = sh.text_frame
         tf.word_wrap, tf.vertical_anchor = True, MSO_ANCHOR.TOP
         tf.margin_left = tf.margin_right = Inches(0.18); tf.margin_top = Inches(0.12)
@@ -208,14 +213,16 @@ def add_caption(slide, text, y=6.55, x=MX, w=CW, color="muted"):
 def add_official(slide, title: str, num: int):
     """Légende « schéma officiel à insérer » (les images officielles sont ajoutées à la main)."""
     OFFICIALS.append((title, num))
-    add_caption(slide, f"Schéma officiel à insérer : « {title} » (documentation Spring Batch)", y=6.62, color="orange")
+    add_caption(slide, f"Schéma officiel à insérer : « {title} » (documentation Spring Batch)", y=6.62, color="blue")
 
 
 # --------------------------------------------------------------------------- code
 _KW = (r"\b(?:public|private|protected|class|record|interface|return|new|static|final|void|var|extends|"
        r"implements|throws|switch|case|default|import|package|if|else|for|while|try|catch|null|true|false)\b")
-_TOK = re.compile(r"(?P<c>//.*$|--.*$|^\s*#.*$)|(?P<s>\"(?:[^\"\\]|\\.)*\")|(?P<a>@\w+)|(?P<k>" + _KW + ")")
-_COL = {"c": "6A9955", "s": "CE9178", "a": "DCDCAA", "k": "569CD6"}
+# commentaire | chaîne | annotation | mot-clé | type (identifiant capitalisé) : mêmes catégories que le PPT d'origine
+_TOK = re.compile(r"(?P<c>//.*$|--.*$|^\s*#.*$)|(?P<s>\"(?:[^\"\\]|\\.)*\")|(?P<a>@\w+)|(?P<k>" + _KW
+                  + r")|(?P<t>\b[A-Z][A-Za-z0-9_]*\b)")
+_COL = {"c": PAL["code_comment"], "s": PAL["lime"], "a": PAL["orange"], "k": PAL["code_kw"], "t": PAL["code_type"]}
 
 
 def _segments(line: str, lang: str):
@@ -223,14 +230,14 @@ def _segments(line: str, lang: str):
     if lang == "xml":
         for part in re.split(r"(<!--.*?-->|</?[\w:.\-]+|/?>)", line):
             if part:
-                yield part, "6A9955" if part.startswith("<!--") else "569CD6" if part[0] in "</" or part == ">" else PAL["code_fg"]
+                yield part, PAL["code_comment"] if part.startswith("<!--") else PAL["code_type"] if part[0] in "</" or part == ">" else PAL["code_fg"]
         return
     if lang == "properties":
         m = re.match(r"^(\s*#.*)$|^([\w.\-]+)(=)(.*)$", line)
         if m and m.group(1):
-            yield line, _COL["c"]
+            yield line, PAL["code_comment"]
         elif m:
-            yield m.group(2), "9CDCFE"; yield "=", PAL["code_fg"]; yield m.group(4), _COL["s"]
+            yield m.group(2), PAL["code_type"]; yield "=", PAL["code_fg"]; yield m.group(4), PAL["lime"]
         else:
             yield line, PAL["code_fg"]
         return
@@ -245,22 +252,27 @@ def _segments(line: str, lang: str):
 
 
 def add_code(slide, code, x=MX, y=1.55, w=7.9, lang="java", size=None, filename=None, h=None):
-    """Bloc de code sur fond sombre. Taille choisie selon le nombre de lignes ; pas de retour à la ligne."""
+    """Panneau de code (comme le PPT d'origine) : fond sombre, bordure verte, nom du fichier en vert clair
+    en 1re ligne. Taille choisie selon le nombre de lignes ; pas de retour à la ligne automatique."""
     lines = code.strip("\n").split("\n")
     size = size or (16 if len(lines) <= 8 else 14 if len(lines) <= 12 else 12 if len(lines) <= 18 else 11)
-    if filename:
-        add_text(slide, filename, x, y - 0.02, w, 0.3, 12, "muted", True)
-        y += 0.3
-    h = h or len(lines) * size * 1.22 / 72 + 0.4
+    h = h or (len(lines) + (1 if filename else 0)) * size * 1.22 / 72 + 0.4
     sh = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h))
     sh.adjustments[0] = 0.03
     sh.shadow.inherit = False
-    sh.fill.solid(); sh.fill.fore_color.rgb = rgb("code_bg"); sh.line.fill.background()
+    sh.fill.solid(); sh.fill.fore_color.rgb = rgb("code_bg")
+    sh.line.color.rgb = rgb("forest"); sh.line.width = Pt(1)
     tf = sh.text_frame
     tf.word_wrap, tf.vertical_anchor = False, MSO_ANCHOR.TOP
     tf.margin_left = tf.margin_right = Inches(0.2); tf.margin_top = Inches(0.15)
-    for i, line in enumerate(lines):
-        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+    first = True
+    if filename:
+        p = tf.paragraphs[0]; p.alignment = PP_ALIGN.LEFT
+        _run(p, filename, 11, "lime", True, font=MONO)
+        first = False
+    for line in lines:
+        p = tf.paragraphs[0] if first else tf.add_paragraph()
+        first = False
         p.alignment = PP_ALIGN.LEFT
         if not line:
             _run(p, " ", size, "code_fg", font=MONO)
@@ -276,29 +288,34 @@ def spread(n, w, total=CW, x0=MX):
     return [x0 + i * (w + gap) for i in range(n)]
 
 
-def add_box(slide, x, y, w, h, text, color="green", fill="white", size=15, text_color="text",
+_DARK_TEXT = ("orange", "lime")     # sur ces fonds clairs, le texte est sombre (comme dans le PPT d'origine)
+
+
+def add_box(slide, x, y, w, h, text, color="green", fill=None, size=15, text_color=None,
             dashed=False, shape=MSO_SHAPE.ROUNDED_RECTANGLE):
-    """Boîte de schéma : 1re ligne en gras (couleur du contour), lignes suivantes plus petites."""
+    """Boîte pleine, comme le PPT d'origine : fond = couleur, 1re ligne en gras, lignes suivantes plus petites."""
+    fill = fill or color
+    text_color = text_color or ("text" if fill in _DARK_TEXT else "white")
     sh = slide.shapes.add_shape(shape, Inches(x), Inches(y), Inches(w), Inches(h))
     if shape == MSO_SHAPE.ROUNDED_RECTANGLE:
         sh.adjustments[0] = 0.12
     sh.shadow.inherit = False
     sh.fill.solid(); sh.fill.fore_color.rgb = rgb(fill)
-    sh.line.color.rgb = rgb(color); sh.line.width = Pt(2.25)
+    sh.line.color.rgb = rgb("orange" if dashed else color)
+    sh.line.width = Pt(2.25 if dashed else 0.75)
     if dashed:
         sh.line.dash_style = MSO_LINE.DASH
     tf = sh.text_frame
     tf.word_wrap, tf.vertical_anchor = True, MSO_ANCHOR.MIDDLE
     tf.margin_left = tf.margin_right = Inches(0.1)
-    head = color if fill == "white" else text_color
     for i, line in enumerate(text.split("\n")):
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         p.alignment = PP_ALIGN.CENTER
-        rich(p, line, size if i == 0 else size - 2, head if i == 0 else text_color, i == 0)
+        rich(p, line, size if i == 0 else size - 2, text_color, i == 0)
     return sh
 
 
-def add_arrow(slide, x1, y1, x2, y2, color="muted", width=2.25, dashed=False):
+def add_arrow(slide, x1, y1, x2, y2, color="forest", width=2.5, dashed=False):
     """Flèche : connecteur droit dont l'extrémité reçoit une pointe (balise a:tailEnd)."""
     c = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Inches(x1), Inches(y1), Inches(x2), Inches(y2))
     c.line.color.rgb = rgb(color)
@@ -310,19 +327,18 @@ def add_arrow(slide, x1, y1, x2, y2, color="muted", width=2.25, dashed=False):
     return c
 
 
-def add_placeholder(slide, sid, desc, x, y, w, h, num):
-    """Remplace un schéma à créer ; l'identifiant et la description vont dans ASSETS_A_CREER.md."""
-    PLACEHOLDERS.append((sid, desc, num))
-    add_box(slide, x, y, w, h, f"Schéma {sid} à créer (Manim)\n{desc}", "orange", "warn_bg",
-            16, "muted", dashed=True)
+def add_line(slide, x1, y1, x2, y2, color="forest", width=1.5, dashed=False):
+    """Trait sans pointe (lignes de vie, axes)."""
+    c = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Inches(x1), Inches(y1), Inches(x2), Inches(y2))
+    c.line.color.rgb = rgb(color)
+    c.line.width = Pt(width)
+    if dashed:
+        c.line.dash_style = MSO_LINE.DASH
+    return c
 
 
-def add_schema(slide, boxes, arrows=(), labels=(), num=0, sid=None, desc="", origin="custom",
-               area=(MX, 1.6, CW, 4.6)):
-    """Dessine un schéma natif. Un schéma personnalisé de plus de MAX_CUSTOM_SHAPES boîtes devient un placeholder."""
-    limit = MAX_CUSTOM_SHAPES if origin == "custom" else MAX_PPT_SHAPES
-    if len(boxes) > limit:
-        return add_placeholder(slide, sid or "S??", desc, *area, num)
+def add_schema(slide, boxes, arrows=(), labels=()):
+    """Dessine un schéma natif : boîtes (dict pour add_box), flèches (`p` = x1, y1, x2, y2) et étiquettes."""
     for b in boxes:
         add_box(slide, **b)
     for a in arrows:
@@ -332,11 +348,44 @@ def add_schema(slide, boxes, arrows=(), labels=(), num=0, sid=None, desc="", ori
                  lb.get("color", "muted"), lb.get("bold", False), lb.get("align", PP_ALIGN.LEFT))
 
 
+def add_entity(slide, x, y, w, h, name, columns, color="green", highlight=("version",)):
+    """Entité d'un schéma entité-relation : bandeau coloré (nom de la table) + corps listant les colonnes.
+    Les colonnes dont le texte contient un mot de `highlight` sont écrites en rouge et en gras."""
+    head_h = 0.4
+    add_box(slide, x, y, w, head_h, name, color, size=14)
+    body = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(x), Inches(y + head_h), Inches(w), Inches(h - head_h))
+    body.shadow.inherit = False
+    body.fill.solid(); body.fill.fore_color.rgb = rgb("light")
+    body.line.color.rgb = rgb(color); body.line.width = Pt(1.25)
+    tf = body.text_frame
+    tf.word_wrap, tf.vertical_anchor = True, MSO_ANCHOR.TOP
+    tf.margin_left = Inches(0.12); tf.margin_top = Inches(0.06)
+    for i, col in enumerate(columns):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        p.alignment = PP_ALIGN.LEFT
+        hot = any(k in col for k in highlight)
+        _run(p, col, 11, "red" if hot else "text", hot, font=MONO)
+
+
+def add_sequence(slide, lifelines, messages, top=1.55, bottom=6.2, box_w=2.6):
+    """Diagramme de séquence : un bandeau par participant, une ligne de vie en pointillés, des messages fléchés.
+    lifelines : [dict(x=centre, text=nom, color=couleur)] ; messages : [dict(a=i, b=j, y=hauteur, text=libellé,
+    color=couleur, dashed=bool)] où a et b sont des indices de participants."""
+    for ll in lifelines:
+        add_box(slide, ll["x"] - box_w / 2, top, box_w, 0.7, ll["text"], ll.get("color", "green"), size=15)
+        add_line(slide, ll["x"], top + 0.7, ll["x"], bottom, "forest", 1.5, dashed=True)
+    for m in messages:
+        x1, x2 = lifelines[m["a"]]["x"], lifelines[m["b"]]["x"]
+        add_arrow(slide, x1, m["y"], x2, m["y"], m.get("color", "forest"), 2.5, m.get("dashed", False))
+        add_text(slide, m["text"], min(x1, x2) + 0.1, m["y"] - 0.4, abs(x2 - x1) - 0.2, 0.38, m.get("size", 13),
+                 m.get("color", "text") if m.get("color") in ("red", "green") else "text", False, PP_ALIGN.CENTER)
+
+
 # --------------------------------------------------------------------------- squelette d'une diapositive
 def add_footer(slide, module: str, num: int, dark=False):
     col = "white" if dark else "muted"
-    add_text(slide, STACK, MX, 7.05, 8.5, 0.3, 11, col)
-    add_text(slide, f"Module {module} · {num}", SW - MX - 3.0, 7.05, 3.0, 0.3, 11, col, False, PP_ALIGN.RIGHT)
+    add_text(slide, STACK, MX, 7.05, 8.5, 0.3, 10, col)
+    add_text(slide, f"Module {module} · {num}", SW - MX - 3.0, 7.05, 3.0, 0.3, 10, col, False, PP_ALIGN.RIGHT)
 
 
 class Deck:
@@ -358,7 +407,7 @@ class Deck:
         add_footer(s, self.module, self.n, dark)
         if notes:
             s.notes_slide.notes_text_frame.text = notes
-        self.cur = self.n                                                # n° du plan, lu par les placeholders
+        self.cur = self.n                                                # n° du plan, lu par add_official et les notes
         self.n += 1
         return s
 
@@ -367,8 +416,7 @@ class Deck:
         s = self.slide(title, notes, dark=True)
         add_text(s, subtitle, MX, 1.5, CW, 0.6, 22, "white")
         opt = badge.startswith("Optionnel")
-        add_box(s, MX, 2.35, 3.4 if opt else 2.4, 0.55, badge.upper(), "orange" if opt else "green",
-                "orange" if opt else "green", 14, "white")
+        add_box(s, MX, 2.35, 3.4 if opt else 2.4, 0.55, badge.upper(), "orange" if opt else "green", size=14)
         add_text(s, f"Durée visée : {minutes} min", MX + (3.6 if opt else 2.6), 2.4, 3.5, 0.5, 16, "white")
         add_bullets(s, subvideos, MX, 3.3, CW, 3.4, 18, color="white")
         return s
@@ -399,7 +447,7 @@ def build_module_1(d: Deck):
               ("Destinations", "base · fichiers", "blue")]
     boxes = [dict(x=xs[i], y=2.4, w=2.1, h=1.5, text=f"{t}\n{sub}", color=c) for i, (t, sub, c) in enumerate(labels)]
     arrows = [dict(p=(xs[i] + 2.1, 3.15, xs[i + 1], 3.15)) for i in range(4)]
-    add_schema(s, boxes, arrows, origin="ppt", num=d.cur)
+    add_schema(s, boxes, arrows)
     add_text(s, "**Batch processing** = répétition de traitements sur de grands ensembles de données, "
                 "sans intervention humaine.", MX, 4.5, CW, 0.6, 20)
     add_text(s, "Données accumulées pendant une période : une semaine, un mois, une année.",
@@ -460,7 +508,7 @@ def build_module_1(d: Deck):
     boxes = [dict(x=xs[i], y=5.0 - i * 0.7, w=2.2, h=1.15, text=f"{t}\n{sub}", color=c, size=14)
              for i, (t, sub, c) in enumerate(steps)]
     arrows = [dict(p=(xs[i] + 2.2, 5.0 - i * 0.7 + 0.57, xs[i + 1], 5.0 - (i + 1) * 0.7 + 0.57)) for i in range(4)]
-    add_schema(s, boxes, arrows, origin="ppt", num=d.cur)
+    add_schema(s, boxes, arrows)
     add_text(s, "Même dans le cas simple : prévoir des **points de validation** et la **reprise**.",
              MX, 1.6, 6.5, 0.8, 18)
 
@@ -485,7 +533,7 @@ def build_module_1(d: Deck):
           ("Relance", "reprise à la dernière position confirmée", "green")]
     boxes = [dict(x=xs[i], y=2.6, w=2.6, h=1.7, text=f"{t}\n{sub}", color=c) for i, (t, sub, c) in enumerate(ev)]
     arrows = [dict(p=(xs[i] + 2.6, 3.45, xs[i + 1], 3.45)) for i in range(3)]
-    add_schema(s, boxes, arrows, sid="S04", desc="frise du crash et de la reprise", num=d.cur)
+    add_schema(s, boxes, arrows)
     add_text(s, "On déclare l'exécution orpheline (`abandon` / `recover`), puis on relance : le step reprend "
                 "à la **position sauvegardée** au lieu de repartir de zéro.", MX, 4.9, CW, 1.0, 20)
 
@@ -500,7 +548,7 @@ def build_module_1(d: Deck):
     ar = [dict(p=(3.6, 3.7, 5.2, 3.7)), dict(p=(8.2, 3.7, 9.7, 3.7)), dict(p=(6.7, 2.5, 6.7, 3.0))]
     lb = [dict(t="1 … *", x=3.8, y=3.25, w=1.2, align=PP_ALIGN.CENTER),
           dict(t="1 … *", x=8.3, y=3.25, w=1.2, align=PP_ALIGN.CENTER)]
-    add_schema(s, bx, ar, lb, origin="ppt", num=d.cur)
+    add_schema(s, bx, ar, lb)
     add_bullets(s, ["**Job** : définit ce qu'est la tâche et comment l'exécuter.",
                     "**JobInstance** : un job + ses paramètres identifiants, une exécution logique.",
                     "**JobExecution** : une tentative réelle, réussie ou échouée."],
@@ -554,7 +602,7 @@ def build_module_1(d: Deck):
           ("Batch Core", "Job, Step, JobOperator, JobRepository", "blue"),
           ("Batch Infrastructure", "ItemReader, ItemWriter, retry…", "purple")]
     boxes = [dict(x=0.8, y=1.8 + i * 1.5, w=6.4, h=1.25, text=f"{t}\n{sub}", color=c, size=18) for i, (t, sub, c) in enumerate(ly)]
-    add_schema(s, boxes, origin="ppt", num=d.cur)
+    add_schema(s, boxes)
     add_text(s, "**Le code que vous écrivez** : les traitements par lots et le code personnalisé.", 7.6, 1.95, 5.2, 0.9, 16)
     add_text(s, "**Le noyau** : classes d'exécution pour lancer et contrôler un job.", 7.6, 3.45, 5.2, 0.9, 16)
     add_text(s, "**Base commune** : readers, writers et services courants, utilisés par l'application ET par le cœur.",
@@ -574,7 +622,7 @@ def build_module_1(d: Deck):
           dict(p=(10.2, 3.0, 8.3, 4.1)), dict(p=(11.2, 3.0, 11.3, 4.1)),
           dict(p=(5.8, 3.0, 4.2, 4.1), dashed=True, color="red")]
     lb = [dict(t="1", x=8.1, y=1.95, w=0.5), dict(t="*", x=8.75, y=1.95, w=0.5)]
-    add_schema(s, bx, ar, lb, origin="ppt", num=d.cur)
+    add_schema(s, bx, ar, lb)
     add_text(s, "Un step a exactement **un reader**, **un writer**, et un **processor facultatif**.",
              MX, 5.7, CW, 0.6, 18)
 
@@ -732,20 +780,39 @@ RunResult run(@RequestBody RunRequest req) throws Exception {
 
     # ---- 1.5 Sous le capot -----------------------------------------------------------------
     s = d.slide("Ce que le JobRepository écrit : 6 tables, 3 séquences",
-                "Source : M1 §3.1. Chaque transition est écrite en base immédiatement : si le serveur est coupé, "
-                "la base connaît le dernier point confirmé.")
-    add_table(s, ["Table", "Une ligne par…", "Contient surtout"], [
-        ["`batch_job_instance`", "job + paramètres identifiants", "nom du job, clé de hachage des paramètres"],
-        ["`batch_job_execution`", "tentative de job", "statut, code de sortie, dates, **`version`**"],
-        ["`batch_job_execution_params`", "paramètre d'une exécution", "nom, type, valeur, `identifying`"],
-        ["`batch_job_execution_context`", "exécution de job", "contexte sérialisé du job"],
-        ["`batch_step_execution`", "tentative de step", "compteurs, statut, **`version`**"],
-        ["`batch_step_execution_context`", "exécution de step", "la « sauvegarde de partie » du step"]],
-        y=1.5, col_w=[4.2, 3.4, CW - 7.6], size=13, row_h=0.5)
-    add_text(s, "3 séquences : `batch_job_instance_seq`, `batch_job_execution_seq`, `batch_step_execution_seq`.",
-             MX, 5.15, CW, 0.4, 14, "muted")
-    add_placeholder(s, "S01", "ERD des 6 tables avec les colonnes `version` en évidence",
-                    MX, 5.7, CW, 1.1, d.cur)
+                "Source : M1 §3.1, schéma S01. Chaque transition est écrite en base immédiatement : si le serveur "
+                "est coupé, la base connaît le dernier point confirmé. Les colonnes version (en rouge) portent le "
+                "verrouillage optimiste.")
+    xs, y1, y2, ew, eh = [0.6, 4.87, 9.13], 1.55, 3.95, 3.6, 1.95
+    # ligne du haut : côté job ; ligne du bas : contextes et côté step
+    add_entity(s, xs[0], y1, ew, eh, "batch_job_instance",
+               ["job_instance_id         PK", "job_name", "job_key (hachage des paramètres)"], "blue")
+    add_entity(s, xs[1], y1, ew, eh, "batch_job_execution",
+               ["job_execution_id        PK", "job_instance_id         FK", "status · exit_code",
+                "start_time · end_time", "version"], "green")
+    add_entity(s, xs[2], y1, ew, eh, "batch_job_execution_params",
+               ["job_execution_id        FK", "parameter_name · type", "parameter_value", "identifying"], "green")
+    add_entity(s, xs[0], y2, ew, eh, "batch_step_execution_context",
+               ["step_execution_id       FK", "short_context (position lue)"], "purple")
+    add_entity(s, xs[1], y2, ew, eh, "batch_step_execution",
+               ["step_execution_id       PK", "job_execution_id        FK", "step_name · status",
+                "read · write · filter · rollback", "version"], "purple")
+    add_entity(s, xs[2], y2, ew, eh, "batch_job_execution_context",
+               ["job_execution_id        FK", "short_context (état du job)"], "green")
+    mid1, mid2 = y1 + 0.95, y2 + 0.95
+    add_arrow(s, xs[0] + ew, mid1, xs[1], mid1)                       # instance 1 → * exécution
+    add_arrow(s, xs[1] + ew, mid1, xs[2], mid1)                       # exécution 1 → * paramètres
+    add_arrow(s, xs[1] + ew / 2, y1 + eh, xs[1] + ew / 2, y2)         # exécution 1 → * step
+    add_arrow(s, xs[1] + ew, y1 + eh - 0.2, xs[2], y2 + 0.4)          # exécution 1 → 1 contexte du job
+    add_arrow(s, xs[1], mid2, xs[0] + ew, mid2)                       # step 1 → 1 contexte du step
+    for t, x, y in [("1", xs[0] + ew + 0.04, mid1 - 0.32), ("*", xs[1] - 0.3, mid1 - 0.32),
+                    ("1", xs[1] + ew + 0.04, mid1 - 0.32), ("*", xs[2] - 0.3, mid1 - 0.32),
+                    ("1", xs[1] + ew / 2 + 0.08, y1 + eh - 0.02), ("*", xs[1] + ew / 2 + 0.08, y2 - 0.3),
+                    ("1", xs[1] + ew + 0.04, y1 + eh - 0.5), ("1", xs[2] - 0.3, y2 - 0.02),
+                    ("1", xs[1] - 0.3, mid2 - 0.32), ("1", xs[0] + ew + 0.04, mid2 - 0.32)]:
+        add_text(s, t, x, y, 0.3, 0.3, 13, "text", True, PP_ALIGN.CENTER)
+    add_text(s, "3 séquences : `batch_job_instance_seq`, `batch_job_execution_seq`, `batch_step_execution_seq`."
+                " Colonnes `version` en rouge : verrouillage optimiste.", MX, 6.1, CW, 0.7, 14, "muted")
 
     s = d.slide("Comment un lancement est vérifié",
                 "Source : M1 §3.2. Ces lectures puis la création ne sont pas atomiques par nature : l'isolation "
@@ -757,15 +824,24 @@ RunResult run(@RequestBody RunRequest req) throws Exception {
           ("4 · Sinon : nouvelle JobExecution", "créée sous isolation SERIALIZABLE", "green")]
     boxes = [dict(x=xs[i], y=2.4, w=2.8, h=2.0, text=f"{t}\n{sub}", color=c, size=15) for i, (t, sub, c) in enumerate(st)]
     arrows = [dict(p=(xs[i] + 2.8, 3.4, xs[i + 1], 3.4)) for i in range(3)]
-    add_schema(s, boxes, arrows, num=d.cur)
+    add_schema(s, boxes, arrows)
     add_text(s, "Le perdant d'une course reçoit une exception : le lancement doit être **retenté** ou **abandonné**.",
              MX, 5.0, CW, 0.8, 20)
 
     s = d.slide("Le verrouillage optimiste, pas à pas",
                 "Source : M1 §3.3, schéma S03. Deux serveurs lisent la version 3 ; le premier écrit la version 4 ; "
                 "le second écrit avec la version 3 : 0 ligne modifiée, exception.")
-    add_placeholder(s, "S03", "séquence A / B / base : UPDATE … WHERE id = 42 AND version = 3, "
-                    "1 ligne puis 0 ligne ; version en rouge au conflit", MX, 1.7, CW, 4.6, d.cur)
+    life = [dict(x=2.2, text="Serveur A", color="blue"), dict(x=6.67, text="PostgreSQL", color="green"),
+            dict(x=11.13, text="Serveur B", color="purple")]
+    msgs = [dict(a=0, b=1, y=2.95, text="lit l'exécution 42 : version = 3"),
+            dict(a=2, b=1, y=3.5, text="lit l'exécution 42 : version = 3"),
+            dict(a=0, b=1, y=4.1, text="UPDATE … WHERE id = 42 AND version = 3"),
+            dict(a=1, b=0, y=4.65, text="1 ligne modifiée : version = 4", color="green", dashed=True),
+            dict(a=2, b=1, y=5.25, text="UPDATE … WHERE id = 42 AND version = 3"),
+            dict(a=1, b=2, y=5.8, text="0 ligne : OptimisticLockingFailureException", color="red", dashed=True)]
+    add_sequence(s, life, msgs, top=1.55, bottom=6.1)
+    add_text(s, "Le second serveur écrit avec une **version périmée** : aucune ligne ne correspond, l'écriture est refusée.",
+             MX, 6.3, CW, 0.5, 16, "text", False, PP_ALIGN.CENTER)
 
     s = d.slide("Ce qu'il faut savoir sur le verrouillage optimiste",
                 "Source : M1 §3.4. Ne pas s'attendre à une exception à chaque fois : la synchronisation du "
@@ -857,8 +933,6 @@ def main():
     deck.prs.save(target)
 
     print(f"{len(deck.prs.slides)} diapositives -> {target}")
-    for sid, desc, num in PLACEHOLDERS:
-        print(f"  placeholder {sid} (diapositive n°{num}) : {desc}")
     for title, num in OFFICIALS:
         print(f"  schéma officiel à insérer (diapositive n°{num}) : « {title} »")
 
