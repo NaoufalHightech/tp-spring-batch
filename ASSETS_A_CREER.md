@@ -6,6 +6,19 @@
 
 Outils déjà écrits dans le script : `add_box`, `add_arrow`, `add_line`, `add_schema`, `add_entity` (entité d'un schéma entité-relation), `add_sequence` (diagramme de séquence), `add_cards`, `add_table`, `add_callouts`.
 
+## État de validation
+
+| Point | État |
+|---|---|
+| Script compilé | oui |
+| Script exécuté (`python pptx/generate_pptx.py 1`) | **oui**, 31 diapositives, rendu PDF par LibreOffice (Caladea / Liberation Mono, métriques de Cambria / Courier New) |
+| Polices | Cambria (titres et texte), Courier New (code) : alignées sur l'original ; tous les caractères non ASCII du code (é, É, è, À, ·, …) existent en Courier New |
+| Débordements constatés | **3 défauts réels, aucun texte coupé** : diapos n°24 (appels 2 et 3 se touchent), n°26 (étiquette « 1 » sous la pointe de flèche), n°27 (mots longs coupés en boîte) ; voir `pptx/build/review_m1/` |
+| Titres officiels confirmés | **6 / 39** (6 schémas officiels vérifiés sur 39 références : 6 officiels + 33 schémas personnalisés) |
+| Titres à confirmer | **33 / 39** : ce sont les 33 schémas personnalisés S05 à S38 ; leurs titres sont ceux de ce plan, **à figer** avant toute description définitive. Les pages officielles à repérer (Chunk-oriented Processing, Controlling Step Flow, Scaling and Parallel Processing, Meta-Data Schema) restent à confirmer en plus. |
+| Descriptions des 33 schémas | provisoires ; ne pas les réviser avant la décision sur les titres |
+| Module 2 | non démarré (attend la validation visuelle du Module 1) |
+
 ## 1. Schémas S01 à S38
 
 S02 et S33 sont **retirés** (décision validée). Reste **36 schémas**, dont **3 réalisés** (Module 1) : **33 à créer**.

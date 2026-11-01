@@ -48,8 +48,8 @@ PAL = {
     "code_fg": "E8F0EA", "code_comment": "8FA89A", "code_kw": "C3A6F5", "code_type": "7FC1EE",
 }
 PAL["bg"], PAL["code_bg"], PAL["muted"] = PAL["white"], PAL["text"], PAL["forest"]
-# Polices : celles demandées pour cette passe. Le PPT d'origine utilise Cambria (titres) et Courier New (code).
-FONT, FONT_TITLE, MONO = "Calibri", "Calibri", "Consolas"
+# Polices alignées sur le PPT d'origine (Cambria / Courier New).
+FONT, FONT_TITLE, MONO = "Cambria", "Cambria", "Courier New"
 SW, SH = 13.333, 7.5            # 16:9, en pouces
 MX = 0.6                        # marge horizontale
 CW = SW - 2 * MX                # largeur utile
