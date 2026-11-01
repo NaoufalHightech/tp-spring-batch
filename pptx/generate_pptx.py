@@ -182,16 +182,17 @@ def add_cards(slide, cards, x=MX, y=1.6, w=CW, h=4.6, cols=3, size=15, gap=0.25,
         _run(p, plain(title), size + 3, col, True)
         for line in body.split("\n"):
             q = tf.add_paragraph(); q.alignment = PP_ALIGN.LEFT; q.space_before = Pt(6)
-            rich(q, line, size, "text")
+            small = line.startswith("§")                      # « § » : ligne en petits caractères (noms longs)
+            rich(q, line.lstrip("§"), size - 5 if small else size, "text")
 
 
-def add_callouts(slide, items, x, y, w, size=14):
+def add_callouts(slide, items, x, y, w, size=14, min_h=0.8, gap=0.2):
     """Points numérotés (pastille + texte), empilés ; la hauteur de chaque point est estimée."""
-    cpl = max(10, int(w * 72 / (size * 0.52)))            # caractères par ligne (estimation)
+    cpl = max(10, int(w * 72 / (size * 0.60)))            # caractères par ligne (estimation prudente pour Cambria)
     cy = y
     for i, item in enumerate(items, 1):
         lines = max(1, -(-len(plain(item)) // cpl))
-        h = max(0.5, lines * size * 1.25 / 72 + 0.12)
+        h = max(min_h, lines * size * 1.25 / 72 + 0.12)
         dot = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x), Inches(cy + 0.04), Inches(0.36), Inches(0.36))
         dot.shadow.inherit = False
         dot.fill.solid(); dot.fill.fore_color.rgb = rgb("green"); dot.line.fill.background()
@@ -201,7 +202,7 @@ def add_callouts(slide, items, x, y, w, size=14):
         p = tf.paragraphs[0]; p.alignment = PP_ALIGN.CENTER
         _run(p, str(i), 13, "white", True)
         add_text(slide, item, x + 0.45, cy, w - 0.45, h, size)
-        cy += h + 0.08
+        cy += h + gap                                      # pas minimal par défaut : 1,0 po
 
 
 def add_caption(slide, text, y=6.55, x=MX, w=CW, color="muted"):
@@ -292,7 +293,7 @@ _DARK_TEXT = ("orange", "lime")     # sur ces fonds clairs, le texte est sombre 
 
 
 def add_box(slide, x, y, w, h, text, color="green", fill=None, size=15, text_color=None,
-            dashed=False, shape=MSO_SHAPE.ROUNDED_RECTANGLE):
+            dashed=False, shape=MSO_SHAPE.ROUNDED_RECTANGLE, sub_size=None):
     """Boîte pleine, comme le PPT d'origine : fond = couleur, 1re ligne en gras, lignes suivantes plus petites."""
     fill = fill or color
     text_color = text_color or ("text" if fill in _DARK_TEXT else "white")
@@ -311,7 +312,7 @@ def add_box(slide, x, y, w, h, text, color="green", fill=None, size=15, text_col
     for i, line in enumerate(text.split("\n")):
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         p.alignment = PP_ALIGN.CENTER
-        rich(p, line, size if i == 0 else size - 2, text_color, i == 0)
+        rich(p, line, size if i == 0 else (sub_size or size - 2), text_color, i == 0)
     return sh
 
 
@@ -462,7 +463,7 @@ def build_module_1(d: Deck):
         ["**Fiabilité**", "reprendre un lot en échec : une transaction par lot"],
         ["**Pas un scheduler**", "un planificateur (Quartz, cron, Kubernetes) peut le lancer"],
         ["**Parallélisme**", "beaucoup de jobs en parallèle pour de gros volumes"]],
-        col_w=[3.6, CW - 3.6], size=17)
+        col_w=[3.6, CW - 3.6], size=20, row_h=0.68)
 
     s = d.slide("Cas d'usage métier", "Source : M1 §1.1, PPT n°6. Banques, assurances, télécoms, commerce.")
     add_table(s, ["Cas", "Exemple"], [
@@ -472,7 +473,7 @@ def build_module_1(d: Deck):
         ["**E-mails**", "envois automatiques à partir de fichiers de données"],
         ["**Rapports**", "quotidiens, hebdomadaires, mensuels"],
         ["**Workflows**", "exécution automatique sans intervention humaine"]],
-        col_w=[3.6, CW - 3.6], size=17)
+        col_w=[3.6, CW - 3.6], size=20, row_h=0.68)
 
     s = d.slide("Cas d'usage techniques", "Source : M1 §1.1, PPT n°7. Très demandé en entretien d'embauche.")
     add_table(s, ["Cas", "Exemple"], [
@@ -481,8 +482,8 @@ def build_module_1(d: Deck):
         ["**Files d'attente**", "consommer les messages d'un broker puis les traiter"],
         ["**Intégrité**", "contrôler l'intégrité d'un serveur d'applications"],
         ["**Données factices**", "remplir une base pour un test de charge"]],
-        col_w=[3.6, CW - 3.6], size=17)
-    add_caption(s, "Même les équipes qui n'utilisent pas Spring finissent par l'utiliser pour le batch.", y=5.9)
+        col_w=[3.6, CW - 3.6], size=20, row_h=0.72)
+    add_caption(s, "Même les équipes qui n'utilisent pas Spring finissent par l'utiliser pour le batch.", y=6.2)
 
     s = d.slide("Principes d'un bon batch",
                 "Source : M1 §1.1, PPT n°8 (documentation officielle Spring Batch). Chaque principe évite un "
@@ -494,7 +495,7 @@ def build_module_1(d: Deck):
         ["**Tester la charge tôt**", "un batch grossit avec le temps", "découvrir la limite en production"],
         ["**Sauvegarder aussi les fichiers**", "les fichiers plats sont oubliés", "un batch qui dépend de fichiers perdus"],
         ["**Rester simple**", "complexité = risque", "des batchs monolithiques ingérables"]],
-        col_w=[3.8, 3.9, CW - 7.7], size=15)
+        col_w=[3.8, 3.9, CW - 7.7], size=17, row_h=0.7)
 
     s = d.slide("Stratégies de traitement : du plus simple au plus complexe",
                 "Source : M1 §1.1, PPT n°9. Cinq stratégies, de la plus simple à la plus complexe ; même dans "
@@ -519,9 +520,9 @@ def build_module_1(d: Deck):
         ["Que s'est-il passé cette nuit, et où le job s'est-il arrêté ?", "les **métadonnées** stockées par le `JobRepository`"],
         ["Deux serveurs peuvent-ils lancer le même job en même temps ?", "le **verrouillage** fondé sur ces mêmes métadonnées"],
         ["Peut-on reprendre sans tout rejouer ni doubler les données ?", "l'**état** de chaque step (`ExecutionContext`)"]],
-        col_w=[7.0, CW - 7.0], size=17)
+        col_w=[7.0, CW - 7.0], size=18, row_h=0.85)
     add_text(s, "Les trois réponses reposent sur une base **durable et partagée** : PostgreSQL. "
-                "Une base en mémoire (H2) convient aux tests, jamais à la production.", MX, 4.9, CW, 1.2, 20)
+                "Une base en mémoire (H2) convient aux tests, jamais à la production.", MX, 5.5, CW, 1.2, 20)
 
     s = d.slide("La nuit interrompue : crash à 3 h 12, reprise au matin",
                 "Source : M1 §4.1, schéma S04 (réalisé nativement). Sans JobRepository persistant, on rejoue 10 Go "
@@ -531,11 +532,11 @@ def build_module_1(d: Deck):
           ("3 h 12", "mise à jour du système : le serveur redémarre", "red"),
           ("Au matin", "exécution restée STARTED, processus disparu", "orange"),
           ("Relance", "reprise à la dernière position confirmée", "green")]
-    boxes = [dict(x=xs[i], y=2.6, w=2.6, h=1.7, text=f"{t}\n{sub}", color=c) for i, (t, sub, c) in enumerate(ev)]
-    arrows = [dict(p=(xs[i] + 2.6, 3.45, xs[i + 1], 3.45)) for i in range(3)]
+    boxes = [dict(x=xs[i], y=2.3, w=2.6, h=2.2, text=f"{t}\n{sub}", color=c, size=17, sub_size=14) for i, (t, sub, c) in enumerate(ev)]
+    arrows = [dict(p=(xs[i] + 2.6, 3.4, xs[i + 1], 3.4)) for i in range(3)]
     add_schema(s, boxes, arrows)
     add_text(s, "On déclare l'exécution orpheline (`abandon` / `recover`), puis on relance : le step reprend "
-                "à la **position sauvegardée** au lieu de repartir de zéro.", MX, 4.9, CW, 1.0, 20)
+                "à la **position sauvegardée** au lieu de repartir de zéro.", MX, 5.2, CW, 1.0, 22)
 
     # ---- 1.2 Le vocabulaire en un schéma ---------------------------------------------------
     s = d.slide("Job, JobInstance, JobExecution",
@@ -565,7 +566,7 @@ def build_module_1(d: Deck):
         col_w=[2.2, 2.2, 3.3, CW - 7.7], size=16)
     add_cards(s, [("Mêmes paramètres", "Même instance, nouvelle exécution : c'est la **reprise**."),
                   ("Instance réussie", "Fermée : un nouveau lancement identique est **refusé**."),
-                  ("Instance en cours", "`JobExecutionAlreadyRunningException` si on la relance.")],
+                  ("Instance en cours", "Si on la relance :\n§`JobExecutionAlreadyRunningException`")],
               y=4.2, h=2.2, cols=3, size=15)
     add_official(s, "Job Parameters", d.cur)
 
@@ -578,8 +579,8 @@ def build_module_1(d: Deck):
         ["`filterCount`", "éléments filtrés par le processor"],
         ["`readSkipCount` / `processSkipCount` / `writeSkipCount`", "éléments ignorés (skip)"],
         ["`executionContext`", "données persistées pour la reprise"]],
-        col_w=[6.0, CW - 6.0], size=16)
-    add_caption(s, "Si un step échoue parce que le précédent a échoué, aucune StepExecution n'est créée.", y=5.9)
+        col_w=[6.0, CW - 6.0], size=18, row_h=0.66)
+    add_caption(s, "Si un step échoue parce que le précédent a échoué, aucune StepExecution n'est créée.", y=6.3)
 
     s = d.slide("ExecutionContext et JobRepository",
                 "Source : M1 §1.2, PPT n°17 (mise à jour). Le contexte du step est sauvegardé à chaque commit ; "
@@ -636,9 +637,9 @@ def build_module_1(d: Deck):
         ["**4.x**", "Spring 5", "alignement sur Spring 5"],
         ["**5.x**", "Spring 6", "Java 17 minimum, Jakarta EE"],
         ["**6.x**", "Spring 7, Boot 4", "`JobOperator`, `ChunkOrientedStep`, retry de Spring Framework 7"]],
-        col_w=[1.8, 2.8, CW - 4.6], size=17)
+        col_w=[1.6, 2.4, CW - 4.0], size=18, row_h=0.66)
     add_caption(s, "Spring Batch N pour Spring Framework N−1. Depuis la v5 : le JobRepository exige une base "
-                   "de données (PostgreSQL en production).", y=5.9)
+                   "de données (PostgreSQL en production).", y=6.3)
 
     s = d.slide("Ce qui change dans Spring Batch 6",
                 "Source : M1 §1.4. Tout import copié d'un tutoriel Spring Batch 4 ou 5 est faux : les paquets ont bougé.")
@@ -648,7 +649,7 @@ def build_module_1(d: Deck):
         ["`JobOperator` étend `JobLauncher`", "`start`, `restart`, `stop`, `abandon`, `recover`"],
         ["`JobRepository` étend `JobExplorer`", "une seule interface pour lire et écrire les métadonnées"],
         ["`@EnableJdbcJobRepository`", "déclare le dépôt JDBC : `dataSourceRef`, `tablePrefix`, `isolationLevelForCreate`…"]],
-        col_w=[4.6, CW - 4.6], size=15)
+        col_w=[4.6, CW - 4.6], size=17, row_h=0.82)
 
     # ---- 1.3 Le projet ---------------------------------------------------------------------
     s = d.slide("Dépendances Maven : Boot 4.1.2, Spring Batch 6.0.6, PostgreSQL",
@@ -709,7 +710,8 @@ public class BatchInfraConfig { }"""
                      "Déclare un `JobRepository` **JDBC**.",
                      "Le `DataSource` PostgreSQL de Boot.",
                      "Le gestionnaire de transactions des métadonnées.",
-                     "Préfixe des tables : plusieurs applications dans un même schéma."], 8.8, 1.85, 4.0, 14)
+                     "Préfixe des tables : plusieurs applications dans un même schéma."], 8.8, 1.7, 4.0, 14,
+                  min_h=0.5, gap=0.06)       # 5 points à loger au-dessus de l'encadré orange
     add_cards(s, [("Ne changez pas l'isolation de création",
                    "`isolationLevelForCreate` vaut **SERIALIZABLE par défaut**. L'abaisser supprime la protection "
                    "contre deux lancements simultanés.")], x=MX, y=4.9, w=CW, h=1.5, cols=1, size=15, colors=("orange",))
@@ -783,7 +785,7 @@ RunResult run(@RequestBody RunRequest req) throws Exception {
                 "Source : M1 §3.1, schéma S01. Chaque transition est écrite en base immédiatement : si le serveur "
                 "est coupé, la base connaît le dernier point confirmé. Les colonnes version (en rouge) portent le "
                 "verrouillage optimiste.")
-    xs, y1, y2, ew, eh = [0.6, 4.87, 9.13], 1.55, 3.95, 3.6, 1.95
+    xs, y1, y2, ew, eh = [0.6, 4.87, 9.13], 1.6, 4.05, 3.6, 1.55
     # ligne du haut : côté job ; ligne du bas : contextes et côté step
     add_entity(s, xs[0], y1, ew, eh, "batch_job_instance",
                ["job_instance_id         PK", "job_name", "job_key (hachage des paramètres)"], "blue")
@@ -799,20 +801,22 @@ RunResult run(@RequestBody RunRequest req) throws Exception {
                 "read · write · filter · rollback", "version"], "purple")
     add_entity(s, xs[2], y2, ew, eh, "batch_job_execution_context",
                ["job_execution_id        FK", "short_context (état du job)"], "green")
-    mid1, mid2 = y1 + 0.95, y2 + 0.95
+    mid1, mid2 = y1 + 0.9, y2 + 0.9
     add_arrow(s, xs[0] + ew, mid1, xs[1], mid1)                       # instance 1 → * exécution
     add_arrow(s, xs[1] + ew, mid1, xs[2], mid1)                       # exécution 1 → * paramètres
     add_arrow(s, xs[1] + ew / 2, y1 + eh, xs[1] + ew / 2, y2)         # exécution 1 → * step
     add_arrow(s, xs[1] + ew, y1 + eh - 0.2, xs[2], y2 + 0.4)          # exécution 1 → 1 contexte du job
     add_arrow(s, xs[1], mid2, xs[0] + ew, mid2)                       # step 1 → 1 contexte du step
-    for t, x, y in [("1", xs[0] + ew + 0.04, mid1 - 0.32), ("*", xs[1] - 0.3, mid1 - 0.32),
-                    ("1", xs[1] + ew + 0.04, mid1 - 0.32), ("*", xs[2] - 0.3, mid1 - 0.32),
-                    ("1", xs[1] + ew / 2 + 0.08, y1 + eh - 0.02), ("*", xs[1] + ew / 2 + 0.08, y2 - 0.3),
-                    ("1", xs[1] + ew + 0.04, y1 + eh - 0.5), ("1", xs[2] - 0.3, y2 - 0.02),
-                    ("1", xs[1] - 0.3, mid2 - 0.32), ("1", xs[0] + ew + 0.04, mid2 - 0.32)]:
-        add_text(s, t, x, y, 0.3, 0.3, 13, "text", True, PP_ALIGN.CENTER)
+    # étiquettes de cardinalité : 0,15 po plus haut que la flèche ; « * » plus grand (Cambria le dessine petit)
+    up = 0.47
+    for t, x, y in [("1", xs[0] + ew + 0.04, mid1 - up), ("*", xs[1] - 0.3, mid1 - up),
+                    ("1", xs[1] + ew + 0.04, mid1 - up), ("*", xs[2] - 0.3, mid1 - up),
+                    ("1", xs[1] + ew / 2 + 0.15, y1 + eh + 0.02), ("*", xs[1] + ew / 2 + 0.15, y2 - 0.45),
+                    ("1", xs[1] + ew + 0.04, y1 + eh - 0.55), ("1", xs[2] - 0.5, y2 + 0.45),
+                    ("1", xs[1] - 0.3, mid2 - up), ("1", xs[0] + ew + 0.04, mid2 - up)]:
+        add_text(s, t, x, y, 0.3, 0.35, 18 if t == "*" else 14, "text", True, PP_ALIGN.CENTER)
     add_text(s, "3 séquences : `batch_job_instance_seq`, `batch_job_execution_seq`, `batch_step_execution_seq`."
-                " Colonnes `version` en rouge : verrouillage optimiste.", MX, 6.1, CW, 0.7, 14, "muted")
+                " Colonnes `version` en rouge : verrouillage optimiste.", MX, 5.95, CW, 0.7, 16, "muted")
 
     s = d.slide("Comment un lancement est vérifié",
                 "Source : M1 §3.2. Ces lectures puis la création ne sont pas atomiques par nature : l'isolation "
@@ -822,11 +826,12 @@ RunResult run(@RequestBody RunRequest req) throws Exception {
           ("2 · Exécution en cours ?", "JobExecutionAlreadyRunningException", "red"),
           ("3 · Instance déjà COMPLETED ?", "JobInstanceAlreadyCompleteException", "red"),
           ("4 · Sinon : nouvelle JobExecution", "créée sous isolation SERIALIZABLE", "green")]
-    boxes = [dict(x=xs[i], y=2.4, w=2.8, h=2.0, text=f"{t}\n{sub}", color=c, size=15) for i, (t, sub, c) in enumerate(st)]
+    boxes = [dict(x=xs[i], y=2.4, w=2.8, h=2.0, text=f"{t}\n{sub}", color=c, size=16,
+                  sub_size=10 if "Exception" in sub else 13) for i, (t, sub, c) in enumerate(st)]   # noms longs : 10 pt, sur une ligne
     arrows = [dict(p=(xs[i] + 2.8, 3.4, xs[i + 1], 3.4)) for i in range(3)]
     add_schema(s, boxes, arrows)
     add_text(s, "Le perdant d'une course reçoit une exception : le lancement doit être **retenté** ou **abandonné**.",
-             MX, 5.0, CW, 0.8, 20)
+             MX, 5.0, CW, 0.8, 22)
 
     s = d.slide("Le verrouillage optimiste, pas à pas",
                 "Source : M1 §3.3, schéma S03. Deux serveurs lisent la version 3 ; le premier écrit la version 4 ; "
@@ -853,18 +858,20 @@ RunResult run(@RequestBody RunRequest req) throws Exception {
                                "Le verrouillage existe, mais il est **atténué**."),
                   ("À retenir", "Ne vous attendez pas à une exception à chaque fois.\nDeux lancements simultanés : "
                                 "exécutions en cours + SERIALIZABLE.\nArrêt depuis l'extérieur : `JobOperator.stop(...)`.")],
-              y=1.6, h=4.8, cols=3, size=14)
+              y=1.6, h=4.0, cols=3, size=17)
+    add_text(s, "**À retenir** : c'est l'isolation SERIALIZABLE, pas le numéro de version, qui arrête deux lancements "
+                "simultanés du même job.", MX, 5.85, CW, 0.9, 20)
 
     s = d.slide("Pourquoi le JobRepository est un singleton sans danger",
                 "Source : M1 §3.5. Annonce du Module 4 : un singleton sans état est sûr ; un singleton qui garde "
                 "un total en mémoire ne l'est pas.")
     add_cards(s, [("Singleton sans état : sûr", "Le `JobRepository` ne conserve **rien** entre deux appels : "
-                                               "tout l'état vit **en base**."),
+                                               "tout l'état vit **en base**.\nExemples : `JobRepository`, `JobOperator`, un `DataSource`."),
                   ("Singleton avec état : piège", "Un total ou un compteur en mémoire se partage entre **tous** les "
-                                                 "lancements : c'est le **double comptage** du Module 4.")],
-              y=1.8, h=3.4, cols=2, size=18, colors=("green", "red"))
+                                                 "lancements : c'est le **double comptage** du Module 4.\nExemple : un total de 135,50 qui devient 271,00 puis 406,50.")],
+              y=1.8, h=3.6, cols=2, size=20, colors=("green", "red"))
     add_text(s, "Une seule instance pour toute l'application : sans danger quand elle ne retient rien.",
-             MX, 5.6, CW, 0.7, 19, "muted")
+             MX, 5.8, CW, 0.7, 20, "muted")
 
     s = d.slide("Deux serveurs, un seul traitement ; l'audit",
                 "Source : M1 §4.2-4.3. Le JobRepository arbitre ; l'audit est une requête SQL sur "
@@ -872,12 +879,12 @@ RunResult run(@RequestBody RunRequest req) throws Exception {
     add_table(s, ["Cas", "Ce qui répond"], [
         ["Deux serveurs lancent le **même job** à 2 h 00", "une exécution démarre ; l'autre échoue proprement (`JobExecutionAlreadyRunningException`)"],
         ["« Quel a été le résultat du job d'hier ? »", "une requête SQL, sans rien ajouter à l'application"]],
-        col_w=[5.2, CW - 5.2], size=16, y=1.6)
+        col_w=[5.2, CW - 5.2], size=18, y=1.6, row_h=0.85)
     sql = """SELECT step_name, status, read_count, write_count,
        filter_count, skip_count
   FROM batch_step_execution
  WHERE job_execution_id = ?;"""
-    add_code(s, sql, lang="sql", w=CW, size=16, y=4.3, filename="Audit : compteurs d'un step")
+    add_code(s, sql, lang="sql", w=CW, size=17, y=4.5, filename="Audit : compteurs d'un step")
 
     # ---- 1.6 Top 10 ------------------------------------------------------------------------
     top = [
@@ -896,7 +903,7 @@ RunResult run(@RequestBody RunRequest req) throws Exception {
         s = d.slide(f"Top 10 des pièges ({half}/2)",
                     "Source : M1 §5. Les pièges 6 et 10 sont repris au Module 2 ; le piège 7 est approfondi au Module 6.")
         add_table(s, ["#", "Piège", "Ce qui se passe", "Parade"], [list(r) for r in top[a:b]],
-                  col_w=[0.6, 3.7, 4.2, CW - 8.5], size=14, row_h=0.8)
+                  col_w=[0.6, 3.4, 4.7, CW - 8.7], size=15, row_h=0.88)
 
     s = d.slide("Exercices du Module 1", "Source : M1 §7.")
     add_bullets(s, [
@@ -905,7 +912,7 @@ RunResult run(@RequestBody RunRequest req) throws Exception {
         "**Paramètre de relance.** Relancer le job du jour autant de fois que nécessaire après un échec, sans jamais "
         "rejouer un job réussi : quel paramètre est identifiant, lequel est non identifiant ? Justifiez.",
         "**Isolation.** Un collègue propose `READ_COMMITTED` pour « supprimer les erreurs de sérialisation ». "
-        "Quel risque cela crée-t-il, et que lui répondez-vous ?"], y=1.7, h=4.8, size=19, numbered=True)
+        "Quel risque cela crée-t-il, et que lui répondez-vous ?"], y=1.7, h=4.8, size=24, numbered=True)
 
     total = d.n - first
     assert total == 31, f"Module 1 : {total} diapositives générées, 31 attendues par PPT_PLAN.md"
