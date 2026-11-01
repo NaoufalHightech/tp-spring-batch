@@ -19,5 +19,5 @@ python tools/voxtral_local.py episodes/m1_fondations                            
 
 | Module | script.md | scenes.js | voix | rendu |
 |---|---|---|---|---|
-| 1 | à valider | à faire | à faire | à faire |
+| 1 | écrit : 298 lignes, 46 min estimées | écrit : 21 scènes, vérifié (ancres, rendu sans erreur) | à faire | à faire |
 | 2 à 8, 3B | à faire | | | |
