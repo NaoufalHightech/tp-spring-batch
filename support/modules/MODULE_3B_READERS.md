@@ -322,8 +322,8 @@ Mémoire stable quelle que soit la taille du fichier.
 - Un **curseur** garde un `ResultSet` ouvert : une seule requête, une connexion occupée pendant tout le step, et **pas de partage entre threads**.
 - La **pagination** émet une requête par page : la connexion est libérée entre deux pages, le reader est utilisable en multithread
   (Module 7), au prix d'un tri obligatoire.
-- Selon la base et le pilote, un curseur peut **charger tout le résultat en mémoire** au lieu de le diffuser : lisez la documentation
-  du pilote PostgreSQL (taille de lecture, mode transactionnel) avant de lui confier dix millions de lignes.
+- Selon la base et le pilote, un curseur peut **charger tout le résultat en mémoire** au lieu de le diffuser : voir l'encart « Rappel : qu'est-ce qu'un curseur ? » du Module 3 (§3.5) : avec PostgreSQL, il faut
+  désactiver l'auto-commit **et** fixer le `fetchSize`.
 
 ### 3.4 Plusieurs fichiers : aucune protection au restart
 

@@ -328,6 +328,68 @@ Un chunk entièrement filtré est un chunk **vide** : le writer reçoit un lot s
 
 ### 3.5 Cursor ou pagination : deux façons de lire une base
 
+> #### Rappel : qu'est-ce qu'un curseur ?
+>
+> **Un curseur est un pointeur vers le résultat d'une requête.** Au lieu de rapatrier toutes les lignes d'un coup
+> (ce qui ferait exploser la mémoire sur un gros résultat), on garde la requête « ouverte » et on dit à la base :
+> *« donne-moi la ligne suivante, puis la suivante… »*.
+>
+> ```
+>  SANS curseur                          AVEC curseur
+>  ┌────────┐   10 millions de lignes   ┌────────┐   ligne 1, 2, 3…
+>  │  Base  │ ────────────────────────▶ │  Base  │ ──┐
+>  └────────┘   tout en mémoire JVM     └────────┘   │  ┌───────────────┐
+>                  💥 OutOfMemory                     └─▶│ curseur ▶ ... │ avance d'une ligne à la fois
+>                                                        └───────────────┘
+> ```
+>
+> **Le rôle du `fetchSize`.** Le pilote JDBC (comme le pilote PostgreSQL) ne va pas chercher les lignes **une par une**
+> sur le serveur : ce serait un aller-retour réseau par ligne. Il les rapatrie **par paquets** de `fetchSize` lignes
+> (par exemple 1 000). Le curseur avance dans le paquet en mémoire ; quand il est épuisé, le pilote demande le suivant.
+>
+> ```
+>   serveur PostgreSQL                          JVM (pilote JDBC)
+>   ┌──────────────────┐   paquet de 1 000   ┌────────────────────────────┐
+>   │ résultat complet │ ──────────────────▶ │ [ 1 ... 1000 ]             │
+>   │ (10 M de lignes) │                     │   ▲ le curseur lit ici,    │
+>   │                  │   paquet suivant    │   │ ligne après ligne      │
+>   │                  │ ──────────────────▶ │ [ 1001 ... 2000 ]          │
+>   └──────────────────┘                     └────────────────────────────┘
+>   en mémoire JVM : au plus UN paquet à la fois
+> ```
+>
+> `fetchSize` trop petit : beaucoup d'allers-retours. Trop grand : un paquet volumineux en mémoire.
+> Un ordre de grandeur courant : 500 à 5 000, à mesurer comme la taille du chunk.
+>
+> **⚠ Piège PostgreSQL.** Par défaut, le pilote PostgreSQL **charge tout le résultat en mémoire**, quel que soit le reader.
+> Il ne fait du vrai *streaming* que si **les quatre conditions** suivantes sont réunies :
+>
+> | Condition | Comment |
+> |---|---|
+> | l'**auto-commit est désactivé** sur la connexion | voir ci-dessous |
+> | le `fetchSize` est **supérieur à 0** | `.fetchSize(1000)` sur le reader |
+> | le curseur est **en avant seulement** (*forward-only*) | c'est le cas par défaut du reader |
+> | la requête est **une seule instruction** | pas de `;` multiples |
+>
+> **Qui désactive l'auto-commit ?** Pas automatiquement. `JdbcCursorItemReader` ouvre **sa propre connexion** à
+> partir du pool, hors de la transaction du chunk ; il ne modifie l'auto-commit que si on le lui demande
+> explicitement (propriété `connectionAutoCommit`, vide par défaut). Deux façons de l'obtenir :
+>
+> ```java
+> var reader = new JdbcCursorItemReaderBuilder<BankTransaction>()
+>     .name("cursorReader")
+>     .dataSource(dataSource)
+>     .sql("SELECT id, account_number, transaction_date, transaction_type, amount FROM bank_transaction")
+>     .fetchSize(1000)                                  // paquets de 1 000 lignes
+>     .rowMapper(rowMapper)
+>     .build();
+> reader.setConnectionAutoCommit(false);                // le curseur PostgreSQL exige l'auto-commit désactivé
+> ```
+>
+> ou, pour toute l'application, `spring.datasource.hikari.auto-commit=false`.
+> **Sans l'un de ces réglages, `fetchSize(1000)` est ignoré par PostgreSQL** : le reader fonctionne, mais lit tout
+> en mémoire, et l'`OutOfMemoryError` n'arrive que sur le gros fichier de production.
+
 | | `JdbcCursorItemReader` | `JdbcPagingItemReader` |
 |---|---|---|
 | Principe | **une requête**, un curseur ouvert pendant tout le step | une requête **par page**, avec tri et clé de reprise |
