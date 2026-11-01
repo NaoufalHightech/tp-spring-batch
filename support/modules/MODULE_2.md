@@ -48,6 +48,20 @@ Le déclencheur n'est **pas** Spring Batch : un batch n'est pas un planificateur
 
 Par défaut, Spring Boot lance **tous les jobs déclarés** au démarrage de l'application, une seule fois, sans paramètre. C'est pratique pour un `Hello World`, dangereux pour une application qui expose une API ou plusieurs jobs. La propriété `spring.batch.job.enabled=false` désactive ce comportement ; `spring.batch.job.name=nomDuJob` en sélectionne un seul.
 
+### Références visuelles (§1 Concept)
+
+> Légende : « ✔ vérifié » = titre relevé dans l'extrait de documentation officielle fourni ; « ◻ à confirmer » = page citée, titre exact du schéma à contrôler sur la page avant d'insérer l'image.
+
+**1. Schéma officiel de la documentation Spring Batch**
+- ◻ à confirmer : page *Configuring a Step* (sections *Tasklet* et *Chunk-oriented Processing*), s'il existe un schéma comparatif.
+- ✔ vérifié : rappel de « Job Hierarchy With Steps » pour situer le step dans le job.
+
+**2. Schéma ASCII à garder (script vidéo)**
+- §1.3 « Qui lance quoi » (déclencheur → JobOperator → job → JobRepository → PostgreSQL) : à garder.
+
+**3. Schéma personnalisé à créer pour le PPT**
+- Tableau visuel **Tasklet / Chunk** (une action contre une boucle lire-traiter-écrire).
+
 ---
 
 ## 2. Le code, ligne par ligne
@@ -344,6 +358,19 @@ Dans les deux cas : l'appelant reçoit la main **avant** la fin ; la `JobExecuti
 ### 3.5 Ce que Spring Boot fait au démarrage
 
 Quand `spring.batch.job.enabled` vaut `true` (valeur par défaut), un composant de démarrage de Spring Boot parcourt les jobs du contexte et les lance, **sans paramètre** (ou avec ceux de la ligne de commande). Cela se produit **après** la construction complète du contexte, mais **avant** que votre application ne soit considérée comme prête à servir. Si le job est long, l'application paraît « bloquée au démarrage ».
+
+### Références visuelles (§3 Sous le capot)
+
+**1. Schéma officiel de la documentation Spring Batch**
+- Pas de schéma officiel pour le cycle de vie des beans ni pour `@StepScope` dans la documentation Spring Batch.
+
+**2. Schéma ASCII à garder (script vidéo)**
+- §3.1 : le cycle de vie en 8 étapes (à garder, repris au Module 4).
+- §3.2 : singleton contre proxy (à garder pour le script).
+
+**3. Schéma personnalisé à créer pour le PPT**
+- **Schéma mémoire JVM** en couleurs : le proxy permanent (gris) qui délègue à des instances éphémères (bleu, vert) créées puis détruites à chaque step ; à animer en 4 temps.
+- Chronologie du double comptage sur la tasklet `CountingTasklet` (100, puis « 200 »).
 
 ---
 

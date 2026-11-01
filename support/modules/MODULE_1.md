@@ -61,6 +61,22 @@ Dans la version 6.0.6 :
 - **`@EnableJdbcJobRepository`** déclare le dépôt JDBC (attributs : `dataSourceRef`, `transactionManagerRef`,
   `tablePrefix`, `isolationLevelForCreate`, `databaseType`, `validateTransactionState`, etc.).
 
+### Références visuelles (§1 Concept)
+
+> Légende : « ✔ vérifié » = titre relevé dans l'extrait de documentation officielle fourni ; « ◻ à confirmer » = page citée, titre exact du schéma à contrôler sur la page avant d'insérer l'image.
+
+**1. Schéma officiel de la documentation Spring Batch**
+- ✔ vérifié : page *The Domain Language of Batch* : « Batch Stereotypes », « Job Hierarchy », « Job Hierarchy With Steps », « Job Parameters ». À placer sur §1.2 (vocabulaire).
+- ✔ vérifié : page *Spring Batch Architecture* : « Spring Batch Layered Architecture ». À placer sur §1.3 (trois couches).
+
+**2. Schéma ASCII à garder (script vidéo)**
+- §1.2 : la hiérarchie Job → JobInstance → JobExecution → StepExecution → ExecutionContext (rappel à l'oral, le schéma officiel « Job Hierarchy With Steps » la remplace dans le PPT).
+- §1.3 : inutile, le schéma officiel des trois couches suffit.
+
+**3. Schéma personnalisé à créer pour le PPT**
+- Schéma entité-relation des **6 tables `BATCH_*`** avec les colonnes `version` mises en évidence (la documentation propose un schéma de métadonnées en annexe ◻ à confirmer, mais il ne montre pas les colonnes de verrouillage).
+- Tableau « 3 questions de production → ce qui y répond » (§1.1), en 3 icônes.
+
 ---
 
 ## 2. Le code, ligne par ligne
@@ -311,6 +327,18 @@ Le `JobRepository` est un bean **singleton** (une seule instance pour toute l'ap
 problème car il est **sans état métier** : il ne conserve rien entre deux appels, tout l'état vit en base.
 Retenez l'opposition qui sera au cœur du Module 4 : *un singleton sans état est sûr ; un singleton qui garde un
 total ou un compteur en mémoire ne l'est pas.*
+
+### Références visuelles (§3 Sous le capot)
+
+**1. Schéma officiel de la documentation Spring Batch**
+- Aucun schéma officiel pour le verrouillage optimiste ni pour l'isolation de création.
+
+**2. Schéma ASCII à garder (script vidéo)**
+- §3.3 : le déroulé « Serveur A lit / Serveur B lit / A écrit / B écrit » en 4 lignes : à garder tel quel pour l'oral.
+
+**3. Schéma personnalisé à créer pour le PPT**
+- **Diagramme de séquence** A / B / base (`UPDATE … WHERE version = ?` : 1 ligne modifiée, puis 0 ligne), avec la version en rouge au moment du conflit.
+- Chronologie du **crash de 3 h 12** et de la reprise (cas d'usage §4.1).
 
 ---
 

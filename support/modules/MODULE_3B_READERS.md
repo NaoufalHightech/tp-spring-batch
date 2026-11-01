@@ -48,6 +48,19 @@ Vérifié dans les jars de la 6.0.6 :
 | Tout magasin Spring Data | `RepositoryItemReader` | méthode paginée du repository |
 | Service Java existant | `ItemReaderAdapter` | la méthode doit retourner `null` à la fin |
 
+### Références visuelles (§1 Concept)
+
+> Légende : « ✔ vérifié » = titre relevé dans l'extrait de documentation officielle fourni ; « ◻ à confirmer » = page citée, titre exact du schéma à contrôler sur la page avant d'insérer l'image.
+
+**1. Schéma officiel de la documentation Spring Batch**
+- Aucun schéma officiel ne couvre le catalogue complet des readers.
+
+**2. Schéma ASCII à garder (script vidéo)**
+- Néant : le tableau du catalogue est un tableau, pas un schéma.
+
+**3. Schéma personnalisé à créer pour le PPT**
+- **Carte mentale** des readers par source (fichier, base, magasin Spring Data, service, personnalisé), avec ce qui a disparu (Hibernate) en grisé.
+
 ---
 
 ## 2. Le code, ligne par ligne
@@ -338,6 +351,18 @@ Une session JPA/Hibernate **mémorise chaque entité lue** (cache de premier niv
 la mémoire grossit jusqu'à `OutOfMemoryError`. Le coût d'un ORM par élément reste en outre supérieur à celui de JDBC, et la mémoire demande une
 surveillance particulière (vider la session régulièrement, ne lire que les colonnes utiles). Quand le mapping existe déjà, c'est un bon raccourci ;
 quand la performance prime, préférez JDBC. Aucun reader Hibernate natif n'existe en 6.0.6 (§1.2) : passez par JPA.
+
+### Références visuelles (§3 Sous le capot)
+
+**1. Schéma officiel de la documentation Spring Batch**
+- Le livre contient des schémas pertinents (flux de traitement à formats multiples, rupture de contrôle, curseur contre pagination) : **à utiliser comme inspiration seulement**, ils ne sont pas réutilisables tels quels dans une formation sans autorisation de l'éditeur.
+
+**2. Schéma ASCII à garder (script vidéo)**
+- Néant : les exemples du §2 sont du code.
+
+**3. Schéma personnalisé à créer pour le PPT**
+- **Rupture de contrôle** : le flux de lecture ACC / OP / OP / ACC avec le `peek` qui regarde la ligne suivante, un compte regroupé en un seul élément.
+- **Restart de `MultiResourceItemReader`** : la liste de fichiers au 1er lancement, puis au restart avec un fichier ajouté ; contre-exemple du répertoire par exécution.
 
 ---
 

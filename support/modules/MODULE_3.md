@@ -58,6 +58,20 @@ vous trouverez dans tous les tutoriels antérieurs, est **dépréciée depuis la
 elle compile encore, avec un avertissement. Dans la nouvelle forme, le gestionnaire de transactions se donne par
 `.transactionManager(tx)`.
 
+### Références visuelles (§1 Concept)
+
+> Légende : « ✔ vérifié » = titre relevé dans l'extrait de documentation officielle fourni ; « ◻ à confirmer » = page citée, titre exact du schéma à contrôler sur la page avant d'insérer l'image.
+
+**1. Schéma officiel de la documentation Spring Batch**
+- ◻ à confirmer : page *Configuring a Step*, section *Chunk-oriented Processing* : schéma lecture / traitement / écriture par chunk.
+- ✔ vérifié : « Job Hierarchy With Steps » pour situer le step.
+
+**2. Schéma ASCII à garder (script vidéo)**
+- §1.2 : l'algorithme du chunk en pseudo-code (à garder pour la narration, le schéma officiel illustre la même boucle).
+
+**3. Schéma personnalisé à créer pour le PPT**
+- **Frise des transactions** : 3 chunks, chaque commit = « 100 lignes écrites + position sauvegardée » (reprend le schéma §3.2), crash avant le commit du 3e chunk.
+
 ---
 
 ## 2. Le code, ligne par ligne
@@ -408,6 +422,20 @@ Un chunk entièrement filtré est un chunk **vide** : le writer reçoit un lot s
 | mémoire minimale | **tout le chunk est en mémoire** : risque `OutOfMemoryError` |
 
 La valeur se **mesure** (courbe débit contre taille), souvent entre 100 et 5 000. Il n'y a pas de bonne réponse théorique.
+
+### Références visuelles (§3 Sous le capot)
+
+**1. Schéma officiel de la documentation Spring Batch**
+- Aucun schéma officiel pour `ItemStream` et la sauvegarde de position.
+
+**2. Schéma ASCII à garder (script vidéo)**
+- §3.2 : « chunk 1 / chunk 2 / chunk 3 + crash » (à garder).
+- §3.5 : les deux schémas de l'encart « curseur » (sans / avec curseur ; paquets de `fetchSize`) : à garder pour la vidéo.
+
+**3. Schéma personnalisé à créer pour le PPT**
+- **Cycle de vie `ItemStream`** : `open` → (`read` × N, `update`, commit) × chunks → `close`, avec l'`ExecutionContext` qui circule.
+- **Curseur contre pagination** redessinés en couleurs (le schéma du livre n'est pas réutilisable sans autorisation).
+- Tableau des **4 conditions du streaming PostgreSQL** en 4 pastilles vertes/rouges.
 
 ---
 

@@ -39,6 +39,19 @@ champ qui change, il garde sa valeur d'un lancement à l'autre tant que la JVM v
 2. **Transformer** : convertir les types, calculer, enrichir.
 3. **Chaîner** (`CompositeItemProcessor`) : plusieurs petits processors, chacun avec **une** responsabilité, appelés l'un après l'autre.
 
+### Références visuelles (§1 Concept)
+
+> Légende : « ✔ vérifié » = titre relevé dans l'extrait de documentation officielle fourni ; « ◻ à confirmer » = page citée, titre exact du schéma à contrôler sur la page avant d'insérer l'image.
+
+**1. Schéma officiel de la documentation Spring Batch**
+- ✔ vérifié : « Batch Stereotypes » (page *The Domain Language of Batch*) pour situer reader / processor / writer.
+
+**2. Schéma ASCII à garder (script vidéo)**
+- §1.1 : le tableau « transformer / filtrer / rejeter » (à garder pour l'oral).
+
+**3. Schéma personnalisé à créer pour le PPT**
+- **Trois flèches** depuis un élément entrant : vers le chunk (transformé), vers la poubelle (`null`, `filter_count + 1`), vers le rollback (exception) ; avec les compteurs de `batch_step_execution` en regard.
+
 ---
 
 ## 2. Le code, ligne par ligne
@@ -315,6 +328,20 @@ Un proxy CGLIB est une **sous-classe**. Il ne peut donc pas :
 - étendre une classe **`final`**, ce qui inclut les **records** : un processor `@StepScope` doit être une classe ordinaire ;
 - intercepter une méthode `final` ;
 - intercepter un **appel interne** (`this.autreMethode()`) : l'appel ne passe pas par le proxy.
+
+### Références visuelles (§3 Sous le capot)
+
+**1. Schéma officiel de la documentation Spring Batch**
+- Aucun schéma officiel pour les scopes ni pour les proxys CGLIB.
+
+**2. Schéma ASCII à garder (script vidéo)**
+- §3.1 : cycle de vie en 8 étapes (même schéma qu'au Module 2).
+- §3.2 : singleton contre `@StepScope` (mémoire JVM) : à garder pour le script.
+
+**3. Schéma personnalisé à créer pour le PPT**
+- **⭐ Le bug du double comptage** (priorité n°1 du PPT, introuvable dans la documentation) : trois lancements successifs, **un seul objet singleton** au centre et son compteur qui monte 135,50 → 271,00 → 406,50, en rouge ; à côté, la version `@StepScope` avec trois instances qui repartent de zéro.
+- **Rejeu du chunk** (§3.6) : l'élément traité deux fois après un retry, le total du processor faux, le `SUM` SQL juste.
+- Tableau comparatif des **3 solutions** (§3.4) sous forme de matrice colorée.
 
 ---
 

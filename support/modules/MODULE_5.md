@@ -66,6 +66,20 @@ coïncident (un step réussi a `ExitStatus` `COMPLETED`), ce qui entretient la c
 - **Module 2.** Les beans `Step`, `Flow` et `Job` sont des **singletons** sans état : ils décrivent le graphe. L'exécution, elle, vit dans les `JobExecution`/`StepExecution`.
   Le `TaskExecutor` que nous allons introduire est aussi un **bean singleton** : un seul pool de threads pour toute l'application.
 
+### Références visuelles (§1 Concept)
+
+> Légende : « ✔ vérifié » = titre relevé dans l'extrait de documentation officielle fourni ; « ◻ à confirmer » = page citée, titre exact du schéma à contrôler sur la page avant d'insérer l'image.
+
+**1. Schéma officiel de la documentation Spring Batch**
+- ◻ à confirmer : page *Configuring a Job*, section *Controlling Step Flow* (flux conditionnels, `on`/`to`/`from`) : repérer les schémas de flux de la page. Remarque : l'exemple « Job State Machine » de l'URL `…/step/chunk-oriented-processing.html` n'est pas vérifié ; cette page traite du chunk, pas de la machine à états du job.
+
+**2. Schéma ASCII à garder (script vidéo)**
+- §1.1 : le graphe `loadStep` → `reportStep` / `alertStep` : **à garder dans le PPT**.
+- §1.3 : le tableau `BatchStatus` / `ExitStatus`.
+
+**3. Schéma personnalisé à créer pour le PPT**
+- **Deux voies parallèles** `BatchStatus` (rail technique, géré par le framework) et `ExitStatus` (rail d'aiguillage, texte libre), avec le cas `COMPLETED` / `COMPLETED_WITH_REJECTS`.
+
 ---
 
 ## 2. Le code, ligne par ligne
@@ -320,6 +334,21 @@ Points clés :
 ### 3.6 Le `Split` et la reprise
 
 Si un flux du `Split` échoue et l'autre réussit, le `SplitState` produit le statut « le plus grave » (échec). Le job échoue ; à la reprise (Module 6), **seul le step en échec est rejoué** : les steps `COMPLETED` ne le sont pas, sauf `allowStartIfComplete(true)`. Le decider, lui, est **réévalué** à chaque exécution du job, y compris en reprise : il doit donc être **déterministe** et sans effet de bord.
+
+### Références visuelles (§3 Sous le capot)
+
+**1. Schéma officiel de la documentation Spring Batch**
+- ◻ à confirmer : page *Scaling and Parallel Processing* (parallèle, `Split`) pour les schémas de parallélisation.
+- ✔ vérifié : « Partitioned Process » (extrait d'architecture fourni) : à réserver au Module 7, pas au `Split`.
+
+**2. Schéma ASCII à garder (script vidéo)**
+- §3.1 : la machine à états en 5 temps (exécuter / produire un statut / chercher la transition / état suivant / fin) : à garder pour la narration.
+- §3.5 : le schéma des threads du `Split` : bon pour le script.
+
+**3. Schéma personnalisé à créer pour le PPT**
+- **Machine à états** en couleurs : états `StepState`, `DecisionState`, `SplitState`, `EndState`, transitions étiquetées par motif (`COMPLETED`, `*`), un chemin « Next state not found » en rouge.
+- **Split** : thread 1 en bleu, thread 2 en vert, barrière de synchronisation en rouge, `consolidateStep` après la barrière.
+- **Pool de connexions** : 2 flux × 3 connexions + `JobRepository`, jauge de pool qui sature.
 
 ---
 
