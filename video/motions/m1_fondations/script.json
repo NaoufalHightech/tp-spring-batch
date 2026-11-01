@@ -1,0 +1,1196 @@
+[
+ {
+  "id": "L01",
+  "scene": 0,
+  "expr": "calme, accroche",
+  "text": "Il est trois heures douze. Ton serveur redémarre pour une mise à jour. Ton traitement de nuit, lui, tournait depuis deux heures."
+ },
+ {
+  "id": "L02",
+  "scene": 0,
+  "expr": "grave, pause avant la question",
+  "text": "Au matin, une seule question compte : qu'est-ce qui a été fait, et qu'est-ce qui reste à faire ?"
+ },
+ {
+  "id": "L03",
+  "scene": 0,
+  "expr": "pédagogue",
+  "text": "Dans ce module, tu vas construire de quoi répondre à cette question. Un environnement de production pour tes traitements par lots."
+ },
+ {
+  "id": "L04",
+  "scene": 0,
+  "expr": "annonce, rythmé",
+  "text": "Six étapes : pourquoi un batch de production, le vocabulaire, le projet, ton premier job, ce qui se passe sous le capot, et les pièges à éviter."
+ },
+ {
+  "id": "L05",
+  "scene": 1,
+  "expr": "posé, image concrète",
+  "text": "Imagine une imprimerie qui, chaque nuit, imprime tous les relevés de compte de la banque. Personne n'appuie sur un bouton pour chaque relevé."
+ },
+ {
+  "id": "L06",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Un batch, c'est ça : répéter un même traitement sur un très grand ensemble de données, sans intervention humaine."
+ },
+ {
+  "id": "L07",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "On lit un élément, on le transforme, on l'écrit. Puis on recommence, des millions de fois."
+ },
+ {
+  "id": "L08",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Les données viennent d'un fichier, d'une base ou d'une file d'attente, et repartent vers une base ou un autre fichier."
+ },
+ {
+  "id": "L09",
+  "scene": 1,
+  "expr": "pédagogue",
+  "text": "Alors, pourquoi on en a besoin ? Regarde les besoins techniques d'un traitement de masse."
+ },
+ {
+  "id": "L10",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Sans intervention humaine : tout est automatique. Efficacité : ça dure des minutes, parfois des heures. Supervision : savoir ce qui est fait et ce qui reste."
+ },
+ {
+  "id": "L11",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Fiabilité : reprendre un lot en échec. Parallélisme : plusieurs jobs en même temps. Et un point souvent oublié : un batch n'est pas un planificateur."
+ },
+ {
+  "id": "L12",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Un planificateur, comme cron ou Kubernetes, décide quand lancer. Le batch fait le travail une fois lancé."
+ },
+ {
+  "id": "L13",
+  "scene": 1,
+  "expr": "narratif",
+  "text": "Côté métier, tu en croises partout : les salaires qu'on vire en fin de mois, les factures de l'opérateur télécom, les bulletins de paie, les e-mails de masse."
+ },
+ {
+  "id": "L14",
+  "scene": 1,
+  "expr": "narratif",
+  "text": "Côté technique : des tests lancés à intervalle régulier, des mises à jour de base à deux heures du matin, la consommation d'une file de messages, un test de charge."
+ },
+ {
+  "id": "L15",
+  "scene": 1,
+  "expr": "pédagogue, pont",
+  "text": "Tout ça fonctionne très bien… tant que rien ne casse. Voyons comment on traite un volume de plus en plus grand."
+ },
+ {
+  "id": "L16",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Cinq stratégies, de la plus simple à la plus complexe. D'abord un traitement normal, dans une fenêtre de nuit."
+ },
+ {
+  "id": "L17",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Puis un batch qui tourne en même temps que les utilisateurs. Puis plusieurs jobs en parallèle."
+ },
+ {
+  "id": "L18",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Puis un même job découpé sur plusieurs instances : on appelle ça du partitionnement. Et enfin, une combinaison de tout ça."
+ },
+ {
+  "id": "L19",
+  "scene": 1,
+  "expr": "règle, lent",
+  "text": "Même dans le cas le plus simple, prévois des points de validation et la possibilité de reprendre."
+ },
+ {
+  "id": "L20",
+  "scene": 1,
+  "expr": "pédagogue, pont",
+  "text": "Cette dernière idée, la reprise, c'est le sujet du module. Reprenons notre nuit de trois heures douze."
+ },
+ {
+  "id": "L21",
+  "scene": 2,
+  "expr": "narratif",
+  "text": "Deux heures du matin, un job de rapprochement bancaire démarre. À trois heures douze, le serveur redémarre pour une mise à jour du système."
+ },
+ {
+  "id": "L22",
+  "scene": 2,
+  "expr": "suspense",
+  "text": "Quand tu arrives, rien n'a planté en apparence. Mais le job ne tourne plus."
+ },
+ {
+  "id": "L23",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Dans la base, l'exécution est restée à l'état « démarré ». Seulement, le processus qui la portait n'existe plus."
+ },
+ {
+  "id": "L24",
+  "scene": 2,
+  "expr": "pédagogue",
+  "text": "La solution : déclarer cette exécution orpheline, puis relancer. Et le traitement reprend à la dernière position confirmée, au lieu de repartir de zéro."
+ },
+ {
+  "id": "L25",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Sans dépôt de métadonnées persistant, ce scénario veut dire : on rejoue dix gigaoctets depuis le début, et on espère ne pas écrire deux fois les mêmes lignes."
+ },
+ {
+  "id": "L26",
+  "scene": 2,
+  "expr": "pédagogue",
+  "text": "Donc la vraie question n'est pas « comment je lance ? ». C'est « qu'est-ce que je dois garder pour pouvoir répondre le lendemain ? »"
+ },
+ {
+  "id": "L27",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Trois questions décident de la tenue en production. Première : que s'est-il passé cette nuit, et où le job s'est-il arrêté ?"
+ },
+ {
+  "id": "L28",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Deuxième : deux serveurs peuvent-ils lancer le même job en même temps ?"
+ },
+ {
+  "id": "L29",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Troisième : peut-on reprendre sans tout rejouer et sans doubler les données ?"
+ },
+ {
+  "id": "L30",
+  "scene": 3,
+  "expr": "règle, posé",
+  "text": "Les trois réponses reposent sur une base de données durable et partagée. Ici, ce sera PostgreSQL."
+ },
+ {
+  "id": "L31",
+  "scene": 3,
+  "expr": "pédagogue",
+  "text": "Une base en mémoire, comme H2, est très bien pour tes tests. Jamais pour la production : elle disparaît avec le processus."
+ },
+ {
+  "id": "L32",
+  "scene": 3,
+  "expr": "pont",
+  "text": "Pour utiliser cette base, il faut d'abord parler le même langage que Spring Batch. Commençons par le vocabulaire."
+ },
+ {
+  "id": "L33",
+  "scene": 4,
+  "expr": "posé, image concrète",
+  "text": "Prends une recette de cuisine : la tarte aux pommes. C'est le même plat à chaque fois. Mais chaque fois que tu la fais, avec des pommes d'une certaine récolte, tu fais une tarte précise."
+ },
+ {
+  "id": "L34",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Un Job, c'est la recette : un nom et une liste d'étapes. Une JobInstance, c'est la recette appliquée à des paramètres précis."
+ },
+ {
+  "id": "L35",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Par exemple, le job de fin de journée, pour la date du cinq mai deux mille sept. Cette date est un paramètre identifiant."
+ },
+ {
+  "id": "L36",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Et une JobExecution, c'est une tentative réelle de réaliser cette instance. Elle peut réussir, ou échouer puis être reprise."
+ },
+ {
+  "id": "L37",
+  "scene": 4,
+  "expr": "règle, détache les mots",
+  "text": "Règle d'or : JobInstance égale Job plus paramètres identifiants."
+ },
+ {
+  "id": "L38",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Deux lancements avec les mêmes paramètres identifiants désignent la même instance."
+ },
+ {
+  "id": "L39",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Si cette instance est déjà terminée avec succès, Spring Batch refuse de la rejouer."
+ },
+ {
+  "id": "L40",
+  "scene": 4,
+  "expr": "pédagogue",
+  "text": "Regarde un exemple dans la table des exécutions."
+ },
+ {
+  "id": "L41",
+  "scene": 4,
+  "expr": "technique",
+  "text": "L'exécution un, pour l'instance un, avec la date du premier janvier : elle a échoué."
+ },
+ {
+  "id": "L42",
+  "scene": 4,
+  "expr": "technique",
+  "text": "L'exécution deux relance la même instance, avec la même date : c'est une reprise, et elle réussit. L'instance un est maintenant fermée."
+ },
+ {
+  "id": "L43",
+  "scene": 4,
+  "expr": "technique",
+  "text": "L'exécution trois a une autre date : c'est une autre instance, qui démarre à zéro."
+ },
+ {
+  "id": "L44",
+  "scene": 4,
+  "expr": "pédagogue",
+  "text": "Trois cas à retenir. Mêmes paramètres : même instance, nouvelle exécution, donc reprise."
+ },
+ {
+  "id": "L45",
+  "scene": 4,
+  "expr": "pédagogue",
+  "text": "Instance réussie : elle est fermée, un nouveau lancement identique est refusé. Instance en cours : on ne peut pas la lancer une seconde fois."
+ },
+ {
+  "id": "L46",
+  "scene": 4,
+  "expr": "pont",
+  "text": "On sait maintenant ce qu'est un lancement. Zoomons sur ce qui se passe à l'intérieur : le step."
+ },
+ {
+  "id": "L47",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Un job est une suite d'étapes. Chaque étape s'appelle un Step."
+ },
+ {
+  "id": "L48",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Chaque tentative d'un step laisse une StepExecution, avec ses compteurs : éléments lus, écrits, filtrés, ignorés."
+ },
+ {
+  "id": "L49",
+  "scene": 5,
+  "expr": "technique",
+  "text": "On y trouve aussi les validations de transaction, et les annulations. Si un step échoue parce que le précédent a échoué, aucune StepExecution n'est créée."
+ },
+ {
+  "id": "L50",
+  "scene": 5,
+  "expr": "image concrète",
+  "text": "Pense à un jeu vidéo. Quand tu sauvegardes, le jeu garde ta position. Si tu coupes la console, tu reprends là où tu étais."
+ },
+ {
+  "id": "L51",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "C'est exactement le rôle de l'ExecutionContext : la sauvegarde de partie du step. Par exemple, la ligne douze mille atteinte."
+ },
+ {
+  "id": "L52",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Le contexte du step est sauvegardé à chaque validation de transaction. Le contexte du job est sauvegardé entre deux steps. Ce ne sont pas les mêmes objets."
+ },
+ {
+  "id": "L53",
+  "scene": 5,
+  "expr": "règle",
+  "text": "Et tout ce que tu y mets doit être sérialisable. Sans cela, la reprise est impossible."
+ },
+ {
+  "id": "L54",
+  "scene": 5,
+  "expr": "pont",
+  "text": "Toutes ces informations doivent bien aller quelque part. C'est le rôle du JobRepository."
+ },
+ {
+  "id": "L55",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Le JobRepository persiste les métadonnées dans PostgreSQL. Tu verras plus loin qu'il y a une colonne version qui sert au verrouillage optimiste."
+ },
+ {
+  "id": "L56",
+  "scene": 5,
+  "expr": "pont",
+  "text": "Reste à voir où il se place dans l'architecture."
+ },
+ {
+  "id": "L57",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Spring Batch s'organise en trois couches. En haut, l'application : ce que tu écris, tes jobs, tes steps, tes lecteurs, tes processeurs."
+ },
+ {
+  "id": "L58",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Au milieu, le noyau : le Job, le Step, le JobOperator et le JobRepository."
+ },
+ {
+  "id": "L59",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "En bas, l'infrastructure : les lecteurs, les écrivains, les services courants, utilisés par ton code et par le cœur."
+ },
+ {
+  "id": "L60",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Un point à noter : l'infrastructure sert à la fois à ton application et au noyau."
+ },
+ {
+  "id": "L61",
+  "scene": 6,
+  "expr": "pédagogue",
+  "text": "Voici maintenant le schéma de référence. Le JobOperator lance le Job. Le Job est fait de Steps. Chaque Step a un reader, un writer, et un processor facultatif."
+ },
+ {
+  "id": "L62",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Et le JobRepository, en pointillé, enregistre tout ce qui se passe."
+ },
+ {
+  "id": "L63",
+  "scene": 6,
+  "expr": "règle",
+  "text": "Retiens : un step a exactement un reader, un writer, et un processor facultatif."
+ },
+ {
+  "id": "L64",
+  "scene": 6,
+  "expr": "pont",
+  "text": "Avant d'écrire du code, un mot sur le contexte. Cette version n'est pas celle que tu as peut-être vue dans les tutoriels."
+ },
+ {
+  "id": "L65",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Spring Batch est né en deux mille huit, en configuration XML. Puis la configuration en Java. Puis Spring Quatre, Cinq, Six."
+ },
+ {
+  "id": "L66",
+  "scene": 6,
+  "expr": "règle",
+  "text": "À partir de la version cinq, le JobRepository exige une base de données. En production, c'est PostgreSQL."
+ },
+ {
+  "id": "L67",
+  "scene": 6,
+  "expr": "pédagogue",
+  "text": "Et avec la version six, il y a de vraies nouveautés que tu dois connaître avant d'écrire une ligne."
+ },
+ {
+  "id": "L68",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Spring Boot quatre point un point deux embarque Spring Batch six point zéro point six, via un starter dédié."
+ },
+ {
+  "id": "L69",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Les paquets ont bougé. Un import copié d'un tutoriel pour la version quatre ou cinq ne compilera plus."
+ },
+ {
+  "id": "L70",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Le JobOperator étend le JobLauncher, et offre start, restart, stop, abandon et recover."
+ },
+ {
+  "id": "L71",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Le JobRepository étend le JobExplorer : lire et écrire les métadonnées passent par une seule interface."
+ },
+ {
+  "id": "L72",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Et une annotation, EnableJdbcJobRepository, déclare le dépôt JDBC."
+ },
+ {
+  "id": "L73",
+  "scene": 6,
+  "expr": "pont",
+  "text": "C'est cette annotation que nous allons écrire. D'abord, il faut un projet."
+ },
+ {
+  "id": "L74",
+  "scene": 7,
+  "expr": "pédagogue, besoin",
+  "text": "Mon besoin : un projet Java qui sait parler à PostgreSQL et à Spring Batch, sans que je gère les versions à la main."
+ },
+ {
+  "id": "L75",
+  "scene": 7,
+  "expr": "pédagogue, première idée",
+  "text": "Première idée : j'ajoute les dépendances une par une, avec leur version. Ça marche, jusqu'au jour où deux versions ne s'entendent plus."
+ },
+ {
+  "id": "L76",
+  "scene": 7,
+  "expr": "explicatif, décision",
+  "text": "La bonne idée : un parent. Le parent Boot fixe toutes les versions compatibles. Je n'écris aucune version de Spring Batch à la main."
+ },
+ {
+  "id": "L77",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Je précise la version de Java : vingt-cinq. Le JDK doit être le vingt-cinq."
+ },
+ {
+  "id": "L78",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Ensuite, le starter Spring Batch JDBC : il apporte Spring Batch et le support JDBC pour enregistrer les métadonnées."
+ },
+ {
+  "id": "L79",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Puis le pilote PostgreSQL, en portée runtime : il n'est utile qu'à l'exécution."
+ },
+ {
+  "id": "L80",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Enfin, le starter de test, en portée test : jamais dans l'application livrée."
+ },
+ {
+  "id": "L81",
+  "scene": 7,
+  "expr": "règle",
+  "text": "Retiens : une seule version écrite, celle du parent. Tout le reste est aligné pour toi."
+ },
+ {
+  "id": "L82",
+  "scene": 7,
+  "expr": "pont",
+  "text": "Le projet sait maintenant quoi utiliser. Il reste à lui dire où est la base."
+ },
+ {
+  "id": "L83",
+  "scene": 8,
+  "expr": "besoin",
+  "text": "Mon besoin : configurer la base sans jamais mettre un mot de passe dans le dépôt Git."
+ },
+ {
+  "id": "L84",
+  "scene": 8,
+  "expr": "explicatif, décision",
+  "text": "La syntaxe dollar accolade, nom de variable, deux-points, valeur par défaut. En production, l'adresse vient de l'environnement, pas du dépôt."
+ },
+ {
+  "id": "L85",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Pareil pour l'utilisateur : un compte dédié au batch, sans droits d'administration."
+ },
+ {
+  "id": "L86",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "Et pour le mot de passe, aucun défaut : il ne doit jamais figurer dans le code."
+ },
+ {
+  "id": "L87",
+  "scene": 8,
+  "expr": "technique",
+  "text": "Deux réglages importants. Le lancement automatique des jobs est désactivé : sinon Boot lance tous les jobs au démarrage."
+ },
+ {
+  "id": "L88",
+  "scene": 8,
+  "expr": "technique",
+  "text": "Et la création du schéma est à never en production : le schéma vient d'un outil de migration versionné, comme Flyway ou Liquibase, pas de l'application."
+ },
+ {
+  "id": "L89",
+  "scene": 8,
+  "expr": "règle",
+  "text": "Le schéma en production n'est jamais créé par l'application."
+ },
+ {
+  "id": "L90",
+  "scene": 8,
+  "expr": "pont",
+  "text": "Il manque une pièce : dire à Spring Batch d'utiliser cette base pour son dépôt."
+ },
+ {
+  "id": "L91",
+  "scene": 9,
+  "expr": "besoin",
+  "text": "Mon besoin : un JobRepository qui écrit dans PostgreSQL."
+ },
+ {
+  "id": "L92",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Je commence par une classe de configuration Spring : ses annotations sont lues au démarrage du contexte."
+ },
+ {
+  "id": "L93",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Puis EnableJdbcJobRepository : elle déclare un JobRepository JDBC. Dans les versions précédentes, il fallait le configurer à la main."
+ },
+ {
+  "id": "L94",
+  "scene": 9,
+  "expr": "technique",
+  "text": "Le nom du bean DataSource : celui que Boot crée à partir des propriétés de tout à l'heure."
+ },
+ {
+  "id": "L95",
+  "scene": 9,
+  "expr": "technique",
+  "text": "Le nom du gestionnaire de transactions, qui encadre l'écriture des métadonnées."
+ },
+ {
+  "id": "L96",
+  "scene": 9,
+  "expr": "technique",
+  "text": "Le préfixe des tables. Utile pour héberger plusieurs applications dans un même schéma."
+ },
+ {
+  "id": "L97",
+  "scene": 9,
+  "expr": "technique",
+  "text": "La classe n'a aucune méthode : l'annotation suffit."
+ },
+ {
+  "id": "L98",
+  "scene": 9,
+  "expr": "alerte, appuyé",
+  "text": "Attention à un détail : l'isolation de création. Par défaut, elle est à SERIALIZABLE, c'est le niveau le plus strict."
+ },
+ {
+  "id": "L99",
+  "scene": 9,
+  "expr": "règle",
+  "text": "Ne l'abaisse pas. Si tu la baisses, tu supprimes la protection contre deux lancements simultanés."
+ },
+ {
+  "id": "L100",
+  "scene": 9,
+  "expr": "pont",
+  "text": "Maintenant que tout est branché, écrivons un premier job."
+ },
+ {
+  "id": "L101",
+  "scene": 10,
+  "expr": "besoin",
+  "text": "Mon besoin : un job minimal, qui affiche un message, pour vérifier que toute la chaîne fonctionne."
+ },
+ {
+  "id": "L102",
+  "scene": 10,
+  "expr": "explicatif",
+  "text": "Pas besoin de lire un fichier ni d'écrire en base. Une tasklet suffit : une seule action."
+ },
+ {
+  "id": "L103",
+  "scene": 10,
+  "expr": "explicatif",
+  "text": "Je déclare un journal : en batch, les logs sont souvent la seule interface."
+ },
+ {
+  "id": "L104",
+  "scene": 10,
+  "expr": "explicatif",
+  "text": "Puis la tasklet, comme un bean : elle sera testable seule."
+ },
+ {
+  "id": "L105",
+  "scene": 10,
+  "expr": "technique",
+  "text": "C'est une lambda, parce que Tasklet n'a qu'une méthode : une interface fonctionnelle."
+ },
+ {
+  "id": "L106",
+  "scene": 10,
+  "expr": "technique",
+  "text": "Le StepContribution donne accès à l'exécution du step : son nom, ses compteurs."
+ },
+ {
+  "id": "L107",
+  "scene": 10,
+  "expr": "technique",
+  "text": "Je retourne FINISHED : le step est terminé. Avec CONTINUABLE, la tasklet serait relancée dans une nouvelle transaction."
+ },
+ {
+  "id": "L108",
+  "scene": 10,
+  "expr": "explicatif",
+  "text": "Maintenant le step. Spring injecte le JobRepository, le gestionnaire de transactions et la tasklet."
+ },
+ {
+  "id": "L109",
+  "scene": 10,
+  "expr": "technique",
+  "text": "Le nom du step est la clé sous laquelle ses exécutions sont enregistrées."
+ },
+ {
+  "id": "L110",
+  "scene": 10,
+  "expr": "technique",
+  "text": "La tasklet s'exécute dans une transaction gérée par le gestionnaire que je lui passe."
+ },
+ {
+  "id": "L111",
+  "scene": 10,
+  "expr": "explicatif",
+  "text": "Enfin le job. Son nom identifie la recette dans la table des instances."
+ },
+ {
+  "id": "L112",
+  "scene": 10,
+  "expr": "technique",
+  "text": "start désigne le premier step, build produit le job."
+ },
+ {
+  "id": "L113",
+  "scene": 10,
+  "expr": "règle",
+  "text": "Un job, un step, une tasklet : c'est le plus petit batch possible. Il reste à le lancer."
+ },
+ {
+  "id": "L114",
+  "scene": 11,
+  "expr": "besoin",
+  "text": "Mon besoin : déclencher ce job depuis l'extérieur, par exemple depuis un ordonnanceur."
+ },
+ {
+  "id": "L115",
+  "scene": 11,
+  "expr": "explicatif",
+  "text": "Je définis la requête avec un record : un porteur de données immuable, sans getters à écrire."
+ },
+ {
+  "id": "L116",
+  "scene": 11,
+  "expr": "explicatif",
+  "text": "Et la réponse aussi, avec un switch en expression sur le statut : le compilateur vérifie que tous les cas sont couverts."
+ },
+ {
+  "id": "L117",
+  "scene": 11,
+  "expr": "technique",
+  "text": "Terminé devient « TERMINÉ ». Échec ou arrêt devient « À REPRENDRE ». Le reste garde son nom."
+ },
+ {
+  "id": "L118",
+  "scene": 11,
+  "expr": "technique",
+  "text": "Le contrôleur reçoit un JobOperator et le job."
+ },
+ {
+  "id": "L119",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Un POST, pas un GET : lancer un job modifie l'état. Un GET doit pouvoir être rejoué sans effet, par un navigateur ou un robot."
+ },
+ {
+  "id": "L120",
+  "scene": 11,
+  "expr": "technique",
+  "text": "JobParametersBuilder fabrique les paramètres. Et runDate est un paramètre identifiant : c'est lui qui définit la JobInstance."
+ },
+ {
+  "id": "L121",
+  "scene": 11,
+  "expr": "technique",
+  "text": "Enfin, JobOperator point start lance le job et renvoie l'exécution terminée."
+ },
+ {
+  "id": "L122",
+  "scene": 11,
+  "expr": "alerte",
+  "text": "Attention : ce lancement est synchrone. Pour un job long, la requête HTTP reste bloquée."
+ },
+ {
+  "id": "L123",
+  "scene": 11,
+  "expr": "pont",
+  "text": "C'est un piège que tu retrouveras. Pour l'instant, regardons ce qui s'est passé dans la base."
+ },
+ {
+  "id": "L124",
+  "scene": 12,
+  "expr": "besoin",
+  "text": "Mon besoin : savoir ce que Spring Batch a écrit pendant ce petit job."
+ },
+ {
+  "id": "L125",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Le schéma contient six tables et trois séquences."
+ },
+ {
+  "id": "L126",
+  "scene": 12,
+  "expr": "technique",
+  "text": "La table des instances : une ligne par job et ses paramètres identifiants, avec le nom du job et la clé de hachage des paramètres."
+ },
+ {
+  "id": "L127",
+  "scene": 12,
+  "expr": "technique",
+  "text": "La table des exécutions : une ligne par tentative, avec le statut, le code de sortie, le début, la fin, et une colonne version."
+ },
+ {
+  "id": "L128",
+  "scene": 12,
+  "expr": "technique",
+  "text": "Les paramètres de l'exécution : nom, type, valeur, et un drapeau pour savoir s'ils sont identifiants."
+ },
+ {
+  "id": "L129",
+  "scene": 12,
+  "expr": "technique",
+  "text": "Le contexte de l'exécution du job : la sauvegarde du job, sérialisée."
+ },
+ {
+  "id": "L130",
+  "scene": 12,
+  "expr": "technique",
+  "text": "La table des steps : les compteurs lu, écrit, filtré, annulé, le statut, et une colonne version aussi."
+ },
+ {
+  "id": "L131",
+  "scene": 12,
+  "expr": "technique",
+  "text": "Et le contexte du step : la sauvegarde de partie."
+ },
+ {
+  "id": "L132",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Trois séquences produisent les identifiants. Les colonnes version, en rouge, portent le verrouillage optimiste : on y arrive."
+ },
+ {
+  "id": "L133",
+  "scene": 12,
+  "expr": "règle",
+  "text": "Chaque transition est écrite en base immédiatement. Si le serveur est coupé, la base connaît le dernier point confirmé. C'est ce qui rend la reprise possible."
+ },
+ {
+  "id": "L134",
+  "scene": 12,
+  "expr": "pont",
+  "text": "Et au lancement, comment Spring Batch décide-t-il qu'un job peut démarrer ?"
+ },
+ {
+  "id": "L135",
+  "scene": 13,
+  "expr": "explicatif",
+  "text": "Première étape : chercher la JobInstance à partir du nom du job et des paramètres identifiants, grâce à la clé de hachage."
+ },
+ {
+  "id": "L136",
+  "scene": 13,
+  "expr": "explicatif",
+  "text": "Deuxième étape : si elle existe, y a-t-il une exécution en cours ? Alors, c'est refusé."
+ },
+ {
+  "id": "L137",
+  "scene": 13,
+  "expr": "explicatif",
+  "text": "Troisième étape : l'instance est-elle déjà terminée avec succès ? Alors, c'est encore refusé."
+ },
+ {
+  "id": "L138",
+  "scene": 13,
+  "expr": "explicatif",
+  "text": "Sinon, on crée une nouvelle JobExecution."
+ },
+ {
+  "id": "L139",
+  "scene": 13,
+  "expr": "pédagogue, pont",
+  "text": "Mais regarde bien : ces lectures puis cette création ne forment pas une opération atomique. Si deux serveurs passent la première étape en même temps ?"
+ },
+ {
+  "id": "L140",
+  "scene": 13,
+  "expr": "explicatif",
+  "text": "C'est la raison d'être de l'isolation de création. Elle est exécutée au niveau le plus strict de PostgreSQL."
+ },
+ {
+  "id": "L141",
+  "scene": 13,
+  "expr": "explicatif",
+  "text": "Ce niveau fait échouer l'une des deux transactions concurrentes, avec une erreur de sérialisation."
+ },
+ {
+  "id": "L142",
+  "scene": 13,
+  "expr": "règle",
+  "text": "Le perdant reçoit une exception. C'est le comportement voulu : le lancement doit être retenté, ou abandonné."
+ },
+ {
+  "id": "L143",
+  "scene": 13,
+  "expr": "pont",
+  "text": "Voilà pour la création. Mais une exécution en cours est aussi mise à jour, sans cesse. Et là, on change de mécanisme."
+ },
+ {
+  "id": "L144",
+  "scene": 14,
+  "expr": "image concrète",
+  "text": "Imagine un document partagé. Deux collègues l'ouvrent en même temps, à la version trois. Le premier enregistre. Le second veut enregistrer à son tour."
+ },
+ {
+  "id": "L145",
+  "scene": 14,
+  "expr": "explicatif",
+  "text": "Soit on bloque le document pour tout le monde pendant l'édition. Soit on laisse faire et on vérifie à l'enregistrement."
+ },
+ {
+  "id": "L146",
+  "scene": 14,
+  "expr": "explicatif",
+  "text": "Le second choix s'appelle un verrouillage optimiste : on parie sur l'absence de conflit, et on le détecte à l'écriture."
+ },
+ {
+  "id": "L147",
+  "scene": 14,
+  "expr": "technique",
+  "text": "Dans Spring Batch, chaque ligne d'exécution porte une colonne version. Le serveur A lit l'exécution quarante-deux, version trois."
+ },
+ {
+  "id": "L148",
+  "scene": 14,
+  "expr": "technique",
+  "text": "Le serveur B la lit aussi, version trois."
+ },
+ {
+  "id": "L149",
+  "scene": 14,
+  "expr": "technique",
+  "text": "A écrit sa mise à jour avec une condition : version égale trois. Une ligne est modifiée, la version passe à quatre."
+ },
+ {
+  "id": "L150",
+  "scene": 14,
+  "expr": "technique, couperet",
+  "text": "B écrit avec la même condition. Mais la version est maintenant quatre : aucune ligne ne correspond."
+ },
+ {
+  "id": "L151",
+  "scene": 14,
+  "expr": "explicatif",
+  "text": "Résultat : une OptimisticLockingFailureException. Le second écrivain est refusé."
+ },
+ {
+  "id": "L152",
+  "scene": 14,
+  "expr": "règle",
+  "text": "Aucun verrou de base n'est tenu pendant la lecture : pas de blocage. Le prix à payer : le perdant doit gérer l'échec."
+ },
+ {
+  "id": "L153",
+  "scene": 14,
+  "expr": "pont",
+  "text": "C'est le principe. Mais en pratique, ce mécanisme est atténué. Il faut que tu saches pourquoi."
+ },
+ {
+  "id": "L154",
+  "scene": 15,
+  "expr": "explicatif",
+  "text": "En théorie, une copie périmée d'une exécution doit lever l'exception à l'écriture."
+ },
+ {
+  "id": "L155",
+  "scene": 15,
+  "expr": "technique, appuyé",
+  "text": "En pratique, dans la classe JdbcJobExecutionDao, une méthode de synchronisation compare la version en base à celle de l'objet en mémoire, avant l'écriture."
+ },
+ {
+  "id": "L156",
+  "scene": 15,
+  "expr": "technique",
+  "text": "Si elles diffèrent, elle recopie la version de la base, et ne fait que monter le statut, jamais le baisser."
+ },
+ {
+  "id": "L157",
+  "scene": 15,
+  "expr": "explicatif",
+  "text": "Pourquoi ? Pour qu'un ordre d'arrêt, posé depuis un autre processus, ne soit pas écrasé par une exécution qui continue de tourner."
+ },
+ {
+  "id": "L158",
+  "scene": 15,
+  "expr": "règle, lent",
+  "text": "Conséquence : le verrouillage existe, mais il est atténué. Ne t'attends pas à une exception à chaque fois."
+ },
+ {
+  "id": "L159",
+  "scene": 15,
+  "expr": "appuyé",
+  "text": "La protection contre deux lancements simultanés combine deux choses : la vérification des exécutions en cours, et l'isolation de création. Pas seulement la colonne version."
+ },
+ {
+  "id": "L160",
+  "scene": 15,
+  "expr": "appuyé",
+  "text": "Et pour arrêter un job depuis l'extérieur, passe par JobOperator point stop. C'est précisément ce que cette synchronisation protège."
+ },
+ {
+  "id": "L161",
+  "scene": 15,
+  "expr": "pédagogue",
+  "text": "Un dernier point, qui paraît anodin et qui sera central plus tard dans la formation. Le JobRepository est un singleton."
+ },
+ {
+  "id": "L162",
+  "scene": 16,
+  "expr": "image concrète",
+  "text": "Un singleton, c'est une seule instance pour toute l'application. Comme un seul guichet pour toute une ville."
+ },
+ {
+  "id": "L163",
+  "scene": 16,
+  "expr": "explicatif",
+  "text": "Ça ne pose aucun problème pour le JobRepository : il ne garde rien entre deux appels. Tout l'état vit en base."
+ },
+ {
+  "id": "L164",
+  "scene": 16,
+  "expr": "pédagogue, appuyé",
+  "text": "En revanche, un singleton qui garde un total ou un compteur en mémoire, c'est un piège. Tous les lancements se partagent ce même total."
+ },
+ {
+  "id": "L165",
+  "scene": 16,
+  "expr": "règle",
+  "text": "Un singleton sans état est sûr. Un singleton qui garde un compteur ne l'est pas."
+ },
+ {
+  "id": "L166",
+  "scene": 16,
+  "expr": "pédagogue",
+  "text": "Retiens bien cette opposition. Nous verrons le double comptage en détail quand nous parlerons des processors et des scopes."
+ },
+ {
+  "id": "L167",
+  "scene": 16,
+  "expr": "pont",
+  "text": "Avant de conclure, deux cas d'usage qui montrent à quoi sert tout ce dispositif."
+ },
+ {
+  "id": "L168",
+  "scene": 17,
+  "expr": "explicatif",
+  "text": "Deux instances de l'application tournent derrière un répartiteur. À deux heures du matin, une tâche planifiée lance le même job, avec le même runDate, sur les deux."
+ },
+ {
+  "id": "L169",
+  "scene": 17,
+  "expr": "appuyé",
+  "text": "Grâce à la vérification et à l'isolation de création, une seule exécution démarre. L'autre échoue proprement."
+ },
+ {
+  "id": "L170",
+  "scene": 17,
+  "expr": "règle",
+  "text": "Sans cela, deux traitements concurrents, et des données en double."
+ },
+ {
+  "id": "L171",
+  "scene": 17,
+  "expr": "explicatif",
+  "text": "Deuxième cas : l'audit. Quel a été le résultat du job d'hier, combien de lignes écrites, combien rejetées ?"
+ },
+ {
+  "id": "L172",
+  "scene": 17,
+  "expr": "technique",
+  "text": "La réponse est une requête SQL sur la table des steps. Les compteurs sont déjà là."
+ },
+ {
+  "id": "L173",
+  "scene": 17,
+  "expr": "règle",
+  "text": "Rien à ajouter à l'application : l'audit vient des métadonnées."
+ },
+ {
+  "id": "L174",
+  "scene": 17,
+  "expr": "pont",
+  "text": "Il ne reste plus qu'à voir où l'on tombe quand on oublie tout ça. Voici le palmarès des pièges."
+ },
+ {
+  "id": "L175",
+  "scene": 18,
+  "expr": "pédagogue",
+  "text": "Dix pièges, avec pour chacun ce qui se passe et la parade. Les premiers touchent la configuration."
+ },
+ {
+  "id": "L176",
+  "scene": 18,
+  "expr": "appuyé",
+  "text": "Un : le schéma créé par l'application en production. Ça donne des droits excessifs. La parade : never, et un outil de migration."
+ },
+ {
+  "id": "L177",
+  "scene": 18,
+  "expr": "appuyé",
+  "text": "Deux : un dépôt en mémoire en production. Aucune reprise après redémarrage, aucune trace. La parade : PostgreSQL persistant."
+ },
+ {
+  "id": "L178",
+  "scene": 18,
+  "expr": "appuyé",
+  "text": "Trois : abaisser l'isolation de création pour éviter les erreurs de sérialisation. Résultat : deux lancements concurrents deviennent possibles."
+ },
+ {
+  "id": "L179",
+  "scene": 18,
+  "expr": "règle",
+  "text": "La parade : garder l'isolation stricte, et gérer l'erreur par une nouvelle tentative ou une alerte."
+ },
+ {
+  "id": "L180",
+  "scene": 18,
+  "expr": "appuyé",
+  "text": "Quatre : relancer avec les mêmes paramètres. L'instance est déjà terminée, et tu reçois JobInstanceAlreadyCompleteException."
+ },
+ {
+  "id": "L181",
+  "scene": 18,
+  "expr": "explicatif",
+  "text": "La parade : un paramètre identifiant qui change, comme une date métier, ou démarrer l'instance suivante."
+ },
+ {
+  "id": "L182",
+  "scene": 18,
+  "expr": "appuyé",
+  "text": "Cinq : mettre l'horodatage courant en paramètre identifiant, « pour que ça marche ». Chaque relance devient une nouvelle instance. Plus de reprise."
+ },
+ {
+  "id": "L183",
+  "scene": 18,
+  "expr": "règle",
+  "text": "La parade : un paramètre métier stable, et l'horodatage en paramètre non identifiant."
+ },
+ {
+  "id": "L184",
+  "scene": 19,
+  "expr": "pont",
+  "text": "Les cinq suivants concernent l'exploitation."
+ },
+ {
+  "id": "L185",
+  "scene": 19,
+  "expr": "appuyé",
+  "text": "Six : laisser le lancement automatique à true. Tous les jobs partent au démarrage de l'application. La parade : false, et un lancement explicite."
+ },
+ {
+  "id": "L186",
+  "scene": 19,
+  "expr": "appuyé",
+  "text": "Sept : une exécution restée en cours après un crash. Le job refuse de repartir. La parade : abandonner ou récupérer, après avoir vérifié que rien ne tourne vraiment."
+ },
+ {
+  "id": "L187",
+  "scene": 19,
+  "expr": "appuyé",
+  "text": "Huit : ne jamais purger les tables de métadonnées. Elles deviennent énormes et les requêtes lentes. La parade : une purge planifiée."
+ },
+ {
+  "id": "L188",
+  "scene": 19,
+  "expr": "appuyé",
+  "text": "Neuf : copier des imports d'une ancienne version. Erreurs de compilation. La parade : les paquets de la version six."
+ },
+ {
+  "id": "L189",
+  "scene": 19,
+  "expr": "appuyé",
+  "text": "Dix : lancer un job long dans la requête HTTP. La requête reste bloquée, le délai est dépassé. La parade : un lancement asynchrone."
+ },
+ {
+  "id": "L190",
+  "scene": 19,
+  "expr": "pédagogue",
+  "text": "Et un bug silencieux typique : un test qui passe sur H2, parce que le verrouillage est trivial en mémoire."
+ },
+ {
+  "id": "L191",
+  "scene": 19,
+  "expr": "règle",
+  "text": "Tout test de concurrence ou de reprise doit tourner sur PostgreSQL."
+ },
+ {
+  "id": "L192",
+  "scene": 20,
+  "expr": "pédagogue",
+  "text": "Reprenons notre nuit de trois heures douze. Tu sais maintenant comment répondre au matin : les métadonnées dans PostgreSQL disent ce qui a été fait et où ça s'est arrêté."
+ },
+ {
+  "id": "L193",
+  "scene": 20,
+  "expr": "récapitulatif",
+  "text": "Un Job est une recette. Une JobInstance, la recette avec ses paramètres. Une JobExecution, une tentative. Un ExecutionContext, la sauvegarde de partie."
+ },
+ {
+  "id": "L194",
+  "scene": 20,
+  "expr": "récapitulatif",
+  "text": "Un dépôt JDBC, déclaré avec une annotation. Six tables, dont deux colonnes version. Une isolation stricte à ne pas toucher."
+ },
+ {
+  "id": "L195",
+  "scene": 20,
+  "expr": "défi",
+  "text": "Trois exercices pour finir. Un : tu lances deux fois le même job avec la même date. Que se passe-t-il si le premier est terminé ? S'il est encore en cours ? Cite les deux exceptions."
+ },
+ {
+  "id": "L196",
+  "scene": 20,
+  "expr": "défi",
+  "text": "Deux : comment relancer le job du jour après un échec, sans jamais rejouer un job réussi ? Quel paramètre est identifiant, lequel ne l'est pas ?"
+ },
+ {
+  "id": "L197",
+  "scene": 20,
+  "expr": "défi",
+  "text": "Trois : un collègue propose de passer l'isolation à READ_COMMITTED pour supprimer des erreurs dans les journaux. Quel risque, et que lui réponds-tu ?"
+ },
+ {
+  "id": "L198",
+  "scene": 20,
+  "expr": "pause",
+  "text": "Prends le temps d'y réfléchir."
+ },
+ {
+  "id": "L199",
+  "scene": 20,
+  "expr": "transition",
+  "text": "Dans le module suivant, tu vas lancer et piloter ce premier job proprement, et voir toute la vie d'une exécution."
+ }
+]
