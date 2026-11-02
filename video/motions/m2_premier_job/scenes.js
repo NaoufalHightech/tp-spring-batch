@@ -377,7 +377,7 @@ SCENES[7] = mk({
     ch('L159', 600, 700, 'test 1 : vert', g, { size: 34 }), ch('L159', 1300, 700, 'test 2 : rouge', r, { size: 34 }), ch('L160', 960, 820, 'toujours lancer le job deux fois', y, { size: 34 }),
     ch('L161', 1500, 960, '2.6 · démarrage Spring Boot →', o, { size: 26 }),
   ],
-  quiz: [{ q: 'L149', a: 'L150', question: 'Troisième lancement, toujours cent éléments. Qu'affiche le journal ?', choices: ['100', '200', '300'], win: 2, answer: 'Trois cents : le compteur grandit à chaque lancement tant que l\'application reste vivante.' },
+  quiz: [{ q: 'L149', a: 'L150', question: "Troisième lancement, toujours cent éléments. Qu'affiche le journal ?", choices: ['100', '200', '300'], win: 2, answer: 'Trois cents : le compteur grandit à chaque lancement tant que l\'application reste vivante.' },
          { q: 'L157', a: 'L158', question: 'Quelle parade est la plus sûre ?', choices: ["pas d'état", 'StepScope', 'réinitialiser'], win: 0, answer: "La première : pas d'état du tout, donc rien à oublier de réinitialiser ni à partager." }],
   cues: [{ a: 'L146', s: 'error' }, { a: 'L147', s: 'stamp' }, { a: 'L150', s: 'error' }],
   fx: [{ a: 'L146', glitch: 0.5, dur: 0.35 }],
