@@ -268,7 +268,7 @@ SCENES[2] = mk({
     bx('L039', 560, 330, 440, 100, 'BatchStatus COMPLETED', b, { size: 22, b: 'L040' }), bx('L039', 1360, 330, 560, 100, 'ExitStatus COMPLETED_WITH_REJECTS', y, { size: 20, b: 'L040' }),
     tx('L040', 960, 900, "5.3 · L'aiguillage →", { size: 48, c: p }),
   ],
-  quiz: [{ q: 'L038', a: 'L039', question: 'Le step a réussi, mais le listener a écrit COMPLETED_WITH_REJECTS. Que valent le BatchStatus et l\'ExitStatus ?', choices: ['COMPLETED / COMPLETED', 'COMPLETED / COMPLETED_WITH_REJECTS', 'FAILED / COMPLETED_WITH_REJECTS'], win: 1, answer: 'BatchStatus COMPLETED, ExitStatus COMPLETED_WITH_REJECTS : colis livré, mais le bordereau dit autre chose.' }],
+  quiz: [{ q: 'L038', a: 'L039', question: 'Le step a réussi, mais le listener a écrit COMPLETED_WITH_REJECTS. Que valent le BatchStatus et l\'ExitStatus ?', choices: ['COMPLETED + COMPLETED', 'COMPLETED + REJECTS', 'FAILED + REJECTS'], win: 1, answer: 'BatchStatus COMPLETED, ExitStatus COMPLETED_WITH_REJECTS : colis livré, mais le bordereau dit autre chose.' }],
   cues: [{ a: 'L022', s: 'pop' }, { a: 'L024', s: 'pop' }, { a: 'L026', s: 'success' }, { a: 'L030', s: 'blip' }],
 });
 
@@ -325,7 +325,7 @@ SCENES[4] = mk({
     ch('L084', 960, 330, 'code de sortie : règle simple du step', b, { size: 30, b: 'L085' }), ch('L084', 960, 420, 'decider : plusieurs sources, ou test isolé', o, { size: 30, b: 'L085' }),
     tx('L085', 960, 900, '5.5 · Le jeu de société →', { size: 48, c: g }),
   ],
-  quiz: [{ q: 'L083', a: 'L084', question: 'Quand utiliser un decider plutôt qu\'un code de sortie ?', choices: ['toujours', 'plusieurs sources, ou test isolé', 'jamais'], win: 1, answer: 'Code de sortie : règle simple, propre au step. Decider : décision multi-sources, ou à tester seule.' }],
+  quiz: [{ q: 'L083', a: 'L084', question: 'Quand utiliser un decider plutôt qu\'un code de sortie ?', choices: ['toujours', 'plusieurs sources', 'jamais'], win: 1, answer: 'Code de sortie : règle simple, propre au step. Decider : décision multi-sources, ou à tester seule.' }],
   cues: [{ a: 'L067', s: 'pop' }, { a: 'L070', s: 'blip' }, { a: 'L079', s: 'error' }, { a: 'L082', s: 'success' }],
 });
 
@@ -338,7 +338,7 @@ SCENES[5] = mk({
     ar('L087', 440, 330, 560, 330, w, { b: 'L092' }), ar('L087', 840, 330, 960, 330, w, { b: 'L092' }), ar('L087', 1240, 330, 1360, 330, w, { b: 'L092' }), ch('L087', 300, 230, 'une case = un step', b, { size: 22, b: 'L092' }),
     bx('L088', 300, 560, 160, 140, 'dé', y, { size: 36, b: 'L092' }), ch('L088', 300, 660, 'on exécute le step', y, { size: 22, b: 'L092' }),
     ch('L089', 600, 560, 'chiffre : COMPLETED', g, { size: 26, b: 'L092' }), ch('L089', 600, 610, "c'est l'ExitStatus", d, { size: 20, b: 'L092' }),
-    ch('L090', 1000, 560, 'plateau : table des transitions', p, { size: 24, b: 'L092' }), ch('L091', 1500, 560, "jusqu'à la case arrivée", r, { size: 24, b: 'L092' }),
+    ch('L090', 1100, 680, 'plateau : table des transitions', p, { size: 24, b: 'L092' }), ch('L091', 1500, 560, "jusqu'à la case arrivée", r, { size: 24, b: 'L092' }),
     tb('L092', 100, 200, [420, 600], ['état', 'transitions'], [row('L092', ['loadBankStep', 'COMPLETED → bankReportStep'], b), row('L092', ['', 'FAILED → alertStep'], o), row('L092', ['', '* → fail'], r)], { size: 24, rh: 58, b: 'L097' }),
     ch('L092', 1500, 260, 'SimpleFlow : le plateau', y, { size: 26, b: 'L097' }),
     pl('L093', 200, 520, 1, "exécuter l'état", b, { size: 26, b: 'L097' }), pl('L094', 200, 590, 2, 'produire un statut', g, { size: 26, b: 'L097' }), pl('L095', 200, 660, 3, 'chercher la transition', p, { size: 26, b: 'L097' }),
