@@ -1,0 +1,1052 @@
+[
+ {
+  "id": "L001",
+  "scene": 0,
+  "expr": "calme, accroche",
+  "text": "Neuf heures du matin. Un utilisateur te prévient : les montants de la nuit sont tous à zéro. Ton test est vert, ton job est COMPLETED. Personne n'a été alerté."
+ },
+ {
+  "id": "L002",
+  "scene": 0,
+  "expr": "pédagogue",
+  "text": "Voilà ce qu'est la production : tout ce qui n'est pas testé sur les valeurs, supervisé, et déployé proprement finit par arriver un matin."
+ },
+ {
+  "id": "L003",
+  "scene": 0,
+  "expr": "pédagogue",
+  "text": "Dernier module de la formation. Trois piliers : les tests, le monitoring, le déploiement. Et un bilan de tout le parcours."
+ },
+ {
+  "id": "L004",
+  "scene": 0,
+  "expr": "annonce",
+  "text": "Dix étapes : les trois piliers, tester un job, le test de contenu, les métriques, JFR et les journaux, les douze facteurs, le lancement sans blocage, Kubernetes, Data Flow, et le bilan."
+ },
+ {
+  "id": "L005",
+  "scene": 1,
+  "expr": "besoin",
+  "text": "Mon besoin : mettre un batch en production sans dormir mal."
+ },
+ {
+  "id": "L006",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Premier pilier : les tests. Ce que je livre fait-il ce que je crois ? JobOperatorTestUtils, et des tests de contenu."
+ },
+ {
+  "id": "L007",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Deuxième pilier : le monitoring. Que s'est-il passé cette nuit, et suis-je prévenu quand ça tourne mal ? Micrometer, JFR, journaux, alertes."
+ },
+ {
+  "id": "L008",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Troisième pilier : le déploiement. Où et comment ça s'exécute, redémarre, s'arrête ? Kubernetes, et Spring Cloud Data Flow."
+ },
+ {
+  "id": "L009",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Un récapitulatif des nouveautés de la version six. Le JobOperator, qui étend le JobLauncher."
+ },
+ {
+  "id": "L010",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Le JobRepository, qui étend le JobExplorer. Les paquets déplacés. Le step orienté chunk. Le retry de Spring Framework sept."
+ },
+ {
+  "id": "L011",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Les événements JFR natifs. Les métriques et les observations Micrometer. Et JobOperatorTestUtils, qui remplace JobLauncherTestUtils, déprécié pour suppression."
+ },
+ {
+  "id": "L012",
+  "scene": 1,
+  "expr": "défi, direct",
+  "text": "Question. Un tutoriel te fait utiliser JobLauncherTestUtils. Que fais-tu en Spring Batch six ?"
+ },
+ {
+  "id": "L013",
+  "scene": 1,
+  "expr": "posé",
+  "text": "JobOperatorTestUtils : il offre startJob et startStep. L'ancien est déprécié pour suppression."
+ },
+ {
+  "id": "L014",
+  "scene": 1,
+  "expr": "pont",
+  "text": "Commençons par les tests."
+ },
+ {
+  "id": "L015",
+  "scene": 2,
+  "expr": "besoin",
+  "text": "Mon besoin : lancer le job complet dans un test, avec une vraie base."
+ },
+ {
+  "id": "L016",
+  "scene": 2,
+  "expr": "technique",
+  "text": "SpringBootTest : un contexte Spring complet, branché sur PostgreSQL. La parité avec la production."
+ },
+ {
+  "id": "L017",
+  "scene": 2,
+  "expr": "technique",
+  "text": "SpringBatchTest : il active les utilitaires de test, et la prise en charge des beans StepScope et JobScope."
+ },
+ {
+  "id": "L018",
+  "scene": 2,
+  "expr": "technique",
+  "text": "JobOperatorTestUtils, injecté. Avec plusieurs jobs dans le contexte, on désigne explicitement celui à tester."
+ },
+ {
+  "id": "L019",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Un état de départ connu : on vide la table. Un test qui dépend du test précédent est un test faux."
+ },
+ {
+  "id": "L020",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Des paramètres uniques : le builder ajoute un paramètre aléatoire. Chaque test crée une nouvelle JobInstance, et ne bute pas sur déjà terminé."
+ },
+ {
+  "id": "L021",
+  "scene": 2,
+  "expr": "technique",
+  "text": "runDate est identifiant. inputFile est non identifiant, avec le troisième argument à false."
+ },
+ {
+  "id": "L022",
+  "scene": 2,
+  "expr": "technique",
+  "text": "startJob lance le job et attend sa fin."
+ },
+ {
+  "id": "L023",
+  "scene": 2,
+  "expr": "technique",
+  "text": "On vérifie le statut technique : COMPLETED. Puis les compteurs : lus cinq, filtrés un, écrits quatre."
+ },
+ {
+  "id": "L024",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Pour tester un seul step, sans rejouer tout le job : startStep, avec le nom du step."
+ },
+ {
+  "id": "L025",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "On diagnostique plus vite, et on évite d'attendre les steps voisins."
+ },
+ {
+  "id": "L026",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Et un composant StepScope, par exemple le reader, se teste hors d'un job."
+ },
+ {
+  "id": "L027",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Une StepExecution factice, avec les paramètres, fabriquée par MetaDataInstanceFactory."
+ },
+ {
+  "id": "L028",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Puis StepScopeTestUtils point doInStepScope : le code s'exécute dans un scope step actif. Sans cela, jobParameters n'est pas résolu."
+ },
+ {
+  "id": "L029",
+  "scene": 2,
+  "expr": "défi, direct",
+  "text": "Question. Pourquoi des paramètres uniques à chaque test ?"
+ },
+ {
+  "id": "L030",
+  "scene": 2,
+  "expr": "posé",
+  "text": "Pour créer une nouvelle JobInstance à chaque test. Avec les mêmes paramètres, le deuxième test recevrait JobInstanceAlreadyComplete."
+ },
+ {
+  "id": "L031",
+  "scene": 2,
+  "expr": "pont",
+  "text": "Mais un test qui ne vérifie que les compteurs peut encore mentir."
+ },
+ {
+  "id": "L032",
+  "scene": 3,
+  "expr": "besoin",
+  "text": "Mon besoin : un test qui détecte une base remplie de données fausses."
+ },
+ {
+  "id": "L033",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "C'est le piège récurrent, le numéro neuf des modules trois et quatre. Un test qui ne vérifie que COMPLETED et le nombre de lignes reste vert."
+ },
+ {
+  "id": "L034",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Premier contrôle : le contenu d'une ligne précise, champ par champ."
+ },
+ {
+  "id": "L035",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Le compte, le type. La date est convertie : le premier octobre deux mille vingt-six, neuf heures quinze."
+ },
+ {
+  "id": "L036",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Le montant, avec isEqualByComparingTo : cent vingt virgule cinquante."
+ },
+ {
+  "id": "L037",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Deuxième contrôle : un total calculé. Une colonne oubliée le ferait échouer."
+ },
+ {
+  "id": "L038",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Troisième contrôle : la ligne filtrée n'est pas en base."
+ },
+ {
+  "id": "L039",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Et un test à deux lancements, comme au module quatre : les totaux ne doublent pas."
+ },
+ {
+  "id": "L040",
+  "scene": 3,
+  "expr": "règle",
+  "text": "La grille d'un bon test de job : le statut, les compteurs, les valeurs d'une ligne complète, un total, les exclusions."
+ },
+ {
+  "id": "L041",
+  "scene": 3,
+  "expr": "défi, direct",
+  "text": "Question. Un processor met LocalDateTime point now à la place de la vraie date. Quel test reste vert ?"
+ },
+ {
+  "id": "L042",
+  "scene": 3,
+  "expr": "posé",
+  "text": "Celui qui vérifie COMPLETED et le nombre de lignes. Seul le contrôle de la valeur de la date le détecte."
+ },
+ {
+  "id": "L043",
+  "scene": 3,
+  "expr": "pont",
+  "text": "Après les tests, le monitoring."
+ },
+ {
+  "id": "L044",
+  "scene": 4,
+  "expr": "besoin",
+  "text": "Mon besoin : savoir, sans ouvrir les journaux, si la nuit s'est bien passée."
+ },
+ {
+  "id": "L045",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Spring Batch publie déjà des métriques. spring point batch point job : la durée d'un job."
+ },
+ {
+  "id": "L046",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "spring point batch point job point launch point count : le nombre de lancements. spring point batch point step : la durée d'un step."
+ },
+ {
+  "id": "L047",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "item read, item process : la durée de lecture et de traitement par élément. chunk write : la durée d'écriture d'un chunk."
+ },
+ {
+  "id": "L048",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Les étiquettes portent le nom du job, du step, son statut."
+ },
+ {
+  "id": "L049",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Pour brancher le job, on lui donne un ObservationRegistry, fourni par Spring Boot avec l'actuator."
+ },
+ {
+  "id": "L050",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Ensuite, des métriques métier, que le framework ne connaît pas : un listener de step."
+ },
+ {
+  "id": "L051",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Un compteur : une valeur qui ne fait que croître. Ici, les lignes rejetées, filtrées plus ignorées."
+ },
+ {
+  "id": "L052",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Un timer : une durée, avec nombre, somme et maximum. Calculée avec BatchMetrics point calculateDuration."
+ },
+ {
+  "id": "L053",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Et le listener rend le code de sortie, inchangé, comme au module cinq."
+ },
+ {
+  "id": "L054",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Les alertes comptent plus que les graphiques. Une : le job n'a pas réussi à l'heure attendue."
+ },
+ {
+  "id": "L055",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Deux : un job a échoué. Trois : une durée anormale, au-dessus de deux fois la normale. Quatre : trop de rejets."
+ },
+ {
+  "id": "L056",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Un piège : les métriques tirées d'un pod de vingt secondes. Le job a disparu avant d'être lu."
+ },
+ {
+  "id": "L057",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Prometheus interroge toutes les trente secondes. Un job de vingt secondes passe entre deux lectures."
+ },
+ {
+  "id": "L058",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Deux solutions : pousser les métriques vers un Pushgateway, ou un export OTLP. Ou lire le référentiel."
+ },
+ {
+  "id": "L059",
+  "scene": 4,
+  "expr": "défi, direct",
+  "text": "Question. Un job dure vingt secondes, Prometheus interroge toutes les trente secondes. Que voit-on ?"
+ },
+ {
+  "id": "L060",
+  "scene": 4,
+  "expr": "posé",
+  "text": "Parfois rien : le job a disparu entre deux lectures. Il faut pousser, ou lire le dépôt."
+ },
+ {
+  "id": "L061",
+  "scene": 4,
+  "expr": "pont",
+  "text": "Les métriques disent combien. Les journaux et JFR disent pourquoi."
+ },
+ {
+  "id": "L062",
+  "scene": 5,
+  "expr": "besoin",
+  "text": "Mon besoin : comprendre pourquoi le job est deux fois plus lent qu'hier."
+ },
+ {
+  "id": "L063",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Java Flight Recorder enregistre des événements dans la JVM, avec très peu de coût, même en production."
+ },
+ {
+  "id": "L064",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Spring Batch publie ses propres événements JFR : sur le chunk, la lecture, le traitement, l'écriture, la transaction."
+ },
+ {
+  "id": "L065",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Un grand nombre d'événements de scan signale un chunk rejoué élément par élément : le mode scan du module six."
+ },
+ {
+  "id": "L066",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Pour un partitionnement : des événements de découpage et d'agrégation."
+ },
+ {
+  "id": "L067",
+  "scene": 5,
+  "expr": "besoin",
+  "text": "Passons aux journaux. Mon besoin : retrouver toutes les lignes d'une exécution."
+ },
+ {
+  "id": "L068",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Un listener de job. Dans beforeJob, le MDC attache le nom du job et l'identifiant de l'exécution à chaque ligne."
+ },
+ {
+  "id": "L069",
+  "scene": 5,
+  "expr": "technique",
+  "text": "L'API fluide de SLF4J deux ajoute des paires clé-valeur. Elles deviennent des champs, pas du texte à analyser."
+ },
+ {
+  "id": "L070",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Dans afterJob : un récapitulatif par step, avec les compteurs du framework, déjà prêts."
+ },
+ {
+  "id": "L071",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Et on nettoie le MDC, pour ne pas polluer le thread suivant."
+ },
+ {
+  "id": "L072",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Dans application point properties : logging structured format console égale ecs, ou logstash. Du JSON sur la sortie standard."
+ },
+ {
+  "id": "L073",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Une limite : le MDC est propre au thread. Dans un step multithread ou partitionné, les threads secondaires n'héritent pas de ces champs."
+ },
+ {
+  "id": "L074",
+  "scene": 5,
+  "expr": "défi, direct",
+  "text": "Question. Pourquoi des journaux en JSON, plutôt que du texte libre ?"
+ },
+ {
+  "id": "L075",
+  "scene": 5,
+  "expr": "posé",
+  "text": "Parce que les champs sont exploitables sans analyse de texte : on filtre par identifiant d'exécution, par job, par statut."
+ },
+ {
+  "id": "L076",
+  "scene": 5,
+  "expr": "pont",
+  "text": "Tout cela dessine une application cloud native. Voyons les douze facteurs, appliqués au batch."
+ },
+ {
+  "id": "L077",
+  "scene": 6,
+  "expr": "besoin",
+  "text": "Mon besoin : qu'un batch se comporte bien dans un conteneur, qu'on peut jeter et relancer."
+ },
+ {
+  "id": "L078",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "La configuration dans l'environnement : l'URL, l'utilisateur, les secrets viennent de variables, pas du jar."
+ },
+ {
+  "id": "L079",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Les services externes sont attachés : la base PostgreSQL est une ressource configurée, pas codée."
+ },
+ {
+  "id": "L080",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Des processus sans état : l'état vit dans le JobRepository. Un job échoué sur un nœud reprend sur un autre."
+ },
+ {
+  "id": "L081",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "La concurrence par les processus : on monte en charge par instances, pas seulement par threads."
+ },
+ {
+  "id": "L082",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Un processus jetable : démarrage rapide, arrêt gracieux. SIGTERM sans perte, relancement sans surprise."
+ },
+ {
+  "id": "L083",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "La parité dev et production : on teste sur PostgreSQL, pas sur une base en mémoire."
+ },
+ {
+  "id": "L084",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Les journaux en flux : tout sur la sortie standard, collecté ailleurs."
+ },
+ {
+  "id": "L085",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Les tâches d'administration ponctuelles : un batch est souvent lui-même cette tâche."
+ },
+ {
+  "id": "L086",
+  "scene": 6,
+  "expr": "défi, direct",
+  "text": "Question. Où doit vivre l'état d'un batch pour qu'un nœud puisse remplacer un autre ?"
+ },
+ {
+  "id": "L087",
+  "scene": 6,
+  "expr": "posé",
+  "text": "Dans le JobRepository, en base partagée. Aucun état local au processus."
+ },
+ {
+  "id": "L088",
+  "scene": 6,
+  "expr": "pont",
+  "text": "Dans ce monde, comment lancer un job sans bloquer ?"
+ },
+ {
+  "id": "L089",
+  "scene": 7,
+  "expr": "besoin",
+  "text": "Mon besoin : lancer un job sans bloquer, avec une règle à un seul endroit. Partie théorique."
+ },
+ {
+  "id": "L090",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Au module deux, le contrôleur confie le lancement à un exécuteur applicatif. Spring Batch six offre une seconde voie."
+ },
+ {
+  "id": "L091",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Un lanceur asynchrone : TaskExecutorJobOperator. Le lanceur crée lui-même le thread."
+ },
+ {
+  "id": "L092",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "La règle est à un seul endroit : tout lancement par ce JobOperator est asynchrone."
+ },
+ {
+  "id": "L093",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Et start retourne la JobExecution, immédiatement, avec son identifiant. Avec l'exécuteur applicatif, l'appel est dans la tâche : rien d'utile n'est retourné."
+ },
+ {
+  "id": "L094",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Les erreurs de lancement, instance déjà terminée ou déjà en cours, sont levées avant le thread. Perdues dans le thread avec l'exécuteur applicatif, si on ne les journalise pas."
+ },
+ {
+  "id": "L095",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Le pool : nommé, borné, avec une file, et un arrêt qui attend la fin des tâches."
+ },
+ {
+  "id": "L096",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Un délai d'attente à l'arrêt de cent vingt secondes : cohérent avec le délai de l'orchestrateur."
+ },
+ {
+  "id": "L097",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Puis le TaskExecutorJobOperator, avec le dépôt, le registre de jobs, et ce pool."
+ },
+ {
+  "id": "L098",
+  "scene": 7,
+  "expr": "défi, direct",
+  "text": "Question. Un job déjà terminé est relancé avec les mêmes paramètres, par le lanceur asynchrone. Où l'erreur apparaît-elle ?"
+ },
+ {
+  "id": "L099",
+  "scene": 7,
+  "expr": "posé",
+  "text": "À l'appel, avant la création du thread : l'appelant la reçoit directement."
+ },
+ {
+  "id": "L100",
+  "scene": 7,
+  "expr": "pont",
+  "text": "Voyons maintenant où ce job s'exécute vraiment : Kubernetes."
+ },
+ {
+  "id": "L101",
+  "scene": 8,
+  "expr": "besoin",
+  "text": "Mon besoin : exécuter mon batch chaque nuit à deux heures, et qu'il s'arrête quand il a fini. Partie théorique."
+ },
+ {
+  "id": "L102",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Première idée : un Deployment. Le processus redémarre après chaque fin, même réussie. C'est le piège."
+ },
+ {
+  "id": "L103",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "La bonne idée : un CronJob, qui crée des Jobs, qui créent des pods. Le pod s'exécute puis disparaît."
+ },
+ {
+  "id": "L104",
+  "scene": 8,
+  "expr": "technique",
+  "text": "Le schedule, au format cron : tous les jours à deux heures. Et le fuseau, sinon c'est celui du cluster."
+ },
+ {
+  "id": "L105",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "concurrencyPolicy Forbid : si l'exécution précédente tourne encore, on n'en lance pas une deuxième. Avec Allow, deux exécutions simultanées."
+ },
+ {
+  "id": "L106",
+  "scene": 8,
+  "expr": "technique",
+  "text": "startingDeadlineSeconds : un déclenchement manqué de plus de dix minutes est sauté."
+ },
+ {
+  "id": "L107",
+  "scene": 8,
+  "expr": "technique",
+  "text": "backoffLimit : le nombre de tentatives avant de déclarer le Job en échec."
+ },
+ {
+  "id": "L108",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "activeDeadlineSeconds : la durée maximale. Au-delà de deux heures, Kubernetes arrête le pod et marque le Job en échec."
+ },
+ {
+  "id": "L109",
+  "scene": 8,
+  "expr": "technique",
+  "text": "ttlSecondsAfterFinished : nettoyage des pods terminés après vingt-quatre heures."
+ },
+ {
+  "id": "L110",
+  "scene": 8,
+  "expr": "technique",
+  "text": "restartPolicy OnFailure : le conteneur est relancé dans le même pod. Never : un nouveau pod à chaque tentative. Pas Always, interdit pour un Job."
+ },
+ {
+  "id": "L111",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "terminationGracePeriodSeconds : le délai de l'arrêt gracieux du module six. Supérieur à la durée d'un chunk."
+ },
+ {
+  "id": "L112",
+  "scene": 8,
+  "expr": "technique",
+  "text": "Les secrets viennent de secretKeyRef : jamais de l'image, jamais du dépôt."
+ },
+ {
+  "id": "L113",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "Un batch n'embarque pas de serveur web : web application type à none. Sinon le processus ne se termine jamais."
+ },
+ {
+  "id": "L114",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "Le lancement automatique est réactivé ici. Le module deux le désactive pour une API. Un Job Kubernetes doit démarrer le job tout seul."
+ },
+ {
+  "id": "L115",
+  "scene": 8,
+  "expr": "technique",
+  "text": "Et le nom du job à lancer, puisque l'application en contient plusieurs."
+ },
+ {
+  "id": "L116",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Kubernetes décide d'une nouvelle tentative d'après le code de sortie du processus."
+ },
+ {
+  "id": "L117",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "Et la reprise est automatique, grâce au JobRepository : la nouvelle tentative relance avec les mêmes paramètres, et reprend l'instance échouée."
+ },
+ {
+  "id": "L118",
+  "scene": 8,
+  "expr": "défi, direct",
+  "text": "Question. Un CronJob a backoffLimit six, restartPolicy OnFailure, et aucun activeDeadlineSeconds. Le job échoue à chaque fois pour une erreur de configuration. Que se passe-t-il ?"
+ },
+ {
+  "id": "L119",
+  "scene": 8,
+  "expr": "posé",
+  "text": "Il réessaie jusqu'à sept fois, toute la nuit, sans limite de durée. Deux réglages corrigent : un backoffLimit bas, et une durée maximale."
+ },
+ {
+  "id": "L120",
+  "scene": 8,
+  "expr": "pont",
+  "text": "Reste une alternative à Kubernetes seul : Spring Cloud Data Flow."
+ },
+ {
+  "id": "L121",
+  "scene": 9,
+  "expr": "besoin",
+  "text": "Mon besoin : superviser des dizaines de batchs depuis un seul tableau de bord. Partie théorique."
+ },
+ {
+  "id": "L122",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Un à cinq jobs, sur Kubernetes : un CronJob et des métriques suffisent. Pas besoin de Data Flow."
+ },
+ {
+  "id": "L123",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Data Flow s'impose quand on gère de nombreuses tâches, avec des définitions, des planifications, et un tableau de bord central."
+ },
+ {
+  "id": "L124",
+  "scene": 9,
+  "expr": "technique",
+  "text": "Étape un : rendre l'application compatible, avec spring-cloud-starter-task et EnableTask."
+ },
+ {
+  "id": "L125",
+  "scene": 9,
+  "expr": "technique",
+  "text": "Étape deux : enregistrer l'application, avec son nom, son type task, et son adresse."
+ },
+ {
+  "id": "L126",
+  "scene": 9,
+  "expr": "technique",
+  "text": "Étape trois : définir une tâche. Étape quatre : la lancer, à la demande, planifiée, ou déclenchée par un flux."
+ },
+ {
+  "id": "L127",
+  "scene": 9,
+  "expr": "technique",
+  "text": "Étape cinq : superviser dans le tableau de bord. Les onglets Tasks et Executions, et Jobs, pour le référentiel Spring Batch."
+ },
+ {
+  "id": "L128",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Deux bases entrent en jeu : celle du serveur Data Flow, et celle du JobRepository de ton batch."
+ },
+ {
+  "id": "L129",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Pour que l'onglet Jobs fonctionne, le serveur doit lire le JobRepository de ton batch. Mal configuré, les métadonnées sont perdues au redémarrage."
+ },
+ {
+  "id": "L130",
+  "scene": 9,
+  "expr": "défi, direct",
+  "text": "Question. Quand Data Flow est-il justifié ?"
+ },
+ {
+  "id": "L131",
+  "scene": 9,
+  "expr": "posé",
+  "text": "Quand on gère beaucoup de tâches avec un tableau de bord central. Pour un à cinq jobs, un CronJob suffit."
+ },
+ {
+  "id": "L132",
+  "scene": 9,
+  "expr": "pont",
+  "text": "Voyons les dix pièges de la production."
+ },
+ {
+  "id": "L133",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Dix pièges, avec pour chacun ce qui se passe, la parade, et comment le repérer."
+ },
+ {
+  "id": "L134",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Un : un test vert avec des données fausses. COMPLETED et le bon nombre de lignes, mais une base fausse."
+ },
+ {
+  "id": "L135",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un utilisateur qui signale des montants à zéro, avec tous les tests au vert."
+ },
+ {
+  "id": "L136",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Deux : aucun monitoring. L'échec est découvert par un utilisateur, à neuf heures."
+ },
+ {
+  "id": "L137",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : aucune alerte reçue, un job FAILED depuis trois heures."
+ },
+ {
+  "id": "L138",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Trois : un batch déployé comme un Deployment, ou un Job mal réglé. Le processus redémarre après chaque fin."
+ },
+ {
+  "id": "L139",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un pod qui redémarre sans fin après des exécutions réussies."
+ },
+ {
+  "id": "L140",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Quatre : Data Flow mal configuré. Pas de base dédiée, ou le JobRepository non lu."
+ },
+ {
+  "id": "L141",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un onglet Jobs vide, ou des exécutions perdues après un redémarrage."
+ },
+ {
+  "id": "L142",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Cinq : des métriques tirées d'un pod de vingt secondes. Le job disparaît avant d'être lu."
+ },
+ {
+  "id": "L143",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un graphique vide les nuits où le job est court."
+ },
+ {
+  "id": "L144",
+  "scene": 11,
+  "expr": "pont",
+  "text": "Les cinq suivants touchent l'image, les secrets, la concurrence et les tests."
+ },
+ {
+  "id": "L145",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Six : un serveur web dans un Job Kubernetes. Le processus ne se termine jamais."
+ },
+ {
+  "id": "L146",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un pod qui reste Running après la fin du job."
+ },
+ {
+  "id": "L147",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Sept : des secrets dans l'image ou le dépôt. Une fuite d'identifiants."
+ },
+ {
+  "id": "L148",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un mot de passe visible dans le dépôt ou dans l'historique de l'image."
+ },
+ {
+  "id": "L149",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Huit : un CronJob avec concurrencyPolicy Allow. Deux exécutions du même lot en parallèle."
+ },
+ {
+  "id": "L150",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : deux pods du même CronJob en même temps."
+ },
+ {
+  "id": "L151",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Neuf : un délai d'arrêt plus court qu'un chunk. Un pod tué en plein chunk, une exécution orpheline."
+ },
+ {
+  "id": "L152",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : une exécution STARTED au matin, sans pod."
+ },
+ {
+  "id": "L153",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Dix : tester sur une base en mémoire, avec des journaux non structurés. Des défauts propres à PostgreSQL apparaissent seulement en production."
+ },
+ {
+  "id": "L154",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un test vert en local, un échec de sérialisation en production."
+ },
+ {
+  "id": "L155",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce que la production est le seul endroit où tout se rejoint, et le dernier endroit où on regarde."
+ },
+ {
+  "id": "L156",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Reprenons notre matin à neuf heures, avec des montants à zéro. Tu sais maintenant pourquoi le test était vert, et comment l'éviter."
+ },
+ {
+  "id": "L157",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Module un : une JobInstance égale un Job plus des paramètres identifiants. Le JobRepository, en PostgreSQL, rend tout reprenable et verrouillable. Le piège : l'isolation abaissée."
+ },
+ {
+  "id": "L158",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Module deux : le singleton, le proxy StepScope, le JobOperator. Le piège : un job long lancé dans la requête HTTP."
+ },
+ {
+  "id": "L159",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Module trois : un chunk égale une transaction, et la position est sauvegardée avec les données. Le piège : une taille de chunk jamais mesurée, ou un curseur sans auto-commit désactivé."
+ },
+ {
+  "id": "L160",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Module quatre : un processor sans état, retourner null filtre. Le piège : le double comptage du singleton."
+ },
+ {
+  "id": "L161",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Module cinq : BatchStatus n'est pas ExitStatus, le decider, le split. Le piège : un ExitStatus non aiguillé."
+ },
+ {
+  "id": "L162",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Module six : skip pour la donnée, retry pour la ressource, restart pour le processus, et l'arrêt gracieux. Le piège : un skip silencieux."
+ },
+ {
+  "id": "L163",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Module sept : mesurer avant d'optimiser, le partitionnement, et SKIP LOCKED. Le piège : des plages qui se chevauchent."
+ },
+ {
+  "id": "L164",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Module huit : des tests de contenu, des métriques, des journaux, Kubernetes. Le piège : un test vert avec des données fausses."
+ },
+ {
+  "id": "L165",
+  "scene": 12,
+  "expr": "défi",
+  "text": "Quatre exercices pour finir. Un : un processor met LocalDateTime point now à la place de la date. Quel test reste vert, et quelle assertion le détecte ?"
+ },
+ {
+  "id": "L166",
+  "scene": 12,
+  "expr": "défi",
+  "text": "Deux : un CronJob avec backoffLimit six, OnFailure, et pas de durée maximale, qui échoue à chaque fois. Que se passe-t-il, et quels deux réglages corrigent ?"
+ },
+ {
+  "id": "L167",
+  "scene": 12,
+  "expr": "défi",
+  "text": "Trois : un job dure vingt secondes, Prometheus interroge toutes les trente secondes. Que voit-on, et quelles deux solutions ?"
+ },
+ {
+  "id": "L168",
+  "scene": 12,
+  "expr": "défi",
+  "text": "Quatre : un job est deux fois plus lent qu'hier. Quels événements JFR consultes-tu d'abord, et que conclus-tu d'un grand nombre d'événements de scan ?"
+ },
+ {
+  "id": "L169",
+  "scene": 12,
+  "expr": "pause",
+  "text": "Prends le temps d'y réfléchir."
+ },
+ {
+  "id": "L170",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Correction un. Le test qui vérifie COMPLETED et le nombre de lignes. L'assertion : la valeur de la date, champ par champ."
+ },
+ {
+  "id": "L171",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Correction deux. Sept tentatives pendant la nuit, sans limite de durée. On baisse le backoffLimit, et on ajoute activeDeadlineSeconds."
+ },
+ {
+  "id": "L172",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Correction trois. Rien, ou un trou : le job disparaît entre deux lectures. On pousse les métriques, ou on lit le dépôt."
+ },
+ {
+  "id": "L173",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Correction quatre. Les événements du chunk d'abord. Beaucoup d'événements de scan : des chunks rejoués élément par élément, après des erreurs d'écriture."
+ },
+ {
+  "id": "L174",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Tu as maintenant tout le parcours : des fondations aux tests de production. Un travail pratique de synthèse complète cette formation."
+ },
+ {
+  "id": "L175",
+  "scene": 12,
+  "expr": "transition",
+  "text": "Merci d'avoir suivi cette formation. Pour la suite, ouvre le projet, lance le job, casse-le exprès, et regarde ce que raconte la base."
+ }
+]
