@@ -1,0 +1,596 @@
+[
+ {
+  "id": "L001",
+  "scene": 0,
+  "expr": "calme, accroche",
+  "text": "Le job a tourné toute la nuit. Le matin, le fichier contient des lignes en double, et une moitié de ligne à la fin."
+ },
+ {
+  "id": "L002",
+  "scene": 0,
+  "expr": "pédagogue",
+  "text": "Jusqu'ici, on a surtout lu. Au module trois, tu as écrit dans PostgreSQL. Mais écrire dans un fichier, une file ou une API, ce n'est pas la même chose."
+ },
+ {
+  "id": "L003",
+  "scene": 0,
+  "expr": "rappel",
+  "text": "Au module trois, tu as vu JdbcBatchItemWriter : un lot JDBC par chunk. Au module trois B, tu as vu la règle des ItemStream pour les readers."
+ },
+ {
+  "id": "L004",
+  "scene": 0,
+  "expr": "explicatif",
+  "text": "Un writer ne reçoit pas un élément. Il reçoit tout le chunk, en un seul appel. C'est ce qui permet d'écrire par lots."
+ },
+ {
+  "id": "L005",
+  "scene": 0,
+  "expr": "annonce",
+  "text": "Cinq étapes : le catalogue, les fichiers, la transaction d'un fichier, les destinations multiples, et ton propre writer."
+ },
+ {
+  "id": "L006",
+  "scene": 0,
+  "expr": "pont",
+  "text": "Commençons par le catalogue, et par ce qui a disparu depuis les anciens tutoriels."
+ },
+ {
+  "id": "L007",
+  "scene": 1,
+  "expr": "besoin",
+  "text": "Mon besoin : choisir le bon writer pour ma destination, et savoir ce qui m'attend quand ça se passe mal."
+ },
+ {
+  "id": "L008",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "ItemWriter n'a qu'une méthode : write, qui reçoit un Chunk. Si le writer garde une ressource ouverte, il est aussi un ItemStream : open, update, close."
+ },
+ {
+  "id": "L009",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Pour les fichiers : FlatFileItemWriter, délimité ou formaté. JsonFileItemWriter pour le JSON, StaxEventItemWriter pour le XML."
+ },
+ {
+  "id": "L010",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Pour une base : JdbcBatchItemWriter pour du SQL écrit à la main, JpaItemWriter pour un ORM, RepositoryItemWriter pour Spring Data."
+ },
+ {
+  "id": "L011",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Pour les messages : JmsItemWriter, AmqpItemWriter, KafkaItemWriter. Et aussi Mongo, Redis, Avro, ou même un courriel."
+ },
+ {
+  "id": "L012",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Pour combiner : CompositeItemWriter envoie à tous. ClassifierCompositeItemWriter choisit selon l'élément. MultiResourceItemWriter découpe en plusieurs fichiers."
+ },
+ {
+  "id": "L013",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Pour un bean existant : ItemWriterAdapter. Pour un test : ListItemWriter. Pour plusieurs threads : SynchronizedItemStreamWriter."
+ },
+ {
+  "id": "L014",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Attention, ce catalogue a changé depuis les anciens tutoriels. Le writer Hibernate natif a disparu."
+ },
+ {
+  "id": "L015",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Il n'existe plus de HibernateItemWriter en version six. Pour un ORM, tu passes par JpaItemWriter."
+ },
+ {
+  "id": "L016",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Autre changement : write reçoit un Chunk, plus une liste. Et les paquets sont sous infrastructure point item."
+ },
+ {
+  "id": "L017",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Bonne nouvelle : le builder du writer de fichier sait maintenant écrire un record, avec sourceType. Plus besoin de getters."
+ },
+ {
+  "id": "L018",
+  "scene": 1,
+  "expr": "défi, direct",
+  "text": "Question. Un tutoriel te demande HibernateItemWriter. Que fais-tu en Spring Batch six ?"
+ },
+ {
+  "id": "L019",
+  "scene": 1,
+  "expr": "posé",
+  "text": "Tu utilises JpaItemWriter, ou JdbcBatchItemWriter si tu préfères le SQL. Aucun writer Hibernate natif n'existe en six point zéro point six."
+ },
+ {
+  "id": "L020",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "JpaItemWriter fait un merge par défaut. Avec usePersist à vrai, il fait un persist. Et il peut vider le contexte de persistance."
+ },
+ {
+  "id": "L021",
+  "scene": 1,
+  "expr": "attention",
+  "text": "Rappelle-toi le module trois B : un ORM complet en batch charge des objets que tu n'utilises pas. Le SQL direct reste souvent plus sûr."
+ },
+ {
+  "id": "L022",
+  "scene": 1,
+  "expr": "pont",
+  "text": "Passons à la pratique, avec le cas le plus fréquent : écrire un fichier."
+ },
+ {
+  "id": "L023",
+  "scene": 2,
+  "expr": "besoin",
+  "text": "Mon besoin : un relevé des transactions, en CSV, pour la comptabilité."
+ },
+ {
+  "id": "L024",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Le writer vient du builder. La destination est une WritableResource, et non une simple Resource : ce type garantit que le fichier est ouvert en écriture, et pas en simple lecture."
+ },
+ {
+  "id": "L025",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Donne-lui un nom. Sans nom, l'état ne peut pas être sauvegardé, et il n'y aura pas de reprise."
+ },
+ {
+  "id": "L026",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Delimited, avec un point-virgule : la virgule sert de séparateur décimal en France."
+ },
+ {
+  "id": "L027",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Puis sourceType avec le record, et les noms des composants : id, accountNumber, transactionDate, transactionType, amount."
+ },
+ {
+  "id": "L028",
+  "scene": 2,
+  "expr": "défi, direct",
+  "text": "Question. Un collègue écrit names sur un record, mais oublie sourceType. Que se passe-t-il ?"
+ },
+ {
+  "id": "L029",
+  "scene": 2,
+  "expr": "posé",
+  "text": "Ça échoue : le builder cherche des getters comme getId, que les records n'ont pas. Avec sourceType, il utilise les noms des composants."
+ },
+ {
+  "id": "L030",
+  "scene": 2,
+  "expr": "technique",
+  "text": "L'en-tête s'écrit avec un headerCallback : une lambda qui reçoit un Writer."
+ },
+ {
+  "id": "L031",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Le pied de page, avec footerCallback. Typiquement un total de contrôle, ou le nombre de lignes."
+ },
+ {
+  "id": "L032",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Et shouldDeleteIfExists, vrai par défaut : un fichier existant est écrasé au premier lancement. À faux, il fait échouer le step."
+ },
+ {
+  "id": "L033",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Les montants BigDecimal sont écrits avec toString : mille deux cent trente-quatre point cinquante. Pour un autre format, il faut un FieldExtractor."
+ },
+ {
+  "id": "L034",
+  "scene": 2,
+  "expr": "besoin",
+  "text": "Autre besoin : un fichier en positions fixes pour un système historique."
+ },
+ {
+  "id": "L035",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Tu passes par formatted, avec un gabarit. Un gabarit, c'est un formulaire à cases : chaque morceau décrit une colonne."
+ },
+ {
+  "id": "L036",
+  "scene": 2,
+  "expr": "pédagogue",
+  "text": "Lis le premier morceau. Le s dit « du texte ». Le moins dit « aligne à gauche ». Le douze dit « prends douze caractères de large »."
+ },
+ {
+  "id": "L037",
+  "scene": 2,
+  "expr": "pédagogue",
+  "text": "Et le dernier : f dit « un nombre décimal », point deux dit « deux décimales ». Un nombre est aligné à droite par défaut."
+ },
+ {
+  "id": "L038",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Piège : une valeur plus longue que sa colonne déborde, et décale toute la ligne. Le fichier est faux, sans erreur."
+ },
+ {
+  "id": "L039",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Parade : maximumLength et minimumLength. Le writer échoue avec le message « String overflowed in formatter »."
+ },
+ {
+  "id": "L040",
+  "scene": 2,
+  "expr": "besoin",
+  "text": "Dernier besoin : du JSON, pour une application web."
+ },
+ {
+  "id": "L041",
+  "scene": 2,
+  "expr": "technique",
+  "text": "JsonFileItemWriter, avec un marshaller. En Spring Batch six, JacksonJsonObjectMarshaller repose sur Jackson trois."
+ },
+ {
+  "id": "L042",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Le fichier produit est un tableau JSON : un crochet ouvrant, les objets séparés par des virgules, un crochet fermant."
+ },
+ {
+  "id": "L043",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Pour des dates ou des formats spéciaux, tu passes ton propre JsonMapper au constructeur du marshaller."
+ },
+ {
+  "id": "L044",
+  "scene": 2,
+  "expr": "pont",
+  "text": "Reste une question importante : que devient ce fichier quand le chunk échoue ?"
+ },
+ {
+  "id": "L045",
+  "scene": 3,
+  "expr": "besoin",
+  "text": "Mon besoin : un fichier qui reste cohérent avec la base, même quand un chunk échoue."
+ },
+ {
+  "id": "L046",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Le writer de fichier n'écrit pas directement sur le disque dur. Il écrit d'abord dans un brouillon : un tampon en mémoire."
+ },
+ {
+  "id": "L047",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Si le chunk est validé, le commit, il recopie le brouillon au propre sur le disque. Si le chunk échoue, le rollback, il jette le brouillon."
+ },
+ {
+  "id": "L048",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "C'est ce qui garantit qu'il n'y a jamais de ligne à moitié écrite : le fichier suit la même frontière que la base."
+ },
+ {
+  "id": "L049",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "À chaque chunk, le writer sauvegarde deux valeurs dans l'ExecutionContext : le nombre d'éléments écrits, et la position en octets."
+ },
+ {
+  "id": "L050",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "La clé written contient la position validée dans le fichier. C'est elle qui sert au restart."
+ },
+ {
+  "id": "L051",
+  "scene": 3,
+  "expr": "défi, direct",
+  "text": "Question. Un export de dix mille lignes échoue à la ligne six mille trois cents, après un commit à six mille. Que contient le fichier ?"
+ },
+ {
+  "id": "L052",
+  "scene": 3,
+  "expr": "posé",
+  "text": "Six mille lignes. Les trois cents suivantes étaient dans le tampon, et le rollback les a jetées. Aucune ligne coupée."
+ },
+ {
+  "id": "L053",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Au restart, le writer rouvre le fichier, le tronque à la position written, et reprend à la ligne six mille un."
+ },
+ {
+  "id": "L054",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Et l'en-tête n'est pas réécrit à la reprise. Pas de doublon, pas de ligne tronquée."
+ },
+ {
+  "id": "L055",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Deux réglages à connaître. transactional à faux écrit tout de suite : plus rapide, mais un rollback laisse des lignes."
+ },
+ {
+  "id": "L056",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Et forceSync à vrai force l'écriture physique sur le disque à chaque chunk : plus sûr en cas de coupure de courant, nettement plus lent."
+ },
+ {
+  "id": "L057",
+  "scene": 3,
+  "expr": "règle",
+  "text": "Garde la valeur par défaut en production. Un fichier de travail jetable peut se passer de la transaction, pas un fichier livré."
+ },
+ {
+  "id": "L058",
+  "scene": 3,
+  "expr": "besoin",
+  "text": "Même logique côté base : savoir si une écriture a vraiment eu lieu."
+ },
+ {
+  "id": "L059",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "JdbcBatchItemWriter a un réglage, assertUpdates, vrai par défaut. Si une requête du lot ne modifie aucune ligne, le chunk échoue."
+ },
+ {
+  "id": "L060",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Pour un UPDATE, c'est précieux : une ligne introuvable est une erreur de données, pas un succès silencieux."
+ },
+ {
+  "id": "L061",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Pour un INSERT avec ON CONFLICT DO NOTHING, c'est l'inverse : zéro ligne est normal. Il faut alors assertUpdates à faux."
+ },
+ {
+  "id": "L062",
+  "scene": 3,
+  "expr": "pont",
+  "text": "Maintenant, plusieurs destinations pour les mêmes données."
+ },
+ {
+  "id": "L063",
+  "scene": 4,
+  "expr": "besoin",
+  "text": "Mon besoin : écrire en base et garder une trace dans un fichier d'audit, en une seule passe."
+ },
+ {
+  "id": "L064",
+  "scene": 4,
+  "expr": "technique",
+  "text": "CompositeItemWriter, c'est un photocopieur. Il prend le chunk entier et le duplique vers toutes les destinations, l'une après l'autre."
+ },
+ {
+  "id": "L065",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "C'est un ItemStreamWriter : il ouvre et ferme lui-même ses délégués. Tu n'as rien à déclarer sur le step."
+ },
+ {
+  "id": "L066",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Si le deuxième writer échoue, tout est annulé : la base revient en arrière, et le tampon du fichier est jeté. Les deux restent cohérents."
+ },
+ {
+  "id": "L067",
+  "scene": 4,
+  "expr": "besoin",
+  "text": "Autre besoin : les débits dans un fichier, les crédits dans un autre."
+ },
+ {
+  "id": "L068",
+  "scene": 4,
+  "expr": "technique",
+  "text": "ClassifierCompositeItemWriter, c'est un facteur. Il regarde chaque lettre, une par une, et la dépose dans la boîte aux lettres qui correspond à sa règle."
+ },
+ {
+  "id": "L069",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "La règle est une lambda : elle reçoit l'élément, et retourne le writer. Les éléments d'un même chunk peuvent donc partir vers des destinations différentes."
+ },
+ {
+  "id": "L070",
+  "scene": 4,
+  "expr": "défi, direct",
+  "text": "Question. Ton job échoue au premier write, avec le message « Writer must be open before it can be written to ». Que manque-t-il ?"
+ },
+ {
+  "id": "L071",
+  "scene": 4,
+  "expr": "posé",
+  "text": "Les deux writers de fichier n'ont jamais été ouverts. ClassifierCompositeItemWriter n'est pas un ItemStream : il faut les enregistrer avec stream."
+ },
+ {
+  "id": "L072",
+  "scene": 4,
+  "expr": "règle",
+  "text": "La règle : un writer de composition qui n'est pas un ItemStream n'ouvre pas ses délégués. Enregistre-les toi-même."
+ },
+ {
+  "id": "L073",
+  "scene": 4,
+  "expr": "besoin",
+  "text": "Dernier besoin : un export de deux millions de lignes, trop gros pour un seul fichier."
+ },
+ {
+  "id": "L074",
+  "scene": 4,
+  "expr": "technique",
+  "text": "MultiResourceItemWriter entoure un writer de fichier, et coupe tous les n éléments, avec itemCountLimitPerResource."
+ },
+ {
+  "id": "L075",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Tu lui donnes la base du nom. Les fichiers s'appellent releve point un, releve point deux, et ainsi de suite."
+ },
+ {
+  "id": "L076",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Le délégué ne doit pas avoir de ressource fixe : elle est remplacée à chaque nouveau fichier."
+ },
+ {
+  "id": "L077",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "La coupure a lieu à la fin d'un chunk. Avec un chunk de trois cents et une limite de cinq cent mille, le premier fichier compte cinq cent mille cent lignes."
+ },
+ {
+  "id": "L078",
+  "scene": 4,
+  "expr": "règle",
+  "text": "Choisis une limite multiple du chunk. Et rappelle-toi que l'en-tête et le pied de page sont écrits dans chaque fichier."
+ },
+ {
+  "id": "L079",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Dernier cas : plusieurs threads. JdbcBatchItemWriter est prévu pour. FlatFileItemWriter ne l'est pas : un seul fichier, un seul tampon."
+ },
+ {
+  "id": "L080",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Tu l'enveloppes dans un SynchronizedItemStreamWriter, qui sérialise write. L'ordre des lignes n'est plus garanti."
+ },
+ {
+  "id": "L081",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Avec plusieurs threads, la position written n'a plus de sens. Mets saveState à faux, et renonce à la reprise au chunk près."
+ },
+ {
+  "id": "L082",
+  "scene": 4,
+  "expr": "pont",
+  "text": "Et quand aucune destination n'existe ? On écrit son propre writer."
+ },
+ {
+  "id": "L083",
+  "scene": 5,
+  "expr": "besoin",
+  "text": "Mon besoin : envoyer le chunk à un service, sans writer prêt à l'emploi."
+ },
+ {
+  "id": "L084",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Tu implémentes ItemWriter, avec une seule méthode : write, qui reçoit un Chunk."
+ },
+ {
+  "id": "L085",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Dans write, tu envoies tous les éléments d'un coup, avec chunk point getItems. Un appel pour cent éléments."
+ },
+ {
+  "id": "L086",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Si ton writer garde une ressource ouverte, étends AbstractItemStreamItemWriter : tu obtiens open, update, close, et le nom pour les clés d'état."
+ },
+ {
+  "id": "L087",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "ItemWriterAdapter est la version sans code : il appelle une méthode d'un bean existant, mais une fois par élément."
+ },
+ {
+  "id": "L088",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "PropertyExtractingDelegatingItemWriter fait pareil, mais il passe des propriétés de l'élément comme arguments de la méthode."
+ },
+ {
+  "id": "L089",
+  "scene": 5,
+  "expr": "attention",
+  "text": "Pratique pour un prototype. Pour la production, préfère ton writer : un appel par chunk coûte bien moins cher qu'un appel par élément."
+ },
+ {
+  "id": "L090",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Mais attention à une différence : la base et le fichier transactionnel suivent le chunk. Une file de messages, une API, un courriel, non."
+ },
+ {
+  "id": "L091",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Un message déjà envoyé ne revient pas après un rollback. Et le chunk rejoué le renvoie."
+ },
+ {
+  "id": "L092",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Deux parades : un destinataire idempotent, avec une clé de déduplication stable, ou le motif outbox : écrire en base, envoyer ensuite."
+ },
+ {
+  "id": "L093",
+  "scene": 5,
+  "expr": "rappel",
+  "text": "Le détail est dans l'annexe REST, au sujet de l'écriture vers une API."
+ },
+ {
+  "id": "L094",
+  "scene": 5,
+  "expr": "pédagogue",
+  "text": "Récapitulons les pièges. Un : names sur un record, sans sourceType. Deux : un writer de fichier sans nom."
+ },
+ {
+  "id": "L095",
+  "scene": 5,
+  "expr": "pédagogue",
+  "text": "Trois : un ClassifierCompositeItemWriter sans stream. Quatre : assertUpdates vrai avec ON CONFLICT DO NOTHING."
+ },
+ {
+  "id": "L096",
+  "scene": 5,
+  "expr": "pédagogue",
+  "text": "Cinq : une largeur fixe dépassée. Six : transactional à faux en production."
+ },
+ {
+  "id": "L097",
+  "scene": 5,
+  "expr": "pédagogue",
+  "text": "Sept : un FlatFileItemWriter partagé entre threads. Huit : écrire vers une API comme vers une base."
+ },
+ {
+  "id": "L098",
+  "scene": 5,
+  "expr": "rappel",
+  "text": "Les exercices du module écrit reprennent ces cas : le record, le restart, le routage, assertUpdates et le découpage."
+ },
+ {
+  "id": "L099",
+  "scene": 5,
+  "expr": "transition",
+  "text": "Tu sais maintenant lire et écrire vers presque n'importe quelle source. Au module quatre, tu transformes les données entre les deux."
+ }
+]
