@@ -1,0 +1,908 @@
+[
+ {
+  "id": "L001",
+  "scene": 0,
+  "expr": "calme, accroche",
+  "text": "Le contrôleur financier découvre l'écart trois semaines plus tard. Le total des débits du rapport est faux, deux nuits cumulées. Aucune erreur, aucun journal rouge."
+ },
+ {
+  "id": "L002",
+  "scene": 0,
+  "expr": "pédagogue",
+  "text": "Ce bug, c'est le double comptage. Il tient en une ligne : un champ modifiable dans un singleton. Aujourd'hui, on le provoque, on le comprend, on l'éteint."
+ },
+ {
+  "id": "L003",
+  "scene": 0,
+  "expr": "rappel",
+  "text": "Un rappel du module trois. Retourner null filtre l'élément : il n'entre pas dans le chunk, la position avance, et filter count augmente. Jamais skip count."
+ },
+ {
+  "id": "L004",
+  "scene": 0,
+  "expr": "rappel",
+  "text": "Un rappel du module deux. Un bean est un singleton : un seul objet pour toute l'application. Tout champ modifiable est un état partagé."
+ },
+ {
+  "id": "L005",
+  "scene": 0,
+  "expr": "annonce",
+  "text": "Sept étapes : le rôle du processor, la validation, le composite, le piège de l'état, les trois solutions, les limites des proxys, et les pièges."
+ },
+ {
+  "id": "L006",
+  "scene": 1,
+  "expr": "besoin",
+  "text": "Mon besoin : appliquer des règles métier entre la lecture et l'écriture."
+ },
+ {
+  "id": "L007",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "C'est le rôle du processor. Il reçoit un seul élément, et il fait l'une de trois choses."
+ },
+ {
+  "id": "L008",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Première : transformer. Il retourne un objet, de même type ou d'un autre type, qui entre dans le chunk."
+ },
+ {
+  "id": "L009",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Deuxième : filtrer. Il retourne null. L'élément n'est pas écrit, filter count augmente, et ce n'est pas une erreur."
+ },
+ {
+  "id": "L010",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Troisième : rejeter. Il lève une exception. Rollback du chunk, le step échoue, sauf règle de skip."
+ },
+ {
+  "id": "L011",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Le contrat est simple : un type en entrée, un type en sortie. ItemProcessor, entrée RawTransaction, sortie BankTransaction."
+ },
+ {
+  "id": "L012",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Dans la base, on lit la relation : read count égale write count plus filter count."
+ },
+ {
+  "id": "L013",
+  "scene": 1,
+  "expr": "défi, direct",
+  "text": "Question. Un processor lève une exception sur un élément. Que devient le chunk ?"
+ },
+ {
+  "id": "L014",
+  "scene": 1,
+  "expr": "posé",
+  "text": "Il est annulé en entier, avec un rollback. Le step échoue, sauf règle de skip, que nous verrons au module six."
+ },
+ {
+  "id": "L015",
+  "scene": 1,
+  "expr": "pont",
+  "text": "Avant d'écrire des règles, voyons comment les exprimer sans écrire de if."
+ },
+ {
+  "id": "L016",
+  "scene": 2,
+  "expr": "besoin",
+  "text": "Mon besoin : refuser les lignes invalides, sans écrire une cascade de if."
+ },
+ {
+  "id": "L017",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Les règles deviennent des annotations sur l'objet. Lisibles, réutilisables, sans code."
+ },
+ {
+  "id": "L018",
+  "scene": 2,
+  "expr": "technique",
+  "text": "D'abord la dépendance : le starter de validation. Sans elle, le validateur ne trouve aucune règle."
+ },
+ {
+  "id": "L019",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Puis le record RawTransaction, enrichi. L'identifiant positif, le compte non vide."
+ },
+ {
+  "id": "L020",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Le type avec une expression régulière : seul D ou C est accepté. Le montant obligatoire, positif ou nul."
+ },
+ {
+  "id": "L021",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Le processor : BeanValidatingItemProcessor, qui applique ces règles à chaque élément."
+ },
+ {
+  "id": "L022",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Par défaut, un élément invalide lève une ValidationException : le chunk est annulé, le step échoue."
+ },
+ {
+  "id": "L023",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Avec setFilter à true, l'élément est filtré, comme avec return null, et filter count augmente."
+ },
+ {
+  "id": "L024",
+  "scene": 2,
+  "expr": "règle",
+  "text": "Choisis selon la règle métier. Une ligne invalide doit-elle arrêter le lot, ou être écartée et comptée ?"
+ },
+ {
+  "id": "L025",
+  "scene": 2,
+  "expr": "défi, direct",
+  "text": "Question. Tu oublies le starter de validation. Que se passe-t-il ?"
+ },
+ {
+  "id": "L026",
+  "scene": 2,
+  "expr": "posé",
+  "text": "Rien ne se plaint : aucune règle n'est appliquée. Toutes les lignes passent, même les invalides."
+ },
+ {
+  "id": "L027",
+  "scene": 3,
+  "expr": "besoin",
+  "text": "Mon besoin : valider d'abord, transformer ensuite, chacun avec une seule responsabilité."
+ },
+ {
+  "id": "L028",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Le processor de transformation du module trois : sans état. Un DateTimeFormatter static final, immuable."
+ },
+ {
+  "id": "L029",
+  "scene": 3,
+  "expr": "technique",
+  "text": "La règle métier : un montant nul est filtré. Sinon, on convertit la date et on construit l'objet."
+ },
+ {
+  "id": "L030",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Ce processor n'a aucun champ modifiable. Rien ne change entre deux appels, ni entre deux lancements. Il est sûr comme singleton."
+ },
+ {
+  "id": "L031",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Pour les enchaîner : CompositeItemProcessor. On lui donne la validation, puis la transformation."
+ },
+ {
+  "id": "L032",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "L'ordre compte. La sortie du premier est l'entrée du suivant. RawTransaction, validation, RawTransaction, transformation, BankTransaction."
+ },
+ {
+  "id": "L033",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Si un maillon retourne null, la chaîne s'arrête. Les suivants ne sont pas appelés, et l'élément est filtré."
+ },
+ {
+  "id": "L034",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Donc la validation en premier évite de transformer des données invalides."
+ },
+ {
+  "id": "L035",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Attention : les types génériques sont effacés à l'exécution. Une erreur d'ordre ne se voit qu'à l'exécution, avec une ClassCastException."
+ },
+ {
+  "id": "L036",
+  "scene": 3,
+  "expr": "défi, direct",
+  "text": "Question. Tu inverses l'ordre : transformation d'abord, validation ensuite. Que se passe-t-il ?"
+ },
+ {
+  "id": "L037",
+  "scene": 3,
+  "expr": "posé",
+  "text": "Une ClassCastException à l'exécution : la validation reçoit un BankTransaction au lieu d'un RawTransaction. Le compilateur n'a rien vu."
+ },
+ {
+  "id": "L038",
+  "scene": 3,
+  "expr": "pont",
+  "text": "Maintenant, le piège. Un processor qui veut garder des totaux."
+ },
+ {
+  "id": "L039",
+  "scene": 4,
+  "expr": "besoin",
+  "text": "Mon besoin : pour un rapport, le total des débits et le total des crédits du fichier."
+ },
+ {
+  "id": "L040",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Première idée, naturelle : un processor qui accumule dans deux champs. Elle est fausse, mais elle marche."
+ },
+ {
+  "id": "L041",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Un Component, donc un singleton. Une seule instance dans toute l'application."
+ },
+ {
+  "id": "L042",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Deux champs modifiables : totalDebit et totalCredit. C'est de l'état."
+ },
+ {
+  "id": "L043",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Dans process, on distingue débit et crédit, et on accumule dans le champ."
+ },
+ {
+  "id": "L044",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Le processor ne modifie pas l'élément : il l'observe et le laisse passer."
+ },
+ {
+  "id": "L045",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Une API REST lit ces totaux pour les afficher."
+ },
+ {
+  "id": "L046",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Ce code compile, s'exécute sans erreur, et passe un test qui ne lance le job qu'une fois."
+ },
+ {
+  "id": "L047",
+  "scene": 4,
+  "expr": "défi, direct",
+  "text": "Question. Quel total affiche le premier lancement : cent trente-cinq virgule cinquante, ou le double ?"
+ },
+ {
+  "id": "L048",
+  "scene": 4,
+  "expr": "posé",
+  "text": "Cent trente-cinq virgule cinquante : exact. Le bug est silencieux au premier lancement."
+ },
+ {
+  "id": "L049",
+  "scene": 4,
+  "expr": "pont",
+  "text": "Voyons le deuxième lancement, dans la même application."
+ },
+ {
+  "id": "L050",
+  "scene": 5,
+  "expr": "besoin",
+  "text": "Reprenons le fichier de cinq lignes du module trois. Une est filtrée. Les débits : cent vingt virgule cinquante, plus quinze. Les crédits : deux mille, plus trois cent cinquante virgule soixante-quinze."
+ },
+ {
+  "id": "L051",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Premier lancement, runDate premier octobre : quatre éléments traités. Débit cent trente-cinq virgule cinquante. Crédit deux mille trois cent cinquante virgule soixante-quinze."
+ },
+ {
+  "id": "L052",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Deuxième lancement, runDate deux octobre, dans la même application : quatre éléments traités. Mais le débit affiché est deux cent soixante et onze."
+ },
+ {
+  "id": "L053",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Et le crédit, quatre mille sept cent un virgule cinquante. Les deux sont faux."
+ },
+ {
+  "id": "L054",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Troisième lancement : quatre cent six virgule cinquante, et sept mille cinquante-deux virgule vingt-cinq. Toujours faux."
+ },
+ {
+  "id": "L055",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Aucune exception. COMPLETED à chaque fois. Le job réussit, et les chiffres sont faux."
+ },
+ {
+  "id": "L056",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Le bug n'apparaît que dans deux cas. Quand l'application reste vivante entre deux lancements."
+ },
+ {
+  "id": "L057",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Et au deuxième lancement, jamais au premier. Un test qui lance le job une fois ne le voit pas."
+ },
+ {
+  "id": "L058",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Après un redémarrage, le compteur repart à zéro, et tout semble normal. C'est ce qui rend le bug si difficile à diagnostiquer."
+ },
+ {
+  "id": "L059",
+  "scene": 5,
+  "expr": "défi, direct",
+  "text": "Question. Pourquoi le test ne le voit-il pas ?"
+ },
+ {
+  "id": "L060",
+  "scene": 5,
+  "expr": "posé",
+  "text": "Parce que le singleton naît à zéro, et que le premier lancement part toujours de zéro. Le défaut n'apparaît qu'au deuxième."
+ },
+ {
+  "id": "L061",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Voici le test qui révèle le bug. On lance le job avec deux dates, dans la même application, et on compare les totaux."
+ },
+ {
+  "id": "L062",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Le deuxième total doit rester égal au premier."
+ },
+ {
+  "id": "L063",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Avec le singleton, ce test échoue. Il passe dès qu'un des correctifs est appliqué."
+ },
+ {
+  "id": "L064",
+  "scene": 5,
+  "expr": "pont",
+  "text": "Alors, comment ça marche, un bean en StepScope ?"
+ },
+ {
+  "id": "L065",
+  "scene": 6,
+  "expr": "rappel",
+  "text": "Rappel du module deux : huit étapes de vie d'un bean. Pour un singleton, les étapes un à sept se passent au démarrage, une seule fois."
+ },
+ {
+  "id": "L066",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Les champs totalDebit et totalCredit naissent à zéro à ce moment-là, puis accumulent pendant toute la vie de la JVM."
+ },
+ {
+  "id": "L067",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Avec StepScope, une seule ligne en plus, Spring change de stratégie. Au démarrage, il n'instancie pas le processor."
+ },
+ {
+  "id": "L068",
+  "scene": 6,
+  "expr": "technique",
+  "text": "À l'étape six, un post-processeur le remplace par un proxy : une sous-classe générée, avec CGLIB, qui n'a aucune donnée."
+ },
+ {
+  "id": "L069",
+  "scene": 6,
+  "expr": "technique",
+  "text": "C'est ce proxy qui est injecté dans le composite et dans le step."
+ },
+ {
+  "id": "L070",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Quand un step démarre, le premier appel au proxy lui fait demander une instance au contexte step."
+ },
+ {
+  "id": "L071",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Ce contexte en crée une neuve, résout les expressions, et la mémorise pour cette exécution du step."
+ },
+ {
+  "id": "L072",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Chaque appel suivant est délégué à cette instance."
+ },
+ {
+  "id": "L073",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "À la fin du step, l'instance est détruite. L'exécution suivante en aura une autre, remise à zéro."
+ },
+ {
+  "id": "L074",
+  "scene": 6,
+  "expr": "règle",
+  "text": "Dans la mémoire de la JVM : un petit proxy permanent, et des vraies instances qui apparaissent et disparaissent. Rien n'est partagé entre deux exécutions."
+ },
+ {
+  "id": "L075",
+  "scene": 6,
+  "expr": "défi, direct",
+  "text": "Question. Tu ajoutes StepScope à un processor. À quel moment le champ repart-il à zéro ?"
+ },
+ {
+  "id": "L076",
+  "scene": 6,
+  "expr": "posé",
+  "text": "À chaque exécution du step : une nouvelle instance, donc des champs neufs."
+ },
+ {
+  "id": "L077",
+  "scene": 7,
+  "expr": "besoin",
+  "text": "Mon besoin : un total correct, quel que soit le nombre de lancements. Voici trois solutions, de la meilleure à la pire."
+ },
+ {
+  "id": "L078",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Première solution, la meilleure : pas d'état dans le composant. L'état va dans l'ExecutionContext."
+ },
+ {
+  "id": "L079",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Le contexte du step est persisté à chaque commit, dans la table que tu connais depuis le module trois."
+ },
+ {
+  "id": "L080",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Le processor est en StepScope, parce que le contexte n'existe que pendant l'exécution du step."
+ },
+ {
+  "id": "L081",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Il garde seulement une référence vers le contexte, pas un total en mémoire."
+ },
+ {
+  "id": "L082",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Spring injecte le contexte de l'exécution en cours, avec une expression sur stepExecution."
+ },
+ {
+  "id": "L083",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Deux clés, une par sens. Et on travaille en centimes entiers : le contexte se sérialise proprement, sans erreur d'arrondi."
+ },
+ {
+  "id": "L084",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Et getLong avec une valeur par défaut. Au restart, c'est la valeur du dernier commit : le total reprend où il s'était arrêté."
+ },
+ {
+  "id": "L085",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Deuxième solution : StepScope avec un champ. Plus simple. Les totaux repartent de zéro à chaque exécution du step."
+ },
+ {
+  "id": "L086",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Limite : seulement en mémoire. Perdus au restart."
+ },
+ {
+  "id": "L087",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Troisième solution, à éviter : remettre à zéro à la main, avec un listener avant le step."
+ },
+ {
+  "id": "L088",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Elle fonctionne tant que personne ne l'oublie, et qu'un seul step utilise le composant à la fois."
+ },
+ {
+  "id": "L089",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Deux steps parallèles, ou deux jobs simultanés, se remettent à zéro mutuellement. Le bug revient, en pire."
+ },
+ {
+  "id": "L090",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Voici la comparaison. Neuf à chaque exécution : oui, oui, et seulement si on y pense."
+ },
+ {
+  "id": "L091",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Survit à un restart : seulement l'ExecutionContext. Deux exécutions simultanées : sûr, sûr, dangereux."
+ },
+ {
+  "id": "L092",
+  "scene": 7,
+  "expr": "défi, direct",
+  "text": "Question. Quelle solution survit à un restart de l'application en plein step ?"
+ },
+ {
+  "id": "L093",
+  "scene": 7,
+  "expr": "posé",
+  "text": "L'ExecutionContext, parce qu'il est persisté à chaque commit. Au restart, le total reprend où il s'était arrêté."
+ },
+ {
+  "id": "L094",
+  "scene": 7,
+  "expr": "pont",
+  "text": "Même avec ces solutions, un total calculé dans un processor peut rester faux. Voici pourquoi."
+ },
+ {
+  "id": "L095",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Un processor est rappelé quand un chunk est rejoué : après un retry, ou après un échec du writer suivi d'une reprise."
+ },
+ {
+  "id": "L096",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "L'élément est alors traité deux fois. Un total accumulé dans le processor le compte deux fois, singleton ou StepScope."
+ },
+ {
+  "id": "L097",
+  "scene": 8,
+  "expr": "règle",
+  "text": "Un processor ne devrait pas produire de chiffre qui engage l'entreprise."
+ },
+ {
+  "id": "L098",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Les agrégats de référence se calculent sur ce qui a été réellement écrit : une requête SUM groupée par type, après le step."
+ },
+ {
+  "id": "L099",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Ou dans une transaction commune avec l'écriture. Le total du processor est faux, le SUM SQL est juste."
+ },
+ {
+  "id": "L100",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Un mot sur SimpleDateFormat. Il garde un état interne, modifié à chaque parse. Deux threads se marchent dessus."
+ },
+ {
+  "id": "L101",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "Les dates sont fausses, parfois sans exception. DateTimeFormatter est immuable : il peut être partagé à volonté."
+ },
+ {
+  "id": "L102",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Dernier sujet : les limites d'un proxy CGLIB. C'est une sous-classe. Il ne peut pas étendre une classe final."
+ },
+ {
+  "id": "L103",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "Ce qui inclut les records. Un processor en StepScope doit être une classe ordinaire."
+ },
+ {
+  "id": "L104",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "Il ne peut pas intercepter une méthode final, ni un appel interne, this point autreMethode. L'appel ne passe pas par le proxy."
+ },
+ {
+  "id": "L105",
+  "scene": 8,
+  "expr": "défi, direct",
+  "text": "Question. Peut-on mettre StepScope sur un record ?"
+ },
+ {
+  "id": "L106",
+  "scene": 8,
+  "expr": "posé",
+  "text": "Non : un record est final, et CGLIB ne peut pas le sous-classer. La création du proxy échoue."
+ },
+ {
+  "id": "L107",
+  "scene": 8,
+  "expr": "pont",
+  "text": "Trois situations réelles pour fixer ces idées."
+ },
+ {
+  "id": "L108",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Premier cas : le rapport de fin de nuit. Le premier jour est exact. Le lendemain, dans une application de longue durée, le total cumule deux nuits."
+ },
+ {
+  "id": "L109",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Le contrôleur financier découvre l'écart trois semaines plus tard. Avec l'ExecutionContext, ou un SUM, le problème n'existe pas."
+ },
+ {
+  "id": "L110",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Deuxième cas : le tri des lignes. Un fichier de deux millions de lignes, huit pour cent invalides."
+ },
+ {
+  "id": "L111",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "La validation en tête du composite les écarte, et filter count donne le chiffre exact pour l'audit."
+ },
+ {
+  "id": "L112",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Troisième cas : l'enrichissement. Ajouter le libellé de l'agence à chaque transaction, à partir d'un référentiel."
+ },
+ {
+  "id": "L113",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Le processor est sans état. Le référentiel est chargé une fois, en lecture seule, et partagé sans risque."
+ },
+ {
+  "id": "L114",
+  "scene": 9,
+  "expr": "pont",
+  "text": "Voyons les dix pièges."
+ },
+ {
+  "id": "L115",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Dix pièges, avec pour chacun ce qui se passe, la parade, et comment le repérer."
+ },
+ {
+  "id": "L116",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Un : un singleton avec état. Double comptage entre lancements successifs, sans erreur."
+ },
+ {
+  "id": "L117",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un total qui augmente d'un lancement à l'autre, après un redémarrage il redevient normal."
+ },
+ {
+  "id": "L118",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce que le premier lancement est toujours correct."
+ },
+ {
+  "id": "L119",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Deux : StepScope sur une classe final ou un record. Échec à la création du proxy."
+ },
+ {
+  "id": "L120",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : une exception au démarrage de l'application, sur la création du proxy."
+ },
+ {
+  "id": "L121",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Trois : lever une exception pour une ligne à ignorer. Rollback du chunk, step en échec."
+ },
+ {
+  "id": "L122",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un step en échec pour une simple ligne invalide, rollback dans les journaux."
+ },
+ {
+  "id": "L123",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Quatre : un ordre incohérent dans le composite. ClassCastException à l'exécution."
+ },
+ {
+  "id": "L124",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : une ClassCastException, avec les deux types de la chaîne."
+ },
+ {
+  "id": "L125",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Cinq : un SimpleDateFormat partagé. Dates fausses, en multithread."
+ },
+ {
+  "id": "L126",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : des dates aléatoirement fausses, ou des erreurs de format sans cause apparente."
+ },
+ {
+  "id": "L127",
+  "scene": 11,
+  "expr": "pont",
+  "text": "Les cinq suivants touchent les rejeux, les effets de bord et les tests."
+ },
+ {
+  "id": "L128",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Six : accumuler un total dans le processor. Un chunk rejoué compte deux fois."
+ },
+ {
+  "id": "L129",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un total du processor différent du SUM SQL, après un retry."
+ },
+ {
+  "id": "L130",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Sept : un effet de bord dans le processor. E-mail, appel d'API, écriture externe. L'effet est répété à chaque rejeu."
+ },
+ {
+  "id": "L131",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : le même e-mail envoyé deux fois à un client."
+ },
+ {
+  "id": "L132",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Huit : une requête en base pour chaque élément. Un million de lignes, un million de requêtes."
+ },
+ {
+  "id": "L133",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un débit qui s'effondre, et des requêtes identiques en masse dans la base."
+ },
+ {
+  "id": "L134",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Neuf : un test vert avec des données fausses. Le processor ne transforme pas, et le test compte seulement les lignes."
+ },
+ {
+  "id": "L135",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : une date égale à maintenant dans la base, avec un test vert."
+ },
+ {
+  "id": "L136",
+  "scene": 11,
+  "expr": "explicatif",
+  "text": "Un processor qui oublie de convertir la date, et utilise LocalDateTime point now. Le test hasSize quatre passe."
+ },
+ {
+  "id": "L137",
+  "scene": 11,
+  "expr": "règle",
+  "text": "Teste le processor seul, avec des valeurs. Et teste le job deux fois."
+ },
+ {
+  "id": "L138",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Dix : une validation sans le starter, ou sans choix entre filtrer et rejeter. Aucune règle appliquée, ou échec à la première ligne invalide."
+ },
+ {
+  "id": "L139",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : des lignes invalides en base, ou un step qui échoue à la première ligne invalide."
+ },
+ {
+  "id": "L140",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce que chaque piège ressemble à un détail, jusqu'au premier incident en production."
+ },
+ {
+  "id": "L141",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Reprenons notre rapport faux depuis trois semaines. Tu sais maintenant d'où il vient, et comment l'éviter."
+ },
+ {
+  "id": "L142",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Un processor transforme, filtre par null, ou rejette par exception. Valide en premier, avec un composite."
+ },
+ {
+  "id": "L143",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Un singleton avec état fait un double comptage. L'ExecutionContext, StepScope et le SUM SQL en sont les remèdes."
+ },
+ {
+  "id": "L144",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Un proxy CGLIB ne sous-classe ni un record, ni une classe final."
+ },
+ {
+  "id": "L145",
+  "scene": 12,
+  "expr": "défi",
+  "text": "Exercices. Un : explique pourquoi le total d'un processor en StepScope peut quand même être faux."
+ },
+ {
+  "id": "L146",
+  "scene": 12,
+  "expr": "défi",
+  "text": "Deux : pourquoi StepScope échoue-t-il sur un record ?"
+ },
+ {
+  "id": "L147",
+  "scene": 12,
+  "expr": "défi",
+  "text": "Trois : donne l'ordre correct d'un composite validation et transformation, et pourquoi."
+ },
+ {
+  "id": "L148",
+  "scene": 12,
+  "expr": "pause",
+  "text": "Prends le temps d'y réfléchir."
+ },
+ {
+  "id": "L149",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Correction un. Un chunk rejoué traite l'élément deux fois : le total l'accumule deux fois. Il faut un SUM sur ce qui est écrit."
+ },
+ {
+  "id": "L150",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Correction deux. Un record est final : CGLIB ne peut pas le sous-classer. Correction trois : validation d'abord, pour ne pas transformer des données invalides."
+ },
+ {
+  "id": "L151",
+  "scene": 12,
+  "expr": "transition",
+  "text": "Au module suivant, tu orchestres plusieurs steps : séquence, conditions, décisions, et exécutions parallèles."
+ }
+]
