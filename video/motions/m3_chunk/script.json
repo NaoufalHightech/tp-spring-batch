@@ -1,0 +1,1340 @@
+[
+ {
+  "id": "L001",
+  "scene": 0,
+  "expr": "calme, accroche",
+  "text": "La banque dépose chaque nuit un fichier de dix gigaoctets. Impossible de le charger en mémoire. Et à trois heures quarante, le serveur redémarre."
+ },
+ {
+  "id": "L002",
+  "scene": 0,
+  "expr": "pédagogue",
+  "text": "Au matin, on veut deux choses : tout le fichier en base, sans doublon, et une reprise qui ne rejoue pas dix heures de travail."
+ },
+ {
+  "id": "L003",
+  "scene": 0,
+  "expr": "rappel",
+  "text": "Deux rappels. Au premier module, l'ExecutionContext est la sauvegarde de partie du step, dans la table batch step execution context."
+ },
+ {
+  "id": "L004",
+  "scene": 0,
+  "expr": "rappel",
+  "text": "Au deuxième module, une tasklet est une action dans une transaction, et StepScope crée un bean neuf à chaque exécution du step."
+ },
+ {
+  "id": "L005",
+  "scene": 0,
+  "expr": "annonce",
+  "text": "Ce module répond à la question : comment traiter des millions d'éléments sans exploser la mémoire, et pouvoir reprendre ? Sept étapes."
+ },
+ {
+  "id": "L006",
+  "scene": 1,
+  "expr": "besoin",
+  "text": "Mon besoin : traiter un million de lignes. Une tasklet, c'est une action. Je peux y écrire une boucle moi-même."
+ },
+ {
+  "id": "L007",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Mais cette boucle, il faut la maintenir : la mémoire, les transactions, la reprise, les compteurs. Tout est à ta charge."
+ },
+ {
+  "id": "L008",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Le traitement par chunk confie tout cela à Spring Batch. Toi, tu fournis seulement trois pièces."
+ },
+ {
+  "id": "L009",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Le reader lit un seul élément à la fois, et retourne null quand il n'y a plus rien à lire."
+ },
+ {
+  "id": "L010",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Le processor transforme, valide ou filtre un seul élément."
+ },
+ {
+  "id": "L011",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Le writer, lui, écrit tout un lot d'un coup. Un appel, un chunk."
+ },
+ {
+  "id": "L012",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Voici l'algorithme, avec une taille de chunk de cent. Spring Batch ouvre une transaction."
+ },
+ {
+  "id": "L013",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Puis, jusqu'à cent fois : il lit un élément, il le passe au processor, et si le résultat n'est pas null, il l'ajoute au chunk."
+ },
+ {
+  "id": "L014",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Ensuite, une seule écriture du lot. Puis la sauvegarde de l'état dans l'ExecutionContext, et la mise à jour des compteurs."
+ },
+ {
+  "id": "L015",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Et enfin le commit. Tout est validé en un seul bloc, puis on recommence, jusqu'à ce que le reader retourne null."
+ },
+ {
+  "id": "L016",
+  "scene": 1,
+  "expr": "règle",
+  "text": "Un chunk égale une transaction. La taille du chunk est donc la taille de ce que tu perds si un chunk échoue."
+ },
+ {
+  "id": "L017",
+  "scene": 1,
+  "expr": "défi, direct",
+  "text": "Question. Un chunk de cent échoue au cinquantième élément. Combien d'éléments de ce chunk sont écrits en base ?"
+ },
+ {
+  "id": "L018",
+  "scene": 1,
+  "expr": "posé",
+  "text": "Aucun. Le rollback annule les cent éléments du lot, mais pas les chunks déjà validés."
+ },
+ {
+  "id": "L019",
+  "scene": 1,
+  "expr": "pont",
+  "text": "Une nouveauté de la version six touche directement l'écriture du step. La voici."
+ },
+ {
+  "id": "L020",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Le step orienté chunk s'écrit maintenant avec StepBuilder point chunk, avec un seul argument : la taille. Il produit un ChunkOrientedStep."
+ },
+ {
+  "id": "L021",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "L'ancienne forme, chunk avec la taille et le gestionnaire de transactions, est dépréciée depuis la version six, et prévue pour suppression."
+ },
+ {
+  "id": "L022",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Elle compile encore, avec un avertissement. Dans la nouvelle forme, le gestionnaire de transactions se donne séparément, avec transactionManager."
+ },
+ {
+  "id": "L023",
+  "scene": 1,
+  "expr": "récapitulatif",
+  "text": "En résumé : trois pièces, une transaction par chunk, et une nouvelle écriture du step. Passons aux données."
+ },
+ {
+  "id": "L024",
+  "scene": 2,
+  "expr": "besoin",
+  "text": "Mon besoin : un exemple réel. Un fichier de transactions bancaires, chargé dans une table PostgreSQL."
+ },
+ {
+  "id": "L025",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Le fichier a une ligne d'en-tête, puis une ligne par transaction : identifiant, compte, date, type et montant."
+ },
+ {
+  "id": "L026",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Regarde la quatrième ligne : un montant à zéro. On y reviendra, pour le filtrage."
+ },
+ {
+  "id": "L027",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Côté base, la table bank transaction. La clé primaire est fournie par le fichier : elle rendra l'écriture rejouable."
+ },
+ {
+  "id": "L028",
+  "scene": 2,
+  "expr": "technique",
+  "text": "La date est un vrai type date-heure, pas une chaîne."
+ },
+ {
+  "id": "L029",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Le type est contraint à D ou C : la base refuse toute autre valeur. C'est la dernière ligne de défense."
+ },
+ {
+  "id": "L030",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Et le montant en NUMERIC. Jamais en double precision : l'argent ne supporte pas les erreurs d'arrondi."
+ },
+ {
+  "id": "L031",
+  "scene": 2,
+  "expr": "défi, direct",
+  "text": "Question. Pourquoi un montant en NUMERIC, et pas en nombre flottant ?"
+ },
+ {
+  "id": "L032",
+  "scene": 2,
+  "expr": "posé",
+  "text": "Parce qu'un flottant ne représente pas exactement les décimales. Zéro virgule un plus zéro virgule deux ne donne pas exactement zéro virgule trois."
+ },
+ {
+  "id": "L033",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Côté Java, deux records. Le premier, RawTransaction, représente la ligne telle qu'elle est lue : la date reste une chaîne."
+ },
+ {
+  "id": "L034",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Pourquoi ? Parce que le reader ne fait que lire. La conversion appartient au processor."
+ },
+ {
+  "id": "L035",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Le second, BankTransaction, a de vrais types, une vraie date et un montant décimal."
+ },
+ {
+  "id": "L036",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Son constructeur compact s'exécute à chaque création, et protège l'invariant : un type inconnu ne peut jamais exister."
+ },
+ {
+  "id": "L037",
+  "scene": 2,
+  "expr": "règle",
+  "text": "Un record pour lire, un autre pour écrire. Le processor fait le pont entre les deux."
+ },
+ {
+  "id": "L038",
+  "scene": 3,
+  "expr": "besoin",
+  "text": "Mon besoin : lire ce fichier ligne par ligne, sans jamais le charger en entier."
+ },
+ {
+  "id": "L039",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Je déclare un bean, en StepScope, parce que le fichier est un paramètre du lancement."
+ },
+ {
+  "id": "L040",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Le type de retour est la classe concrète, FlatFileItemReader, pas l'interface ItemReader. Retiens bien ce détail, on y revient dans le piège numéro quatre."
+ },
+ {
+  "id": "L041",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Le chemin du fichier arrive par une expression sur jobParameters, évaluée au démarrage du step."
+ },
+ {
+  "id": "L042",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Un tokenizer découpe une ligne en champs, selon un séparateur. Ici, la virgule."
+ },
+ {
+  "id": "L043",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Et on donne les noms des colonnes, dans l'ordre du fichier. Ils serviront à remplir l'objet."
+ },
+ {
+  "id": "L044",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Puis le builder, la manière moderne d'assembler un reader."
+ },
+ {
+  "id": "L045",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Le nom est obligatoire. Il préfixe les clés sauvegardées dans l'ExecutionContext. Sans nom, pas de reprise."
+ },
+ {
+  "id": "L046",
+  "scene": 3,
+  "expr": "technique",
+  "text": "La ressource : un FileSystemResource pour un fichier du disque, un ClassPathResource pour un fichier embarqué."
+ },
+ {
+  "id": "L047",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Et linesToSkip à un : saute l'en-tête. Sans cela, la ligne d'en-tête est lue comme une donnée, et la conversion de l'identifiant échoue."
+ },
+ {
+  "id": "L048",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Puis le tokenizer, et le mapper : il remplit le record à partir des champs, par nom."
+ },
+ {
+  "id": "L049",
+  "scene": 3,
+  "expr": "défi, direct",
+  "text": "Question. Que se passe-t-il si j'oublie linesToSkip ?"
+ },
+ {
+  "id": "L050",
+  "scene": 3,
+  "expr": "posé",
+  "text": "La première ligne, id, accountNumber et la suite, est traitée comme une donnée : la conversion de id en nombre échoue dès la ligne un."
+ },
+ {
+  "id": "L051",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Un mot sur les deux paramètres du job. runDate est un paramètre identifiant : il définit la JobInstance, comme au premier module."
+ },
+ {
+  "id": "L052",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "inputFile est un paramètre non identifiant, avec le troisième argument à false. Il n'entre pas dans l'identité de l'instance."
+ },
+ {
+  "id": "L053",
+  "scene": 3,
+  "expr": "règle",
+  "text": "runDate identifie le lot. inputFile est une entrée qui peut varier."
+ },
+ {
+  "id": "L054",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Conséquence : si le fichier est corrigé et que tu relances le lot du même jour après un échec, c'est la même instance qui reprend."
+ },
+ {
+  "id": "L055",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Et si le lot est déjà terminé, le relancement est refusé, quel que soit le fichier."
+ },
+ {
+  "id": "L056",
+  "scene": 3,
+  "expr": "défi, direct",
+  "text": "Question. Je relance le lot du même jour avec un autre fichier. L'instance précédente est COMPLETED. Que se passe-t-il ?"
+ },
+ {
+  "id": "L057",
+  "scene": 3,
+  "expr": "posé",
+  "text": "Refus : JobInstanceAlreadyCompleteException. L'instance est identifiée par runDate, pas par le fichier."
+ },
+ {
+  "id": "L058",
+  "scene": 3,
+  "expr": "récapitulatif",
+  "text": "En résumé : un reader nommé, de type concret, qui saute l'en-tête, et un fichier non identifiant."
+ },
+ {
+  "id": "L059",
+  "scene": 4,
+  "expr": "besoin",
+  "text": "Mon besoin : convertir la date, et ignorer les transactions de montant nul."
+ },
+ {
+  "id": "L060",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Un composant qui implémente ItemProcessor, avec deux types : l'entrée, RawTransaction, et la sortie, BankTransaction."
+ },
+ {
+  "id": "L061",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Les deux types peuvent différer. C'est précisément le rôle du processor : transformer."
+ },
+ {
+  "id": "L062",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Un DateTimeFormatter, en champ static final. Il est immuable et thread-safe, donc sans risque."
+ },
+ {
+  "id": "L063",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Son ancêtre, SimpleDateFormat, ne l'est pas. On y reviendra avec les processeurs en multi-thread."
+ },
+ {
+  "id": "L064",
+  "scene": 4,
+  "expr": "technique",
+  "text": "La méthode process reçoit un élément, et en retourne un. Elle ne connaît ni le fichier, ni la base."
+ },
+ {
+  "id": "L065",
+  "scene": 4,
+  "expr": "technique",
+  "text": "La règle métier : un montant nul n'a rien à enregistrer."
+ },
+ {
+  "id": "L066",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Et on retourne null. Retourner null filtre l'élément : il n'est pas ajouté au chunk, donc jamais écrit."
+ },
+ {
+  "id": "L067",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Ce n'est pas une erreur. C'est le contrat : retourner null signifie, ne pas poursuivre le traitement de cet élément."
+ },
+ {
+  "id": "L068",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Sinon, on construit l'objet cible, avec la date convertie. Un format invalide lève une DateTimeParseException ici."
+ },
+ {
+  "id": "L069",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Dans la boucle du step, un résultat null incrémente filterCount, et l'élément n'entre pas dans le chunk."
+ },
+ {
+  "id": "L070",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Pas skipCount : le filtrage n'est ni une erreur, ni un skip. Le compteur filter count augmente."
+ },
+ {
+  "id": "L071",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Et la position de lecture avance quand même : la ligne est considérée comme traitée."
+ },
+ {
+  "id": "L072",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Sur notre exemple : cinq lignes lues, une filtrée, quatre écrites. read count cinq, filter count un, write count quatre."
+ },
+ {
+  "id": "L073",
+  "scene": 4,
+  "expr": "défi, direct",
+  "text": "Question. Le fichier contient mille lignes dont quatre-vingts à montant nul. Combien vaut write count ?"
+ },
+ {
+  "id": "L074",
+  "scene": 4,
+  "expr": "posé",
+  "text": "Neuf cent vingt. Mille lues, quatre-vingts filtrées, neuf cent vingt écrites. Et skip count vaut zéro."
+ },
+ {
+  "id": "L075",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Un cas limite : un chunk entièrement filtré est un chunk vide. Le writer reçoit un lot sans élément, ne fait rien, et le commit a lieu quand même."
+ },
+ {
+  "id": "L076",
+  "scene": 4,
+  "expr": "récapitulatif",
+  "text": "En résumé : un processor sans état, qui convertit et filtre par null. Passons à l'écriture."
+ },
+ {
+  "id": "L077",
+  "scene": 5,
+  "expr": "besoin",
+  "text": "Mon besoin : écrire cent éléments d'un coup dans PostgreSQL, et pouvoir rejouer sans doublon."
+ },
+ {
+  "id": "L078",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Un bean JdbcBatchItemWriter, typé avec l'objet de sortie du processor."
+ },
+ {
+  "id": "L079",
+  "scene": 5,
+  "expr": "technique",
+  "text": "La DataSource PostgreSQL du premier module : la même que le JobRepository, donc la même transaction."
+ },
+ {
+  "id": "L080",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Le SQL, avec des paramètres nommés, et un bloc de texte entre triples guillemets : lisible, sans concaténation."
+ },
+ {
+  "id": "L081",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Et ON CONFLICT DO UPDATE rend l'écriture rejouable : relancer le même fichier ne duplique rien, et ne plante pas."
+ },
+ {
+  "id": "L082",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Chaque élément est converti en paramètres, par un fournisseur explicite."
+ },
+ {
+  "id": "L083",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Pourquoi explicite ? Parce que beanMapped s'appuie sur des getters getX, que les records n'ont pas. Ils exposent id, pas getId."
+ },
+ {
+  "id": "L084",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Le writer envoie les cent éléments du chunk en un seul lot JDBC."
+ },
+ {
+  "id": "L085",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Un réglage PostgreSQL : reWriteBatchedInserts à true dans l'adresse JDBC. Le pilote regroupe les insertions en moins de requêtes."
+ },
+ {
+  "id": "L086",
+  "scene": 5,
+  "expr": "défi, direct",
+  "text": "Question. Je relance exactement le même fichier. ON CONFLICT DO UPDATE est en place. Combien de lignes se retrouvent en base ?"
+ },
+ {
+  "id": "L087",
+  "scene": 5,
+  "expr": "posé",
+  "text": "Quatre : les mêmes, mises à jour. Aucun doublon, et aucune erreur."
+ },
+ {
+  "id": "L088",
+  "scene": 5,
+  "expr": "pont",
+  "text": "Reste à assembler les trois pièces dans un step."
+ },
+ {
+  "id": "L089",
+  "scene": 6,
+  "expr": "besoin",
+  "text": "Mon besoin : un step qui branche le reader, le processor et le writer, avec des chunks de cent."
+ },
+ {
+  "id": "L090",
+  "scene": 6,
+  "expr": "technique",
+  "text": "StepBuilder, avec un nom : la clé de ses exécutions dans batch step execution."
+ },
+ {
+  "id": "L091",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Puis chunk de cent, avec les types d'entrée et de sortie. C'est la forme de la version six."
+ },
+ {
+  "id": "L092",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Puis transactionManager : la transaction qui entoure chaque chunk."
+ },
+ {
+  "id": "L093",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Puis le reader, le processor, facultatif, et le writer."
+ },
+ {
+  "id": "L094",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Et stream, avec le reader. Il enregistre explicitement le reader comme ItemStream : le step l'ouvre, le met à jour à chaque commit, et le ferme."
+ },
+ {
+  "id": "L095",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Le déclarer ne coûte rien, et évite le piège numéro quatre."
+ },
+ {
+  "id": "L096",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Build produit un ChunkOrientedStep. Puis le job, comme au deuxième module."
+ },
+ {
+  "id": "L097",
+  "scene": 6,
+  "expr": "besoin",
+  "text": "Lançons le job avec le fichier d'exemple."
+ },
+ {
+  "id": "L098",
+  "scene": 6,
+  "expr": "technique",
+  "text": "La console affiche le lancement, le step, puis le statut final : COMPLETED. Extrait indicatif."
+ },
+ {
+  "id": "L099",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Dans la table des steps : read count cinq, filter count un, write count quatre."
+ },
+ {
+  "id": "L100",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Et dans la table de destination, quatre lignes. Le total des montants est de deux mille quatre cent quatre-vingt-six virgule vingt-cinq."
+ },
+ {
+  "id": "L101",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Et dans le contexte du step, la position du reader : read count égal cinq."
+ },
+ {
+  "id": "L102",
+  "scene": 6,
+  "expr": "récapitulatif",
+  "text": "En résumé : le step assemble trois pièces, déclare le reader comme flux, et laisse Spring Batch tenir la boucle. Voyons sous le capot."
+ },
+ {
+  "id": "L103",
+  "scene": 6,
+  "expr": "besoin",
+  "text": "Provoquons maintenant un échec. Je remplace le montant de la ligne trois cent cinquante par du texte."
+ },
+ {
+  "id": "L104",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Le reader lève une FlatFileParseException, avec le numéro de ligne. La transaction du chunk quatre est annulée."
+ },
+ {
+  "id": "L105",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Dans la base : trois cents lignes, celles des trois premiers chunks. Et dans le contexte du step : read count égal trois cents."
+ },
+ {
+  "id": "L106",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Le step est en échec, le job aussi. Mais rien n'est écrit à moitié : le chunk quatre n'a laissé aucune trace."
+ },
+ {
+  "id": "L107",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "On corrige le fichier, et on relance avec la même date : c'est la même instance, donc une reprise."
+ },
+ {
+  "id": "L108",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "La méthode open relit la position, saute trois cents éléments, et reprend à la trois cent unième."
+ },
+ {
+  "id": "L109",
+  "scene": 6,
+  "expr": "règle",
+  "text": "À la fin, mille lignes en base, sans doublon. C'est exactement la promesse du chunk."
+ },
+ {
+  "id": "L110",
+  "scene": 7,
+  "expr": "besoin",
+  "text": "Mon besoin : comprendre comment la position de lecture est sauvegardée, et pourquoi elle ne peut pas mentir."
+ },
+ {
+  "id": "L111",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Un reader ou un writer qui tient une ressource, un fichier, un curseur, une connexion, implémente ItemStream."
+ },
+ {
+  "id": "L112",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Trois méthodes. Open, appelée une fois, avant la première lecture : elle ouvre la ressource, et relit l'état sauvegardé."
+ },
+ {
+  "id": "L113",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Update, appelée à chaque chunk, avant le commit : elle écrit l'état dans le contexte, la position atteinte."
+ },
+ {
+  "id": "L114",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Et close, appelée une fois, à la fin, qu'il y ait succès ou échec : elle libère la ressource."
+ },
+ {
+  "id": "L115",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Le step appelle ce cycle de vie automatiquement, pour tout flux qu'on lui a déclaré."
+ },
+ {
+  "id": "L116",
+  "scene": 7,
+  "expr": "technique",
+  "text": "À chaque chunk, le reader inscrit son compteur dans l'ExecutionContext, sous une clé préfixée par son nom."
+ },
+ {
+  "id": "L117",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "C'est pour cela que le nom est obligatoire, et unique par reader."
+ },
+ {
+  "id": "L118",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Juste avant le commit, Spring Batch persiste ce contexte dans batch step execution context."
+ },
+ {
+  "id": "L119",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Et le commit valide d'un seul bloc les cent lignes écrites et la position."
+ },
+ {
+  "id": "L120",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Chunk deux : cent lignes de plus, position deux cents, dans le même commit."
+ },
+ {
+  "id": "L121",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Chunk trois : un crash. Ni les lignes, ni la position trois cents ne sont enregistrées."
+ },
+ {
+  "id": "L122",
+  "scene": 7,
+  "expr": "règle",
+  "text": "Les données et la position sont validées ensemble. Elles ne peuvent jamais se contredire. C'est ce qui évite à la fois la perte et le doublon."
+ },
+ {
+  "id": "L123",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Au redémarrage, open relit read count égal deux cents, saute deux cents éléments, et reprend à la deux cent unième."
+ },
+ {
+  "id": "L124",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Une condition : écrire dans la même base que le JobRepository. Avec une autre base, sans transaction commune, cette garantie est brisée."
+ },
+ {
+  "id": "L125",
+  "scene": 7,
+  "expr": "défi, direct",
+  "text": "Question. Un chunk de cent échoue à la ligne trois cent cinquante. Quelle position est enregistrée, et combien de lignes sont en base ?"
+ },
+ {
+  "id": "L126",
+  "scene": 7,
+  "expr": "posé",
+  "text": "Position trois cents, et trois cents lignes en base. Le chunk quatre, de trois cent un à quatre cents, est annulé en entier."
+ },
+ {
+  "id": "L127",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Il existe un réglage, saveState, à true par défaut. C'est lui qui rend la reprise possible."
+ },
+ {
+  "id": "L128",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Le désactiver supprime toute écriture dans le contexte. Le reader n'a plus besoin de nom, mais un restart repart du début."
+ },
+ {
+  "id": "L129",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "On ne s'y résout que dans un cas : un step multithread. On y reviendra plus loin dans la formation."
+ },
+ {
+  "id": "L130",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Qui détient la transaction ? Le gestionnaire de transactions en ouvre une par chunk."
+ },
+ {
+  "id": "L131",
+  "scene": 8,
+  "expr": "technique",
+  "text": "Le reader, le processor et le writer s'exécutent dans cette transaction."
+ },
+ {
+  "id": "L132",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "Les écritures du writer et celles du JobRepository, compteurs et contexte, partagent la même connexion et le même commit."
+ },
+ {
+  "id": "L133",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "Une exception dans le processor ou le writer provoque un rollback de tout le chunk. Aucune ligne n'est écrite, la position n'avance pas."
+ },
+ {
+  "id": "L134",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Le step échoue, ou applique skip et retry, que nous verrons au module six."
+ },
+ {
+  "id": "L135",
+  "scene": 8,
+  "expr": "besoin",
+  "text": "Dernière question de réglage : quelle taille de chunk choisir ?"
+ },
+ {
+  "id": "L136",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Un chunk petit, un seul élément : un commit par élément, très lent. Mais un rollback minuscule."
+ },
+ {
+  "id": "L137",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Un chunk énorme, cent mille : peu de commits, très rapide. Mais tout le chunk est en mémoire, et un rollback refait tout."
+ },
+ {
+  "id": "L138",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "Entre les deux, il n'y a pas de bonne réponse théorique. La valeur se mesure : une courbe de débit contre la taille."
+ },
+ {
+  "id": "L139",
+  "scene": 8,
+  "expr": "règle",
+  "text": "Souvent entre cent et cinq mille. Mesure, ne devine pas."
+ },
+ {
+  "id": "L140",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Voici un exemple de mesure sur un million de lignes. Les chiffres sont illustratifs : ils changent avec ta machine et ta base."
+ },
+ {
+  "id": "L141",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Un chunk de dix : dix minutes. Cent : une minute vingt. Mille : cinquante secondes. Cent mille : le même temps, mais la mémoire sature."
+ },
+ {
+  "id": "L142",
+  "scene": 8,
+  "expr": "défi, direct",
+  "text": "Question. Pourquoi un chunk de cent mille risque-t-il un OutOfMemoryError ?"
+ },
+ {
+  "id": "L143",
+  "scene": 8,
+  "expr": "posé",
+  "text": "Parce que tous les éléments du chunk sont en mémoire en même temps, avant l'écriture."
+ },
+ {
+  "id": "L144",
+  "scene": 8,
+  "expr": "pont",
+  "text": "Parlons maintenant de la lecture en base de données, avec les curseurs."
+ },
+ {
+  "id": "L145",
+  "scene": 9,
+  "expr": "besoin",
+  "text": "Mon besoin : lire dix millions de lignes d'une base, sans faire exploser la mémoire."
+ },
+ {
+  "id": "L146",
+  "scene": 9,
+  "expr": "image concrète",
+  "text": "Un curseur, c'est un pointeur vers le résultat d'une requête. Au lieu de rapatrier toutes les lignes d'un coup, on garde la requête ouverte."
+ },
+ {
+  "id": "L147",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "On dit à la base : donne-moi la ligne suivante, puis la suivante. Sans curseur, dix millions de lignes en mémoire : OutOfMemoryError."
+ },
+ {
+  "id": "L148",
+  "scene": 9,
+  "expr": "technique",
+  "text": "Le fetchSize règle la taille des paquets : le pilote ne va pas chercher les lignes une par une, ce serait un aller-retour réseau par ligne."
+ },
+ {
+  "id": "L149",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Il les rapatrie par paquets, par exemple mille. Le curseur avance dans le paquet en mémoire, puis demande le suivant."
+ },
+ {
+  "id": "L150",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Trop petit, beaucoup d'allers-retours. Trop grand, un paquet volumineux en mémoire. Entre cinq cents et cinq mille, à mesurer."
+ },
+ {
+  "id": "L151",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Attention : un piège propre à PostgreSQL. Par défaut, le pilote charge tout le résultat en mémoire, quel que soit le reader."
+ },
+ {
+  "id": "L152",
+  "scene": 9,
+  "expr": "technique",
+  "text": "Il ne fait du vrai streaming que si quatre conditions sont réunies. Première : l'auto-commit est désactivé sur la connexion."
+ },
+ {
+  "id": "L153",
+  "scene": 9,
+  "expr": "technique",
+  "text": "Deuxième : un fetchSize supérieur à zéro. Troisième : un curseur en avant seulement. Quatrième : une seule instruction."
+ },
+ {
+  "id": "L154",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Qui désactive l'auto-commit ? Pas automatiquement. JdbcCursorItemReader ouvre sa propre connexion, hors de la transaction du chunk."
+ },
+ {
+  "id": "L155",
+  "scene": 9,
+  "expr": "technique",
+  "text": "Il faut le demander : setConnectionAutoCommit à false, ou, pour toute l'application, hikari auto-commit à false."
+ },
+ {
+  "id": "L156",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Sans l'un de ces réglages, fetchSize est ignoré. Le reader fonctionne, mais lit tout en mémoire."
+ },
+ {
+  "id": "L157",
+  "scene": 9,
+  "expr": "technique",
+  "text": "Voyons le reader de base en code. Un builder, un nom, et la source de données."
+ },
+ {
+  "id": "L158",
+  "scene": 9,
+  "expr": "technique",
+  "text": "La requête SQL, puis fetchSize à mille : des paquets de mille lignes."
+ },
+ {
+  "id": "L159",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Puis le mapper de ligne, et surtout, à part, setConnectionAutoCommit à false. Sans cette ligne, le streaming n'a pas lieu."
+ },
+ {
+  "id": "L160",
+  "scene": 9,
+  "expr": "pédagogue",
+  "text": "Et l'OutOfMemoryError n'arrive que sur le gros fichier de production."
+ },
+ {
+  "id": "L161",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Deux readers de base. JdbcCursorItemReader : une seule requête, un curseur ouvert pendant tout le step."
+ },
+ {
+  "id": "L162",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "JdbcPagingItemReader : une requête par page, avec tri et clé de reprise. Il est thread-safe, pas le curseur."
+ },
+ {
+  "id": "L163",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Le risque du curseur : coupé si le step dure trop longtemps. Le risque de la pagination : des lignes sautées ou doublées, si le tri est instable."
+ },
+ {
+  "id": "L164",
+  "scene": 9,
+  "expr": "règle",
+  "text": "Pour la pagination, trie toujours sur une clé unique, comme la clé primaire."
+ },
+ {
+  "id": "L165",
+  "scene": 9,
+  "expr": "défi, direct",
+  "text": "Question. Dans quel cas JdbcPagingItemReader peut-il lire deux fois la même ligne ?"
+ },
+ {
+  "id": "L166",
+  "scene": 9,
+  "expr": "posé",
+  "text": "Quand le tri porte sur une colonne non unique : l'ordre n'est plus stable d'une page à l'autre."
+ },
+ {
+  "id": "L167",
+  "scene": 10,
+  "expr": "explicatif",
+  "text": "Premier cas : le fichier de dix gigaoctets de la banque. Avec un chunk de mille, la mémoire reste constante : un chunk à la fois."
+ },
+ {
+  "id": "L168",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "À trois heures quarante, le serveur redémarre. La reprise rejoue au plus un chunk, pas dix heures de travail."
+ },
+ {
+  "id": "L169",
+  "scene": 10,
+  "expr": "explicatif",
+  "text": "Deuxième cas : la migration entre deux référentiels. Lecture paginée dans l'ancienne base, transformation, écriture par lots dans PostgreSQL."
+ },
+ {
+  "id": "L170",
+  "scene": 10,
+  "expr": "explicatif",
+  "text": "ON CONFLICT DO UPDATE permet de rejouer la migration, sans doublon."
+ },
+ {
+  "id": "L171",
+  "scene": 10,
+  "expr": "explicatif",
+  "text": "Troisième cas : le nettoyage. Un fichier de deux millions de lignes contient huit pour cent de montants nuls."
+ },
+ {
+  "id": "L172",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Le processor les filtre. Elles ne polluent pas la base, et filter count donne le chiffre exact pour le rapport d'audit."
+ },
+ {
+  "id": "L173",
+  "scene": 10,
+  "expr": "pont",
+  "text": "Voyons maintenant les dix pièges du module."
+ },
+ {
+  "id": "L174",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Dix pièges, avec pour chacun ce qui se passe, la parade, et comment le repérer."
+ },
+ {
+  "id": "L175",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Un : une taille de chunk à un, ou jamais mesurée. Un commit par ligne, un débit divisé par dix à cent."
+ },
+ {
+  "id": "L176",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un commit count égal au nombre de lignes lues."
+ },
+ {
+  "id": "L177",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce que la valeur par défaut du tutoriel convient pour dix lignes de test."
+ },
+ {
+  "id": "L178",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Deux : un OutOfMemoryError. Un reader qui charge tout, ou un chunk énorme."
+ },
+ {
+  "id": "L179",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : la JVM s'arrête au milieu de la nuit."
+ },
+ {
+  "id": "L180",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : un findAll semble pratique, et marche parfaitement en test."
+ },
+ {
+  "id": "L181",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Trois : un reader sans nom. Échec au démarrage, ou clés qui se mélangent entre deux readers."
+ },
+ {
+  "id": "L182",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un message qui exige un nom au démarrage du step."
+ },
+ {
+  "id": "L183",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : on retire le nom pour simplifier, et rien ne casse tant qu'on ne reprend pas."
+ },
+ {
+  "id": "L184",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Quatre : un bean StepScope typé ItemReader au lieu de la classe concrète. Le proxy ne se voit pas comme ItemStream."
+ },
+ {
+  "id": "L185",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : aucune position sauvegardée, un restart qui repart du début."
+ },
+ {
+  "id": "L186",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce que le type ItemReader semble plus propre. Le proxy cache le flux."
+ },
+ {
+  "id": "L187",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Cinq : un processor avec état, ou un SimpleDateFormat partagé. Double comptage, valeurs fausses en multi-thread."
+ },
+ {
+  "id": "L188",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : des dates incohérentes d'un lancement à l'autre."
+ },
+ {
+  "id": "L189",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce qu'un formateur de dates semble inoffensif, jusqu'au deuxième thread."
+ },
+ {
+  "id": "L190",
+  "scene": 12,
+  "expr": "pont",
+  "text": "Les cinq suivants touchent la pagination, l'écriture et les tests."
+ },
+ {
+  "id": "L191",
+  "scene": 12,
+  "expr": "appuyé",
+  "text": "Six : un reader paginé instable. Tri sur une colonne non unique. Des lignes sautées ou lues deux fois, sans erreur."
+ },
+ {
+  "id": "L192",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un total qui ne correspond jamais exactement au nombre de lignes de la source."
+ },
+ {
+  "id": "L193",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce que le tri sur une colonne non unique marche, jusqu'à ce que deux lignes soient à égalité."
+ },
+ {
+  "id": "L194",
+  "scene": 12,
+  "expr": "appuyé",
+  "text": "Sept : ON CONFLICT DO NOTHING avec le contrôle des mises à jour actif. Un lot de doublons fait échouer le step."
+ },
+ {
+  "id": "L195",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : une erreur sur le nombre de lignes mises à jour, à la relance du même fichier."
+ },
+ {
+  "id": "L196",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : on veut ignorer les doublons, sans voir que le contrôle des mises à jour attend au moins une ligne."
+ },
+ {
+  "id": "L197",
+  "scene": 12,
+  "expr": "appuyé",
+  "text": "Huit : beanMapped avec des records. Les paramètres sont introuvables, puisque les records n'ont pas de getters."
+ },
+ {
+  "id": "L198",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : une exception sur un paramètre nommé introuvable."
+ },
+ {
+  "id": "L199",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : beanMapped est le raccourci le plus connu, et il vient d'avant les records."
+ },
+ {
+  "id": "L200",
+  "scene": 12,
+  "expr": "appuyé",
+  "text": "Neuf : un test vert avec des données fausses. Il ne vérifie que le nombre de lignes."
+ },
+ {
+  "id": "L201",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un champ à zéro en base, alors que le test est vert."
+ },
+ {
+  "id": "L202",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce que le comptage est le test le plus facile à écrire."
+ },
+ {
+  "id": "L203",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Voici le bon test : la somme des montants. Deux mille quatre cent quatre-vingt-six virgule vingt-cinq, la ligne à zéro étant filtrée."
+ },
+ {
+  "id": "L204",
+  "scene": 12,
+  "expr": "règle",
+  "text": "Un test de chargement doit contrôler au moins une valeur calculée. Le comptage seul ne voit pas une colonne oubliée."
+ },
+ {
+  "id": "L205",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Un second réflexe : tester le job complet deux fois, comme au module deux, et comparer la somme à chaque lancement."
+ },
+ {
+  "id": "L206",
+  "scene": 12,
+  "expr": "appuyé",
+  "text": "Dix : oublier linesToSkip. L'en-tête est lue comme une donnée, et la conversion échoue à la ligne un."
+ },
+ {
+  "id": "L207",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : une erreur de conversion sur la première ligne, avec le mot id."
+ },
+ {
+  "id": "L208",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce que le fichier d'exemple du tutoriel n'avait pas d'en-tête."
+ },
+ {
+  "id": "L209",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Un flashback : les pièges quatre et cinq sont deux visages du même sujet du module deux. Un composant partagé ne fait pas ce qu'on croit."
+ },
+ {
+  "id": "L210",
+  "scene": 13,
+  "expr": "pédagogue",
+  "text": "Reprenons notre fichier de dix gigaoctets et notre redémarrage de trois heures quarante. Tu sais maintenant comment on s'en sort."
+ },
+ {
+  "id": "L211",
+  "scene": 13,
+  "expr": "récapitulatif",
+  "text": "Un chunk, c'est une transaction : lire un par un, écrire par lot."
+ },
+ {
+  "id": "L212",
+  "scene": 13,
+  "expr": "récapitulatif",
+  "text": "La position est sauvegardée dans le même commit que les données : jamais de perte, jamais de doublon."
+ },
+ {
+  "id": "L213",
+  "scene": 13,
+  "expr": "récapitulatif",
+  "text": "Le reader a un nom, un type concret, et il est déclaré comme flux. Le processor filtre par null."
+ },
+ {
+  "id": "L214",
+  "scene": 13,
+  "expr": "défi",
+  "text": "Quatre exercices pour finir. Un : le fichier contient mille lignes dont quatre-vingts à montant nul. Combien valent read count, filter count et write count ?"
+ },
+ {
+  "id": "L215",
+  "scene": 13,
+  "expr": "défi",
+  "text": "Deux : un chunk de cent échoue à la ligne trois cent cinquante. Quelle position est enregistrée, combien de lignes sont en base ?"
+ },
+ {
+  "id": "L216",
+  "scene": 13,
+  "expr": "défi",
+  "text": "Trois : un collègue retire le nom du reader. Que risque-t-il de se passer ? Et s'il retourne ItemReader depuis la méthode StepScope ?"
+ },
+ {
+  "id": "L217",
+  "scene": 13,
+  "expr": "défi",
+  "text": "Quatre : écris l'assertion qui détecte qu'un champ montant n'a pas été mappé, alors que le test de comptage reste vert."
+ },
+ {
+  "id": "L218",
+  "scene": 13,
+  "expr": "pause",
+  "text": "Prends le temps d'y réfléchir."
+ },
+ {
+  "id": "L219",
+  "scene": 13,
+  "expr": "explicatif",
+  "text": "Correction un. Mille lues, quatre-vingts filtrées, neuf cent vingt écrites. Skip count vaut zéro."
+ },
+ {
+  "id": "L220",
+  "scene": 13,
+  "expr": "explicatif",
+  "text": "Correction deux. Position trois cents, et trois cents lignes en base : le chunk quatre est annulé en entier."
+ },
+ {
+  "id": "L221",
+  "scene": 13,
+  "expr": "explicatif",
+  "text": "Correction trois. Sans nom, échec au démarrage, ou clés mélangées. Avec ItemReader, le proxy n'est pas un ItemStream, et aucune position n'est sauvegardée."
+ },
+ {
+  "id": "L222",
+  "scene": 13,
+  "expr": "explicatif",
+  "text": "Correction quatre. Vérifier la somme des montants, ou le premier et le dernier enregistrement."
+ },
+ {
+  "id": "L223",
+  "scene": 13,
+  "expr": "transition",
+  "text": "Au module suivant, tu vas enrichir le processor : composer, valider, et comprendre pourquoi les scopes et les proxys comptent autant."
+ }
+]
