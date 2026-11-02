@@ -1,0 +1,794 @@
+[
+ {
+  "id": "L001",
+  "scene": 0,
+  "expr": "calme, accroche",
+  "text": "Un export bancaire, un seul fichier, et dedans, des lignes de compte mélangées à des lignes d'opération. Ton reader de fichier plat, lui, attend un seul format."
+ },
+ {
+  "id": "L002",
+  "scene": 0,
+  "expr": "pédagogue",
+  "text": "Au module trois, tu as lu un fichier CSV tout simple. Ici, on passe au catalogue complet : les sources que tu rencontreras vraiment."
+ },
+ {
+  "id": "L003",
+  "scene": 0,
+  "expr": "rappel",
+  "text": "Un rappel du module trois. Un reader qui garde une ressource est un ItemStream : open, update, close. Sa position est sauvegardée à chaque chunk."
+ },
+ {
+  "id": "L004",
+  "scene": 0,
+  "expr": "annonce",
+  "text": "Cinq étapes : le catalogue, les fichiers à plusieurs formats, la rupture de contrôle, la lecture par pages, et enfin les readers personnalisés."
+ },
+ {
+  "id": "L005",
+  "scene": 1,
+  "expr": "besoin",
+  "text": "Mon besoin : choisir le bon reader pour ma source. Il y en a beaucoup, alors mettons de l'ordre."
+ },
+ {
+  "id": "L006",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Un ItemReader n'a qu'une méthode, read. Elle retourne un élément à chaque appel, et null quand il n'y en a plus."
+ },
+ {
+  "id": "L007",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Spring Batch fournit des implémentations pour la plupart des sources. On n'écrit son propre reader que pour une source inhabituelle."
+ },
+ {
+  "id": "L008",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Pour les fichiers : FlatFileItemReader, délimité ou en positions fixes. Pour plusieurs formats de ligne, un mapper composite."
+ },
+ {
+  "id": "L009",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Pour plusieurs fichiers de même format : MultiResourceItemReader. Pour le XML : StaxEventItemReader. Pour le JSON : JsonItemReader."
+ },
+ {
+  "id": "L010",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Pour une base : JdbcCursorItemReader, ou JdbcPagingItemReader. Pour JPA : JpaPagingItemReader et JpaCursorItemReader."
+ },
+ {
+  "id": "L011",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Pour une procédure stockée : StoredProcedureItemReader. Pour MongoDB : MongoPagingItemReader et MongoCursorItemReader."
+ },
+ {
+  "id": "L012",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Pour un magasin Spring Data : RepositoryItemReader. Pour un service Java existant : ItemReaderAdapter."
+ },
+ {
+  "id": "L013",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Attention, ce catalogue a changé depuis les anciens tutoriels. Les readers Hibernate natifs ont disparu."
+ },
+ {
+  "id": "L014",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Il n'existe plus aucun reader Hibernate natif en version six. Pour un mapping objet-relationnel, on passe par JPA."
+ },
+ {
+  "id": "L015",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Autre changement : JpaCursorItemReader existe maintenant, à côté du paginé. Et MongoItemReader est remplacé par deux readers."
+ },
+ {
+  "id": "L016",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Les paquets ont bougé aussi. Tout est dans infrastructure point item. Et les fabriques, JobBuilderFactory et StepBuilderFactory, ont disparu."
+ },
+ {
+  "id": "L017",
+  "scene": 1,
+  "expr": "défi, direct",
+  "text": "Question. Un tutoriel te demande HibernateCursorItemReader. Que fais-tu en Spring Batch six ?"
+ },
+ {
+  "id": "L018",
+  "scene": 1,
+  "expr": "posé",
+  "text": "Tu utilises JPA : JpaCursorItemReader ou JpaPagingItemReader. Aucun reader Hibernate natif n'existe en six point zéro point six."
+ },
+ {
+  "id": "L019",
+  "scene": 1,
+  "expr": "pont",
+  "text": "Commençons par le cas le plus fréquent dans les systèmes anciens : un fichier qui mélange plusieurs formats."
+ },
+ {
+  "id": "L020",
+  "scene": 2,
+  "expr": "besoin",
+  "text": "Mon besoin : lire un export où comptes et opérations sont mêlés, repérés par un préfixe."
+ },
+ {
+  "id": "L021",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Une ligne ACC porte un compte : numéro, nom, prénom. Une ligne OP porte une opération : date, type, montant."
+ },
+ {
+  "id": "L022",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Première idée : un seul tokenizer qui devine le format. Ça marche pour deux formats."
+ },
+ {
+  "id": "L023",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Mais avec trois ou quatre formats, il devient illisible, et il mélange deux responsabilités : reconnaître la ligne, puis la découper."
+ },
+ {
+  "id": "L024",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "La bonne idée : un tokenizer par format. Chacun ne connaît que son format."
+ },
+ {
+  "id": "L025",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Le tokenizer des comptes : les colonnes prefix, accountNumber, lastName, firstName."
+ },
+ {
+  "id": "L026",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Le tokenizer des opérations : prefix, date, type, amount. Le préfixe est une colonne comme une autre."
+ },
+ {
+  "id": "L027",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Puis le mapper composite, PatternMatchingCompositeLineMapper. Pour chaque ligne, il choisit le tokenizer et le mapper selon son début."
+ },
+ {
+  "id": "L028",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Le motif ACC étoile signifie : commence par ACC. Un motif absent pour une ligne provoque une erreur."
+ },
+ {
+  "id": "L029",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Un FieldSetMapper par format : il transforme les champs en objet typé. readBigDecimal convertit directement le montant."
+ },
+ {
+  "id": "L030",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Le builder du reader : un nom unique, comme toujours, et lineMapper à la place de la paire tokenizer et mapper simple."
+ },
+ {
+  "id": "L031",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Deux records portent les résultats : AccountLine pour un compte, OperationLine pour une opération."
+ },
+ {
+  "id": "L032",
+  "scene": 2,
+  "expr": "défi, direct",
+  "text": "Question. Le fichier contient une ligne qui commence par XYZ. Que se passe-t-il ?"
+ },
+ {
+  "id": "L033",
+  "scene": 2,
+  "expr": "posé",
+  "text": "Une erreur : aucun motif ne correspond. Il faut prévoir un motif par format, et un motif de rejet explicite."
+ },
+ {
+  "id": "L034",
+  "scene": 2,
+  "expr": "pont",
+  "text": "Mais on veut mieux qu'un flux mêlé de lignes. On veut un compte qui contient ses opérations."
+ },
+ {
+  "id": "L035",
+  "scene": 3,
+  "expr": "besoin",
+  "text": "Mon besoin : un objet Account qui contient sa liste d'opérations."
+ },
+ {
+  "id": "L036",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Voici le défi : on ne sait qu'un compte est complet qu'en lisant la ligne suivante."
+ },
+ {
+  "id": "L037",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "La solution : un reader qui regarde en avance. On appelle ça peek."
+ },
+ {
+  "id": "L038",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Je crée un reader qui implémente ItemStreamReader, et non ItemReader. Il doit propager le cycle de vie à celui qu'il enveloppe."
+ },
+ {
+  "id": "L039",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Il enveloppe un SingleItemPeekableItemReader, qui fournit peek : regarder la ligne suivante sans la consommer."
+ },
+ {
+  "id": "L040",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Le reader de fichier est le délégué."
+ },
+ {
+  "id": "L041",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Dans read : je lis une ligne. Si c'est un compte, je l'appelle head, avec du pattern matching. Sinon, c'est la fin des données."
+ },
+ {
+  "id": "L042",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Puis, tant que la ligne suivante est une opération, elle appartient à ce compte. Je la consomme, et je l'ajoute."
+ },
+ {
+  "id": "L043",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Et je retourne le compte, avec zéro, une ou plusieurs opérations. C'est un seul élément : c'est ce que compte le chunk."
+ },
+ {
+  "id": "L044",
+  "scene": 3,
+  "expr": "règle",
+  "text": "Un chunk de cent contient cent comptes, pas cent lignes."
+ },
+ {
+  "id": "L045",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "On appelle cette technique la rupture de contrôle : on détecte la fin d'un groupe quand le suivant commence."
+ },
+ {
+  "id": "L046",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Et le point crucial : open, update et close sont transmis au délégué. Sans cela, le fichier ne serait jamais ouvert, ni fermé."
+ },
+ {
+  "id": "L047",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Oublier update ne casse pas le premier lancement. Mais aucune position n'est sauvegardée : la reprise rejoue tout."
+ },
+ {
+  "id": "L048",
+  "scene": 3,
+  "expr": "défi, direct",
+  "text": "Question. Avec le fichier d'exemple, combien d'Account le reader retourne-t-il ?"
+ },
+ {
+  "id": "L049",
+  "scene": 3,
+  "expr": "posé",
+  "text": "Trois. Alice avec deux opérations, Martin sans opération, Bernard avec une. Un compte sans opération reste un compte, avec une liste vide."
+ },
+ {
+  "id": "L050",
+  "scene": 3,
+  "expr": "défi, direct",
+  "text": "Question. Avec un chunk de cent, combien de lignes du fichier traite-t-on dans une transaction ?"
+ },
+ {
+  "id": "L051",
+  "scene": 3,
+  "expr": "posé",
+  "text": "Plus de cent, puisque chaque compte contient ses opérations. Cent comptes, c'est cent lignes de compte, plus toutes leurs lignes d'opération."
+ },
+ {
+  "id": "L052",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Il existe aussi un réglage, saveState à false, pour les readers partagés entre threads. On y reviendra avec le multithread."
+ },
+ {
+  "id": "L053",
+  "scene": 3,
+  "expr": "pont",
+  "text": "Passons à une autre source : la base de données, lue par pages."
+ },
+ {
+  "id": "L054",
+  "scene": 4,
+  "expr": "besoin",
+  "text": "Mon besoin : lire les transactions d'un compte, par pages de cinq cents, avec une mémoire constante."
+ },
+ {
+  "id": "L055",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Un curseur garde un résultat ouvert : une seule requête, une connexion occupée pendant tout le step, et pas de partage entre threads."
+ },
+ {
+  "id": "L056",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "La pagination émet une requête par page. La connexion est libérée entre deux pages, et le reader est utilisable en multithread."
+ },
+ {
+  "id": "L057",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Le prix : un tri obligatoire."
+ },
+ {
+  "id": "L058",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Le reader : JdbcPagingItemReaderBuilder, avec un nom obligatoire. La page courante est sauvegardée sous ce préfixe."
+ },
+ {
+  "id": "L059",
+  "scene": 4,
+  "expr": "technique",
+  "text": "La source de données PostgreSQL, puis un fournisseur de requête, qui écrit la requête paginée propre à la base."
+ },
+ {
+  "id": "L060",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Les paramètres nommés, sous forme de table, et pageSize à cinq cents."
+ },
+ {
+  "id": "L061",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Le RowMapper : chaque colonne doit être lue. Un champ oublié reste à zéro, et le test peut rester vert."
+ },
+ {
+  "id": "L062",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Le fournisseur de requête : une fabrique qui détecte PostgreSQL à partir de la DataSource, et choisit la bonne variante."
+ },
+ {
+  "id": "L063",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Les clauses sont fournies par morceaux : select, from, where. Le reader assemble une requête par page."
+ },
+ {
+  "id": "L064",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Et la clé de tri : id. Elle sert à repérer la page suivante."
+ },
+ {
+  "id": "L065",
+  "scene": 4,
+  "expr": "règle",
+  "text": "Une clé non unique, ou modifiée pendant la lecture, fait sauter ou répéter des lignes."
+ },
+ {
+  "id": "L066",
+  "scene": 4,
+  "expr": "défi, direct",
+  "text": "Question. Un collègue trie les pages sur transaction date. Plusieurs transactions partagent la même date. Que risque-t-il ?"
+ },
+ {
+  "id": "L067",
+  "scene": 4,
+  "expr": "posé",
+  "text": "Des lignes sautées ou lues deux fois, sans erreur. Il faut trier sur une clé unique, comme l'identifiant, ou ajouter l'identifiant au tri."
+ },
+ {
+  "id": "L068",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Un mot sur le curseur, côté PostgreSQL : le pilote charge tout en mémoire, sauf si l'auto-commit est désactivé et le fetchSize fixé."
+ },
+ {
+  "id": "L069",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Un dernier point sur les ORM. Une session JPA mémorise chaque entité lue. Sur un million de lignes, la mémoire grossit jusqu'à l'erreur."
+ },
+ {
+  "id": "L070",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Quand le mapping existe déjà, c'est un bon raccourci. Quand la performance prime, préfère JDBC."
+ },
+ {
+  "id": "L071",
+  "scene": 4,
+  "expr": "pont",
+  "text": "Il reste les sources sans reader prêt à l'emploi."
+ },
+ {
+  "id": "L072",
+  "scene": 5,
+  "expr": "besoin",
+  "text": "Mon besoin : lire une liste de comptes fournie par un service interne, avec une reprise automatique."
+ },
+ {
+  "id": "L073",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Première idée : écrire open et update moi-même, avec mes propres clés. C'est possible, mais fragile."
+ },
+ {
+  "id": "L074",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "La bonne idée : étendre AbstractItemCountingItemStreamItemReader. La classe de base compte les éléments lus, et gère la reprise."
+ },
+ {
+  "id": "L075",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Le client du service est injecté. Et le nom est obligatoire : c'est le préfixe des clés sauvegardées."
+ },
+ {
+  "id": "L076",
+  "scene": 5,
+  "expr": "technique",
+  "text": "doOpen ouvre la source. Ici, il charge un itérateur."
+ },
+ {
+  "id": "L077",
+  "scene": 5,
+  "expr": "technique",
+  "text": "doRead lit un élément, ou retourne null."
+ },
+ {
+  "id": "L078",
+  "scene": 5,
+  "expr": "technique",
+  "text": "doClose libère la source."
+ },
+ {
+  "id": "L079",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Au redémarrage, la classe de base saute les éléments déjà lus, grâce au compteur. Tu n'écris rien pour la reprise."
+ },
+ {
+  "id": "L080",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Attention : fetchAll charge tout en mémoire. Acceptable pour mille comptes, pas pour dix millions."
+ },
+ {
+  "id": "L081",
+  "scene": 5,
+  "expr": "défi, direct",
+  "text": "Question. Une méthode d'ItemReaderAdapter ne retourne jamais null. Que se passe-t-il ?"
+ },
+ {
+  "id": "L082",
+  "scene": 5,
+  "expr": "posé",
+  "text": "Une boucle infinie : le step ne se termine jamais. La méthode doit retourner null à la fin."
+ },
+ {
+  "id": "L083",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Autre cas : une méthode d'adaptateur qui retourne une liste. La liste entière devient un seul élément."
+ },
+ {
+  "id": "L084",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Deuxième sujet : un fichier vide. Par défaut, le step se termine normalement, sans rien lire."
+ },
+ {
+  "id": "L085",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Si c'est anormal, un lot réussi sans donnée passe inaperçu. Un listener de step peut le faire échouer."
+ },
+ {
+  "id": "L086",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Dans afterStep : si le nombre d'éléments lus est supérieur à zéro, on garde le code de sortie. Sinon, FAILED."
+ },
+ {
+  "id": "L087",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Le job pourra alors être aiguillé vers une alerte, comme on le verra au module cinq."
+ },
+ {
+  "id": "L088",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Troisième sujet : ignorer des erreurs de lecture. Un aperçu, le détail est au module six."
+ },
+ {
+  "id": "L089",
+  "scene": 5,
+  "expr": "technique",
+  "text": "faultTolerant, skip sur FlatFileParseException, et skipLimit à dix : au plus dix lignes mal formées sont ignorées."
+ },
+ {
+  "id": "L090",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Au-delà de dix, le step échoue : à ce stade, c'est le fichier qui est mauvais."
+ },
+ {
+  "id": "L091",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Mais ignorer sans consigner est inacceptable pour de l'argent. Des lignes disparaissent sans trace."
+ },
+ {
+  "id": "L092",
+  "scene": 5,
+  "expr": "règle",
+  "text": "Il faut un listener de rejets, avec le numéro de ligne et le texte brut."
+ },
+ {
+  "id": "L093",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Un cas de plus : plusieurs fichiers avec MultiResourceItemReader. Il parcourt une liste de fichiers avec un seul reader délégué."
+ },
+ {
+  "id": "L094",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Au restart, la liste est recalculée. Un fichier déposé entre le premier lancement et la reprise sera traité, alors qu'il n'existait pas au départ."
+ },
+ {
+  "id": "L095",
+  "scene": 5,
+  "expr": "règle",
+  "text": "La parade : un répertoire par exécution. Les nouveaux fichiers vont dans le répertoire suivant."
+ },
+ {
+  "id": "L096",
+  "scene": 5,
+  "expr": "défi, direct",
+  "text": "Question. Un job échoue au deuxième fichier. Un troisième arrive avant la reprise. Que traite la reprise ?"
+ },
+ {
+  "id": "L097",
+  "scene": 5,
+  "expr": "posé",
+  "text": "Elle traite le troisième fichier aussi, puisque la liste est recalculée. Un répertoire par exécution évite ce problème."
+ },
+ {
+  "id": "L098",
+  "scene": 5,
+  "expr": "pont",
+  "text": "Voyons les dix pièges de ce module."
+ },
+ {
+  "id": "L099",
+  "scene": 6,
+  "expr": "pédagogue",
+  "text": "Dix pièges, avec pour chacun ce qui se passe, la parade, et comment le repérer."
+ },
+ {
+  "id": "L100",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Un : un reader d'enveloppe qui oublie open, update ou close. Le fichier n'est jamais fermé, aucune position n'est sauvegardée."
+ },
+ {
+  "id": "L101",
+  "scene": 6,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un restart qui repart du début, alors que le reader est enveloppé."
+ },
+ {
+  "id": "L102",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Deux : un motif absent dans le mapper composite. Erreur sur une ligne de type inconnu."
+ },
+ {
+  "id": "L103",
+  "scene": 6,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un échec sur une ligne dont le préfixe n'est pas prévu."
+ },
+ {
+  "id": "L104",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Trois : FixedLengthTokenizer en mode strict. Une ligne plus longue ou plus courte que les colonnes fait échouer le step."
+ },
+ {
+  "id": "L105",
+  "scene": 6,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : une erreur de nombre de champs, dès la première ligne du fichier réel."
+ },
+ {
+  "id": "L106",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Quatre : les espaces conservés dans les champs en positions fixes. Durand avec ses espaces n'est pas Durand."
+ },
+ {
+  "id": "L107",
+  "scene": 6,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : des jointures qui ne trouvent rien, alors que les valeurs semblent identiques."
+ },
+ {
+  "id": "L108",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Cinq : un tri de pagination non unique. Lignes sautées ou lues deux fois, sans erreur."
+ },
+ {
+  "id": "L109",
+  "scene": 6,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un total qui diffère de la source, sans aucune exception."
+ },
+ {
+  "id": "L110",
+  "scene": 7,
+  "expr": "pont",
+  "text": "Les cinq suivants touchent les fichiers multiples, les adaptateurs et les erreurs ignorées."
+ },
+ {
+  "id": "L111",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Six : MultiResourceItemReader avec restart. Un fichier ajouté entre-temps est traité."
+ },
+ {
+  "id": "L112",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : plus de fichiers traités à la reprise qu'au premier lancement."
+ },
+ {
+  "id": "L113",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Sept : un ItemReaderAdapter dont la méthode ne retourne jamais null. Boucle infinie."
+ },
+ {
+  "id": "L114",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un step qui ne se termine jamais, avec un compteur de lecture qui grimpe."
+ },
+ {
+  "id": "L115",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Huit : une méthode d'adaptateur qui retourne une liste. La liste entière devient un seul élément."
+ },
+ {
+  "id": "L116",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un compteur de lecture à un, alors que la liste contenait mille éléments."
+ },
+ {
+  "id": "L117",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Neuf : un fichier vide traité comme un succès. Un lot réussi sans donnée passe inaperçu."
+ },
+ {
+  "id": "L118",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un statut COMPLETED, et un nombre de lignes lues à zéro."
+ },
+ {
+  "id": "L119",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Dix : ignorer des erreurs sans les consigner. Des lignes disparaissent sans trace, inacceptable pour de l'argent."
+ },
+ {
+  "id": "L120",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un skip count supérieur à zéro, et aucune ligne dans un journal des rejets."
+ },
+ {
+  "id": "L121",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce que chaque piège ressemble à un détail, jusqu'au premier incident en production."
+ },
+ {
+  "id": "L122",
+  "scene": 8,
+  "expr": "pédagogue",
+  "text": "Reprenons notre export bancaire aux formats mêlés. Tu sais maintenant le lire, le regrouper, et le reprendre."
+ },
+ {
+  "id": "L123",
+  "scene": 8,
+  "expr": "récapitulatif",
+  "text": "Un tokenizer par format, et un mapper composite. Un reader d'enveloppe qui propage open, update et close."
+ },
+ {
+  "id": "L124",
+  "scene": 8,
+  "expr": "récapitulatif",
+  "text": "Une pagination triée sur une clé unique. Un reader personnalisé qui compte, et un répertoire par exécution."
+ },
+ {
+  "id": "L125",
+  "scene": 8,
+  "expr": "défi",
+  "text": "Quatre exercices pour finir. Un : avec le fichier d'exemple, combien d'Account, avec combien d'opérations chacun ?"
+ },
+ {
+  "id": "L126",
+  "scene": 8,
+  "expr": "défi",
+  "text": "Deux : avec un chunk de cent, combien de lignes dans une transaction ? Pourquoi pas cent ?"
+ },
+ {
+  "id": "L127",
+  "scene": 8,
+  "expr": "défi",
+  "text": "Trois : un collègue trie les pages sur la date. Plusieurs transactions partagent la même date. Que risque-t-il, et comment corriger ?"
+ },
+ {
+  "id": "L128",
+  "scene": 8,
+  "expr": "défi",
+  "text": "Quatre : un job lit un répertoire partagé. Il échoue au deuxième fichier, un troisième arrive. Que traite la reprise ?"
+ },
+ {
+  "id": "L129",
+  "scene": 8,
+  "expr": "pause",
+  "text": "Prends le temps d'y réfléchir."
+ },
+ {
+  "id": "L130",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Correction un. Trois comptes : deux opérations, zéro, une. Correction deux : plus de cent lignes, puisque chaque compte contient ses opérations."
+ },
+ {
+  "id": "L131",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Correction trois : des lignes sautées ou doublées. Trier sur une clé unique. Correction quatre : la reprise traite aussi le troisième fichier. Un répertoire par exécution."
+ },
+ {
+  "id": "L132",
+  "scene": 8,
+  "expr": "transition",
+  "text": "Au module suivant, tu passes aux processors, aux scopes et aux proxys, pour transformer les données que tu viens d'apprendre à lire."
+ }
+]
