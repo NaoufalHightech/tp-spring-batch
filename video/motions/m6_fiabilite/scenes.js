@@ -221,6 +221,7 @@ SCENES[0] = mk({
 SCENES[1] = mk({
   label: 'TROIS_OUTILS', color: g, part: '6.1 · TROIS PROBLÈMES, TROIS OUTILS',
   els: [
+    ch('L007', 960, 150, 'un lot de nuit qui survit aux ennuis', d, { size: 24, b: 'L008' }),
     cd('L008', 100, 190, 560, 170, 'Donnée mauvaise', ['ligne mal formée, montant illisible'], o), cd('L009', 680, 190, 560, 170, 'Ressource indisponible', ['verrou, réseau, panne de 2 s'], b), cd('L010', 1260, 190, 560, 170, 'Processus arrêté', ['crash, redémarrage, arrêt demandé'], r),
     bx('L011', 380, 450, 360, 90, 'SKIP', o, { size: 34 }), bx('L012', 960, 450, 360, 90, 'RETRY', b, { size: 34 }), bx('L013', 1540, 450, 360, 90, 'RESTART', g, { size: 34 }),
     ch('L011', 380, 530, 'ignorer, consigner, continuer', o, { size: 20 }), ch('L012', 960, 530, 'réessayer après une pause', b, { size: 20 }), ch('L013', 1540, 530, 'reprendre au dernier point validé', g, { size: 20 }),
@@ -275,6 +276,7 @@ SCENES[4] = mk({
 SCENES[5] = mk({
   label: 'OU_REPRENDRE', color: p, part: '6.5 · COMMENT SPRING BATCH SAIT OÙ REPRENDRE',
   els: [
+    ch('L071', 960, 180, 'ce que lit exactement un restart', d, { size: 24, b: 'L072' }),
     bx('L072', 960, 250, 620, 90, 'batch_job_instance : bankJob + runDate', b, { size: 24 }),
     bx('L073', 500, 400, 560, 90, 'exécution n°1 : FAILED', r, { size: 26 }), bx('L073', 500, 510, 560, 90, 'loadBankStep : FAILED · 34 commits', r, { size: 22 }), bx('L074', 500, 620, 560, 90, 'read.count = 3400', y, { size: 26 }),
     bx('L075', 1420, 400, 560, 90, 'exécution n°2 (restart)', g, { size: 26 }), ar('L075', 1100, 330, 1300, 380, g), ar('L072', 800, 290, 600, 360, d),
@@ -310,7 +312,7 @@ SCENES[7] = mk({
       ['L106', 'Map<Long, Thread> hooks = new ConcurrentHashMap<>();', y], ['L108', 'ObjectProvider<JobOperator> jobOperator;', b], ['L109', 'var hook = new JobExecutionShutdownHook(jobExecution, jobOperator.getObject());', g],
       ['L110', 'Runtime.getRuntime().addShutdownHook(hook);', o], ['L111', 'afterJob : Runtime.getRuntime().removeShutdownHook(hook);', C.text], ['L113', '.listener(gracefulShutdownListener)', g]], { size: 21, b: 'L124' }),
     ch('L104', 1650, 240, 'SIGTERM → fin du chunk → STOPPED', g, { size: 20, b: 'L124' }), ch('L105', 1650, 310, 'arrêt coopératif', b, { size: 22, b: 'L124' }), ch('L107', 1650, 380, 'jamais un champ unique', r, { size: 22, b: 'L124' }), ch('L112', 1650, 450, 'JVM déjà en arrêt : on ignore', d, { size: 20, b: 'L124' }),
-    ch('L115', 1650, 520, 'demande l\'arrêt, n\'attend pas', y, { size: 20, b: 'L124' }), ch('L119', 1650, 590, 'arrêt entre deux chunks', o, { size: 22, b: 'L124' }), ch('L120', 1650, 660, 'STOPPED, pas FAILED : restart ok', g, { size: 20, b: 'L124' }),
+    ch('L115', 1650, 520, 'demande l\'arrêt, n\'attend pas', y, { size: 20, b: 'L124' }), ch('L117', 1650, 730, 'JobInterruptedException avant le chunk suivant', b, { size: 18, b: 'L124' }), ch('L119', 1650, 590, 'arrêt entre deux chunks', o, { size: 22, b: 'L124' }), ch('L120', 1650, 660, 'STOPPED, pas FAILED : restart ok', g, { size: 20, b: 'L124' }),
     bx('L114', 200, 800, 280, 100, 'SIGTERM', r, { size: 28, b: 'L124' }), bx('L114', 560, 800, 280, 100, 'hook : stop(…)', o, { size: 24, b: 'L124' }), bx('L116', 920, 800, 300, 100, 'chunk en cours : commit', b, { size: 22, b: 'L124' }), bx('L118', 1300, 800, 300, 100, 'STOPPED + contexte', g, { size: 24, b: 'L124' }), bx('L118', 1660, 800, 260, 100, 'JVM arrêtée', d, { size: 24, b: 'L124' }),
     ar('L114', 340, 800, 420, 800, d, { b: 'L124' }), ar('L116', 700, 800, 770, 800, d, { b: 'L124' }), ar('L118', 1070, 800, 1150, 800, d, { b: 'L124' }), ar('L118', 1450, 800, 1530, 800, d, { b: 'L124' }),
     ch('L121', 960, 900, 'délai de l\'orchestrateur > durée d\'un chunk', y, { size: 26, b: 'L124' }),
