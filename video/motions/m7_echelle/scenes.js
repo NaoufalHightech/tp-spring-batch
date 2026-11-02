@@ -264,119 +264,148 @@ SCENES[3] = mk({
   cues: [{ a: 'L045', s: 'error' }, { a: 'L046', s: 'success' }],
 });
 
-SCENES[4] = mk({
+SCENES[5] = mk({
   label: 'ASYNC', color: o, part: '7.4 · ASYNCITEMPROCESSOR',
   els: [
-    code('L055', 100, 190, 1300, 360, 'AsyncItemProcessor', [['L055', 'new AsyncItemProcessor<RawTransaction, BankTransaction>()', C.text], ['L056', 'async.setDelegate(bankProcessor);  async.setTaskExecutor(processorExecutor);', b], ['L057', 'new AsyncItemWriter<BankTransaction>()   // va toujours avec', g], ['L058', '.<RawTransaction, Future<BankTransaction>>chunk(100)', y]], { size: 21 }),
-    rc('L054', 240, 'processor lent, lecture inchangée', d), rc('L059', 330, '5 ms × 1 M ≈ 1 h 23', r), rc('L060', 410, '8 threads ≈ 10 min', g),
-    ch('L062', 960, 700, 'seul le processor est parallélisé : lecture et écriture restent séquentielles', y, { size: 26 }),
+    code('L069', 100, 190, 1300, 360, 'AsyncItemProcessor', [['L069', 'new AsyncItemProcessor<RawTransaction, BankTransaction>()', C.text], ['L070', 'async.setDelegate(bankProcessor);  async.setTaskExecutor(processorExecutor);', b], ['L071', 'new AsyncItemWriter<BankTransaction>()   // va toujours avec', g], ['L072', '.<RawTransaction, Future<BankTransaction>>chunk(100)', y]], { size: 21 }),
+    rc('L068', 240, 'processor lent, lecture inchangée', d), rc('L073', 330, '5 ms × 1 M ≈ 1 h 23', r), rc('L074', 410, '8 threads ≈ 10 min', g),
+    ch('L076', 960, 700, 'seul le processor est parallélisé : lecture et écriture restent séquentielles', y, { size: 26 }),
   ],
-  quiz: [{ q: 'L061', a: 'L062', question: "Le processor est rapide, l'écriture est lente. L'AsyncItemProcessor aide-t-il ?", choices: ['oui', 'non'], win: 1, answer: 'Non : lecture et écriture restent séquentielles. Il ne parallélise que le processor.' }],
-  cues: [{ a: 'L060', s: 'success' }],
-});
-
-SCENES[5] = mk({
-  label: 'PARTITION_LOCAL', color: g, part: '7.5 · LE PARTITIONNEMENT LOCAL, LIGNE PAR LIGNE',
-  els: [
-    code('L068', 100, 190, 1250, 330, 'IdRangePartitioner', [['L068', 'implements Partitioner { Map<String, ExecutionContext> partition(int gridSize)', y], ['L069', '  min = SELECT MIN(id)    max = SELECT MAX(id)', C.text], ['L070', '  long size = Math.ceilDiv(max - min + 1, gridSize);', g], ['L072', '  context.putLong("minId", start);  context.putLong("maxId", end);', b], ['L073', '  partitions.put("partition" + i, context);', o]], { size: 21 }),
-    code('L074', 100, 550, 1250, 270, 'ouvrier et maître', [['L074', '@Value("#{stepExecutionContext[\'minId\']}") Long minId   // reader @StepScope', y], ['L076', '.partitioner("loadWorkerStep", partitioner)', g], ['L077', '.step(loadWorkerStep).gridSize(4)', g], ['L078', '.taskExecutor(partitionExecutor)', r]], { size: 21 }),
-    rc('L063', 240, 'gros volume, un serveur, reprise précise', d, 20), rc('L064', 310, 'maître : partition(gridSize)', b), rc('L065', 380, 'un ouvrier complet par plage', g), rc('L071', 450, 'chaque id : une seule plage', y), rc('L075', 520, 'plage lue dans le contexte du step', b, 20),
-    rc('L079', 590, 'sans exécuteur : aucun gain', r), rc('L080', 660, 'pool borné < pool de connexions', o, 20), rc('L081', 730, '16 partitions, 4 threads', d), rc('L083', 800, 'loadWorkerStep:partition0…3', b, 20), rc('L084', 870, 'compteurs du maître = somme', g, 20),
-    ch('L066', 700, 880, '1–2500 · 2501–5000 · 5001–7500 · 7501–10000', y, { size: 24 }), ch('L067', 700, 940, 'le maître agrège les statuts', d, { size: 22 }), ch('L082', 700, 990, 'un thread = une StepExecution = ses connexions', d, { size: 20 }),
-    ch('L089', 1550, 1000, 'restart →', b, { size: 24 }),
-  ],
-  quiz: [{ q: 'L085', a: 'L086', question: 'min = 1, max = 10 000, quatre partitions : quelles plages ?', choices: ['4 × 2 500', '4 × 2 501', '5 × 2 000'], win: 0, answer: 'Un à 2 500, 2 501 à 5 000, 5 001 à 7 500, 7 501 à 10 000.' },
-         { q: 'L087', a: 'L088', question: 'Avec max = 10 002 : combien d\'identifiants dans la dernière plage ?', choices: ['2 500', '2 499', '2 501'], win: 1, answer: 'La taille devient 2 501 : la dernière plage va de 7 504 à 10 002, soit 2 499 identifiants.' }],
-  cues: [{ a: 'L078', s: 'alarm', g: -12 }, { a: 'L071', s: 'stamp' }],
+  quiz: [{ q: 'L075', a: 'L076', question: "Le processor est rapide, l'écriture est lente. L'AsyncItemProcessor aide-t-il ?", choices: ['oui', 'non'], win: 1, answer: 'Non : lecture et écriture restent séquentielles. Il ne parallélise que le processor.' }],
+  cues: [{ a: 'L074', s: 'success' }],
 });
 
 SCENES[6] = mk({
-  label: 'RESTART_PARTITION', color: b, part: '7.6 · PARTITIONNEMENT, RESTART ET CHEVAUCHEMENT',
+  label: 'PARTITION_LOCAL', color: g, part: '7.5 · LE PARTITIONNEMENT LOCAL, LIGNE PAR LIGNE',
   els: [
-    bx('L090', 300, 300, 340, 100, 'partition0', g, { size: 26 }), bx('L090', 700, 300, 340, 100, 'partition1', g, { size: 26 }), bx('L091', 1100, 300, 340, 100, 'partition2 : FAILED', r, { size: 24 }), bx('L090', 1500, 300, 340, 100, 'partition3', g, { size: 26 }),
-    ch('L091', 960, 420, 'restart : seule la partition échouée est rejouée', y, { size: 28 }), ch('L092', 960, 490, 'nom déterministe : la partition est retrouvée', g, { size: 26 }), ch('L093', 960, 560, 'une position de lecture par partition', b, { size: 24 }), ch('L094', 960, 640, 'reprise précise : partitionnement > multithread', y, { size: 28 }),
-    ch('L095', 500, 760, 'plages qui se chevauchent : lignes en double', r, { size: 24 }), ch('L095', 1400, 760, 'ou un trou : lignes jamais traitées', r, { size: 24 }),
-    ch('L096', 500, 840, 'test : chaque id dans exactement une plage', g, { size: 24 }), ch('L097', 1400, 840, 'première plage = min, dernière = max', g, { size: 24 }), ch('L100', 1550, 1000, 'distribué →', p, { size: 26 }),
+    code('L082', 100, 190, 1250, 330, 'IdRangePartitioner', [['L082', 'implements Partitioner { Map<String, ExecutionContext> partition(int gridSize)', y], ['L083', '  min = SELECT MIN(id)    max = SELECT MAX(id)', C.text], ['L084', '  long size = Math.ceilDiv(max - min + 1, gridSize);', g], ['L086', '  context.putLong("minId", start);  context.putLong("maxId", end);', b], ['L087', '  partitions.put("partition" + i, context);', o]], { size: 21 }),
+    code('L088', 100, 550, 1250, 270, 'ouvrier et maître', [['L088', '@Value("#{stepExecutionContext[\'minId\']}") Long minId   // reader @StepScope', y], ['L090', '.partitioner("loadWorkerStep", partitioner)', g], ['L091', '.step(loadWorkerStep).gridSize(4)', g], ['L092', '.taskExecutor(partitionExecutor)', r]], { size: 21 }),
+    rc('L077', 240, 'gros volume, un serveur, reprise précise', d, 20), rc('L078', 310, 'maître : partition(gridSize)', b), rc('L079', 380, 'un ouvrier complet par plage', g), rc('L085', 450, 'chaque id : une seule plage', y), rc('L089', 520, 'plage lue dans le contexte du step', b, 20),
+    rc('L093', 590, 'sans exécuteur : aucun gain', r), rc('L094', 660, 'pool borné < pool de connexions', o, 20), rc('L095', 730, '16 partitions, 4 threads', d), rc('L097', 800, 'loadWorkerStep:partition0…3', b, 20), rc('L098', 870, 'compteurs du maître = somme', g, 20),
+    ch('L080', 700, 880, '1–2500 · 2501–5000 · 5001–7500 · 7501–10000', y, { size: 24 }), ch('L081', 700, 940, 'le maître agrège les statuts', d, { size: 22 }), ch('L096', 700, 990, 'un thread = une StepExecution = ses connexions', d, { size: 20 }),
+    ch('L103', 1550, 1000, 'restart →', b, { size: 24 }),
   ],
-  quiz: [{ q: 'L098', a: 'L099', question: 'Les plages se chevauchent de 10 identifiants. Que se passe-t-il ?', choices: ['rien', '10 lignes traitées deux fois', 'erreur SQL'], win: 1, answer: 'Dix lignes traitées deux fois : doublons ou totaux faux, sans aucune erreur.' }],
-  cues: [{ a: 'L091', s: 'error' }],
+  quiz: [{ q: 'L099', a: 'L100', question: 'min = 1, max = 10 000, quatre partitions : quelles plages ?', choices: ['4 × 2 500', '4 × 2 501', '5 × 2 000'], win: 0, answer: 'Un à 2 500, 2 501 à 5 000, 5 001 à 7 500, 7 501 à 10 000.' },
+         { q: 'L101', a: 'L102', question: 'Avec max = 10 002 : combien d\'identifiants dans la dernière plage ?', choices: ['2 500', '2 499', '2 501'], win: 1, answer: 'La taille devient 2 501 : la dernière plage va de 7 504 à 10 002, soit 2 499 identifiants.' }],
+  cues: [{ a: 'L092', s: 'alarm', g: -12 }, { a: 'L085', s: 'stamp' }],
 });
 
 SCENES[7] = mk({
-  label: 'DISTRIBUE', color: p, part: '7.7 · DISTRIBUÉ ET REMOTE CHUNKING (THÉORIE)',
+  label: 'RESTART_PARTITION', color: b, part: '7.6 · PARTITIONNEMENT, RESTART ET CHEVAUCHEMENT',
   els: [
-    code('L103', 100, 190, 1300, 520, 'ManagerConfig (théorique)', [['L103', 'RemotePartitioningManagerStepBuilderFactory factory;', y], ['L103', 'factory.get("managerStep").partitioner("workerStep", partitioner)', C.text], ['L104', '    .outputChannel(requests).inputChannel(replies)', g], ['L105', 'RemotePartitioningWorkerStepBuilderFactory   // côté ouvrier', b], ['L106', '@EnableBatchIntegration', o], ['L107', '@Profile("manager")   // le job n\'existe que sur le maître', r]], { size: 21 }),
-    rc('L101', 240, 'THÉORIQUE : code non exécuté', o), rc('L102', 310, 'seule la plage voyage (messages)', b), rc('L108', 380, 'un JobRepository partagé', g), rc('L109', 450, 'ouvrier : hors du contexte du job', r, 20), rc('L110', 520, 'courtier : messages persistants', y), rc('L111', 590, 'lancement dynamique : Spring Cloud Task', d, 18),
-    rc('L112', 660, 'remote chunking : le maître lit', p), rc('L113', 730, 'données par le réseau : plus lent si E/S', r, 20),
-    ch('L116', 1550, 1000, 'SKIP LOCKED →', r, { size: 26 }),
+    bx('L104', 300, 300, 340, 100, 'partition0', g, { size: 26 }), bx('L104', 700, 300, 340, 100, 'partition1', g, { size: 26 }), bx('L105', 1100, 300, 340, 100, 'partition2 : FAILED', r, { size: 24 }), bx('L104', 1500, 300, 340, 100, 'partition3', g, { size: 26 }),
+    ch('L105', 960, 420, 'restart : seule la partition échouée est rejouée', y, { size: 28 }), ch('L106', 960, 490, 'nom déterministe : la partition est retrouvée', g, { size: 26 }), ch('L107', 960, 560, 'une position de lecture par partition', b, { size: 24 }), ch('L108', 960, 640, 'reprise précise : partitionnement > multithread', y, { size: 28 }),
+    ch('L109', 500, 760, 'plages qui se chevauchent : lignes en double', r, { size: 24 }), ch('L109', 1400, 760, 'ou un trou : lignes jamais traitées', r, { size: 24 }),
+    ch('L110', 500, 840, 'test : chaque id dans exactement une plage', g, { size: 24 }), ch('L111', 1400, 840, 'première plage = min, dernière = max', g, { size: 24 }), ch('L114', 1550, 1000, 'distribué →', p, { size: 26 }),
   ],
-  quiz: [{ q: 'L114', a: 'L115', question: "Le goulot est l'écriture en base. Remote chunking ou partitionnement ?", choices: ['remote chunking', 'partitionnement'], win: 1, answer: 'Partitionnement : chaque ouvrier lit et écrit sa plage. Le remote chunking ferait transiter toutes les données par le réseau.' }],
-  cues: [{ a: 'L107', s: 'pop' }],
+  quiz: [{ q: 'L112', a: 'L113', question: 'Les plages se chevauchent de 10 identifiants. Que se passe-t-il ?', choices: ['rien', '10 lignes traitées deux fois', 'erreur SQL'], win: 1, answer: 'Dix lignes traitées deux fois : doublons ou totaux faux, sans aucune erreur.' }],
+  cues: [{ a: 'L105', s: 'error' }],
 });
 
 SCENES[8] = mk({
-  label: 'SKIP_LOCKED', color: r, part: '7.8 · MULTI-INSTANCE : SKIP LOCKED ET BAIL',
+  label: 'DISTRIBUE', color: p, part: '7.7 · DISTRIBUÉ ET REMOTE CHUNKING (THÉORIE)',
   els: [
-    code('L119', 100, 190, 1300, 540, 'staging_transaction · claim', [
-      ['L119', 'status : NEW → CLAIMED → DONE      claimed_by      claimed_at', y], ['L120', 'CREATE INDEX idx_staging_claim ON staging_transaction (status, claimed_at, id);', b], ['L121', 'UPDATE staging_transaction SET status = \'CLAIMED\', claimed_by = :worker …', C.text],
-      ['L121', ' WHERE id IN (SELECT id … ORDER BY id LIMIT :batch', C.text], ['L122', '       FOR UPDATE SKIP LOCKED)', r], ['L124', ' … OR (status = \'CLAIMED\' AND claimed_at < now() - lease)', g], ['L125', 'TransactionTemplate  →  PROPAGATION_REQUIRES_NEW', o], ['L127', 'public synchronized RawTransaction read() { … buffer.poll(); }', b]], { size: 21 }),
-    rc('L117', 240, 'file de travail, instances multiples', d), rc('L118', 310, 'verrou distribué : complexe', r), rc('L123', 380, 'deux instances : lignes différentes', g), rc('L126', 450, 'verrou court', b), rc('L128', 520, 'tampon vide → réservation', d), rc('L131', 590, 'verrou de ligne, jamais d\'attente', y, 20), rc('L132', 660, 'sans SKIP LOCKED : attente ou doublon', r, 20),
-    ...[0, 1, 2, 3].map(i => bx('L123', 220 + i * 150, 850, 130, 70, 'A', b, { size: 26 })), ...[0, 1, 2, 3].map(i => bx('L123', 820 + i * 150, 850, 130, 70, 'B', g, { size: 26 })), ch('L123', 960, 930, 'lignes réservées par A, puis par B', d, { size: 20 }),
-    ch('L133', 1550, 1000, 'JobRepository →', b, { size: 26 }),
+    code('L117', 100, 190, 1300, 520, 'ManagerConfig (théorique)', [['L117', 'RemotePartitioningManagerStepBuilderFactory factory;', y], ['L117', 'factory.get("managerStep").partitioner("workerStep", partitioner)', C.text], ['L118', '    .outputChannel(requests).inputChannel(replies)', g], ['L119', 'RemotePartitioningWorkerStepBuilderFactory   // côté ouvrier', b], ['L120', '@EnableBatchIntegration', o], ['L121', '@Profile("manager")   // le job n\'existe que sur le maître', r]], { size: 21 }),
+    rc('L115', 240, 'THÉORIQUE : code non exécuté', o), rc('L116', 310, 'seule la plage voyage (messages)', b), rc('L122', 380, 'un JobRepository partagé', g), rc('L123', 450, 'ouvrier : hors du contexte du job', r, 20), rc('L124', 520, 'courtier : messages persistants', y), rc('L125', 590, 'lancement dynamique : Spring Cloud Task', d, 18),
+    rc('L126', 660, 'remote chunking : le maître lit', p), rc('L127', 730, 'données par le réseau : plus lent si E/S', r, 20),
+    ch('L130', 1550, 1000, 'SKIP LOCKED →', r, { size: 26 }),
   ],
-  quiz: [{ q: 'L129', a: 'L130', question: 'Une instance réserve cent lignes, puis plante. Que deviennent ces lignes ?', choices: ['perdues', 'reprises après le bail', 'rejouées tout de suite'], win: 1, answer: "Elles restent CLAIMED jusqu'à l'expiration du bail : alors une autre instance les reprend. Sans bail, elles seraient perdues." }],
-  cues: [{ a: 'L122', s: 'pop' }, { a: 'L124', s: 'success' }],
+  quiz: [{ q: 'L128', a: 'L129', question: "Le goulot est l'écriture en base. Remote chunking ou partitionnement ?", choices: ['remote chunking', 'partitionnement'], win: 1, answer: 'Partitionnement : chaque ouvrier lit et écrit sa plage. Le remote chunking ferait transiter toutes les données par le réseau.' }],
+  cues: [{ a: 'L121', s: 'pop' }],
 });
 
 SCENES[9] = mk({
-  label: 'JOBREPOSITORY_CONCURRENCE', color: o, part: '7.9 · CONCURRENCE SUR LE JOBREPOSITORY',
+  label: 'SKIP_LOCKED', color: r, part: '7.8 · MULTI-INSTANCE : SKIP LOCKED ET BAIL',
   els: [
-    cd('L134', 100, 200, 560, 250, 'Isolation SERIALIZABLE', ['deux lancements simultanés du même job'], g), cd('L135', 680, 200, 560, 250, 'Exécutions en cours', ['JobExecutionAlreadyRunningException'], b), cd('L136', 1260, 200, 560, 250, 'Colonne version', ['verrouillage optimiste : deux écritures, même ligne'], p),
-    ch('L137', 960, 540, 'OptimisticLockingFailureException : deux processus, une StepExecution', o, { size: 24 }), ch('L138', 960, 610, 'ne la masque pas : c\'est un signal', y, { size: 28 }),
-    ch('L139', 500, 720, 'message de partition livré en double', r, { size: 24 }), ch('L140', 1350, 720, 'la 2e écriture est refusée : le verrou optimiste travaille', g, { size: 22 }),
-    ch('L141', 1550, 1000, 'Top 10 →', r, { size: 28 }),
+    code('L133', 100, 190, 1300, 540, 'staging_transaction · claim', [
+      ['L133', 'status : NEW → CLAIMED → DONE      claimed_by      claimed_at', y], ['L134', 'CREATE INDEX idx_staging_claim ON staging_transaction (status, claimed_at, id);', b], ['L135', 'UPDATE staging_transaction SET status = \'CLAIMED\', claimed_by = :worker …', C.text],
+      ['L135', ' WHERE id IN (SELECT id … ORDER BY id LIMIT :batch', C.text], ['L136', '       FOR UPDATE SKIP LOCKED)', r], ['L138', ' … OR (status = \'CLAIMED\' AND claimed_at < now() - lease)', g], ['L139', 'TransactionTemplate  →  PROPAGATION_REQUIRES_NEW', o], ['L141', 'public synchronized RawTransaction read() { … buffer.poll(); }', b]], { size: 21 }),
+    rc('L131', 240, 'file de travail, instances multiples', d), rc('L132', 310, 'verrou distribué : complexe', r), rc('L137', 380, 'deux instances : lignes différentes', g), rc('L140', 450, 'verrou court', b), rc('L142', 520, 'tampon vide → réservation', d), rc('L145', 590, 'verrou de ligne, jamais d\'attente', y, 20), rc('L146', 660, 'sans SKIP LOCKED : attente ou doublon', r, 20),
+    ...[0, 1, 2, 3].map(i => bx('L137', 220 + i * 150, 850, 130, 70, 'A', b, { size: 26 })), ...[0, 1, 2, 3].map(i => bx('L137', 820 + i * 150, 850, 130, 70, 'B', g, { size: 26 })), ch('L137', 960, 930, 'lignes réservées par A, puis par B', d, { size: 20 }),
+    ch('L147', 1550, 1000, 'JobRepository →', b, { size: 26 }),
   ],
-  cues: [{ a: 'L137', s: 'pop' }],
+  quiz: [{ q: 'L143', a: 'L144', question: 'Une instance réserve cent lignes, puis plante. Que deviennent ces lignes ?', choices: ['perdues', 'reprises après le bail', 'rejouées tout de suite'], win: 1, answer: "Elles restent CLAIMED jusqu'à l'expiration du bail : alors une autre instance les reprend. Sans bail, elles seraient perdues." }],
+  cues: [{ a: 'L136', s: 'pop' }, { a: 'L138', s: 'success' }],
 });
 
 SCENES[10] = mk({
-  label: 'TOP10_1', color: r, part: 'TOP 10 DES PIÈGES (1/2)',
+  label: 'JOBREPOSITORY_CONCURRENCE', color: o, part: '7.9 · CONCURRENCE SUR LE JOBREPOSITORY',
   els: [
-    tb('L142', 100, 190, PC2, PH2, [
-      row('L143', ['1', 'reader non thread-safe partagé', 'lignes sautées ou dupliquées', 'paginé, synchronisé, ou partitionner'], r), row('L145', ['2', 'singleton avec état en multithread', 'résultats aléatoires', 'sans état, StepScope'], r),
-      row('L147', ['3', 'pool de threads mal dimensionné', 'base saturée, blocage', 'pool borné < connexions'], o), row('L149', ['4', 'OptimisticLockingFailureException', 'deux processus, même StepExecution', 'ne pas la masquer'], o),
-      row('L151', ['5', 'plages qui se chevauchent', 'lignes en double ou jamais traitées', 'ceilDiv, bornes testées'], r)], { size: 21, rh: 70, noBold: true }),
-    extrait2('L144', 'L145', [['source : 1 000 000 lignes      destination : 999 412 lignes', r]]), extrait2('L146', 'L147', [['total = 1 187,00      puis      1 203,50', r]]),
-    extrait2('L148', 'L149', [['HikariPool: Connection is not available, request timed out', r]]), extrait2('L150', 'L151', [['OptimisticLockingFailureException … batch_step_execution', r]]),
-    extrait2('L152', null, [['count = 1 000 010      (attendu : 1 000 000)', r]]),
+    cd('L148', 100, 200, 560, 250, 'Isolation SERIALIZABLE', ['deux lancements simultanés du même job'], g), cd('L149', 680, 200, 560, 250, 'Exécutions en cours', ['JobExecutionAlreadyRunningException'], b), cd('L150', 1260, 200, 560, 250, 'Colonne version', ['verrouillage optimiste : deux écritures, même ligne'], p),
+    ch('L151', 960, 540, 'OptimisticLockingFailureException : deux processus, une StepExecution', o, { size: 24 }), ch('L152', 960, 610, 'ne la masque pas : c\'est un signal', y, { size: 28 }),
+    ch('L153', 500, 720, 'message de partition livré en double', r, { size: 24 }), ch('L154', 1350, 720, 'la 2e écriture est refusée : le verrou optimiste travaille', g, { size: 22 }),
+    ch('L155', 1550, 1000, 'Top 10 →', r, { size: 28 }),
   ],
-  cues: [{ a: 'L143', s: 'pop' }, { a: 'L145', s: 'pop' }, { a: 'L147', s: 'pop' }, { a: 'L149', s: 'pop' }, { a: 'L151', s: 'alarm', g: -12 }],
+  cues: [{ a: 'L151', s: 'pop' }],
 });
 
 SCENES[11] = mk({
-  label: 'TOP10_2', color: r, part: 'TOP 10 DES PIÈGES (2/2)',
+  label: 'TOP10_1', color: r, part: 'TOP 10 DES PIÈGES (1/2)',
   els: [
-    tb('L153', 100, 190, PC2, PH2, [
-      row('L154', ['6', 'partitionnement sans TaskExecutor', 'exécuteur synchrone : aucun gain', 'taskExecutor explicite'], o), row('L156', ['7', 'multithread avec reprise', 'restart au mauvais endroit', 'saveState(false) ou partitionner'], r),
-      row('L158', ['8', 'remote chunking, E/S goulot', 'plus lent qu\'avant', 'partitionner'], o), row('L160', ['9', 'SKIP LOCKED sans bail', 'lignes CLAIMED pour toujours', 'claimed_at + expiration'], r),
-      row('L162', ['10', 'job démarré sur chaque ouvrier', 'le job tourne partout', '@Profile("manager")'], o)], { size: 21, rh: 70, noBold: true }),
-    extrait2('L155', 'L156', [['[main] loadWorkerStep:partition0 … partition1 …   (un seul thread)', r]]), extrait2('L157', 'L158', [['read.count = 300  alors que les chunks 4 et 5 sont écrits', r]]),
-    extrait2('L159', 'L160', [['débit : 4 200 → 1 900 lignes/s', r]]), extrait2('L161', 'L162', [['status = CLAIMED      claimed_at = il y a 3 jours', r]]),
-    extrait2('L163', null, [['Job: [name=bankJob] launched   sur trois machines', r]]), ch('L164', 960, 990, 'en démonstration : un serveur, une base, peu de données', y, { size: 22 }),
+    tb('L156', 100, 190, PC2, PH2, [
+      row('L157', ['1', 'reader non thread-safe partagé', 'lignes sautées ou dupliquées', 'paginé, synchronisé, ou partitionner'], r), row('L159', ['2', 'singleton avec état en multithread', 'résultats aléatoires', 'sans état, StepScope'], r),
+      row('L161', ['3', 'pool de threads mal dimensionné', 'base saturée, blocage', 'pool borné < connexions'], o), row('L163', ['4', 'OptimisticLockingFailureException', 'deux processus, même StepExecution', 'ne pas la masquer'], o),
+      row('L165', ['5', 'plages qui se chevauchent', 'lignes en double ou jamais traitées', 'ceilDiv, bornes testées'], r)], { size: 21, rh: 70, noBold: true }),
+    extrait2('L158', 'L159', [['source : 1 000 000 lignes      destination : 999 412 lignes', r]]), extrait2('L160', 'L161', [['total = 1 187,00      puis      1 203,50', r]]),
+    extrait2('L162', 'L163', [['HikariPool: Connection is not available, request timed out', r]]), extrait2('L164', 'L165', [['OptimisticLockingFailureException … batch_step_execution', r]]),
+    extrait2('L166', null, [['count = 1 000 010      (attendu : 1 000 000)', r]]),
   ],
-  cues: [{ a: 'L154', s: 'pop' }, { a: 'L156', s: 'pop' }, { a: 'L158', s: 'pop' }, { a: 'L160', s: 'alarm', g: -12 }, { a: 'L162', s: 'pop' }],
+  cues: [{ a: 'L157', s: 'pop' }, { a: 'L159', s: 'pop' }, { a: 'L161', s: 'pop' }, { a: 'L163', s: 'pop' }, { a: 'L165', s: 'alarm', g: -12 }],
 });
 
 SCENES[12] = mk({
+  label: 'TOP10_2', color: r, part: 'TOP 10 DES PIÈGES (2/2)',
+  els: [
+    tb('L167', 100, 190, PC2, PH2, [
+      row('L168', ['6', 'partitionnement sans TaskExecutor', 'exécuteur synchrone : aucun gain', 'taskExecutor explicite'], o), row('L170', ['7', 'multithread avec reprise', 'restart au mauvais endroit', 'saveState(false) ou partitionner'], r),
+      row('L172', ['8', 'remote chunking, E/S goulot', 'plus lent qu\'avant', 'partitionner'], o), row('L174', ['9', 'SKIP LOCKED sans bail', 'lignes CLAIMED pour toujours', 'claimed_at + expiration'], r),
+      row('L176', ['10', 'job démarré sur chaque ouvrier', 'le job tourne partout', '@Profile("manager")'], o)], { size: 21, rh: 70, noBold: true }),
+    extrait2('L169', 'L170', [['[main] loadWorkerStep:partition0 … partition1 …   (un seul thread)', r]]), extrait2('L171', 'L172', [['read.count = 300  alors que les chunks 4 et 5 sont écrits', r]]),
+    extrait2('L173', 'L174', [['débit : 4 200 → 1 900 lignes/s', r]]), extrait2('L175', 'L176', [['status = CLAIMED      claimed_at = il y a 3 jours', r]]),
+    extrait2('L177', null, [['Job: [name=bankJob] launched   sur trois machines', r]]), ch('L178', 960, 990, 'en démonstration : un serveur, une base, peu de données', y, { size: 22 }),
+  ],
+  cues: [{ a: 'L168', s: 'pop' }, { a: 'L170', s: 'pop' }, { a: 'L172', s: 'pop' }, { a: 'L174', s: 'alarm', g: -12 }, { a: 'L176', s: 'pop' }],
+});
+
+SCENES[13] = mk({
   label: 'BILAN', color: g, part: 'BILAN ET EXERCICES',
   els: [
-    ic('L165', 250, 300, 'clock', g, { sz: 70 }), tx('L165', 250, 400, '06:00', { size: 36, fam: MONO, c: g }),
-    pl('L166', 650, 240, 1, 'mesurer · multithread (reader sûr) · async (processor lent)', g, { size: 22 }), pl('L167', 650, 320, 2, 'partitionnement (reprise précise) · remote chunking (processor goulot)', b, { size: 20 }), pl('L168', 650, 400, 3, 'SKIP LOCKED + bail : instances interchangeables', o, { size: 22 }),
-    cd('L169', 100, 500, 410, 300, 'Exercice 1', ['40 min, fichier de 4 Go, calcul de 30 ms/ligne : goulot, approches ?'], b, { size: 20 }), cd('L170', 540, 500, 410, 300, 'Exercice 2', ['min 1, max 10 000, 4 partitions : plages ? Avec 10 002 ?'], o, { size: 20 }),
-    cd('L171', 980, 500, 410, 300, 'Exercice 3', ['8 partitions, aucun gain : quelle ligne manque ?'], p, { size: 20 }), cd('L172', 1420, 500, 400, 300, 'Exercice 4', ['Instance plantée après 100 lignes réservées : avec / sans bail ?'], r, { size: 20 }),
-    bar('L173', 960, 930, 800, 36, [['L173', 1], ['L174', 0]], y, { label: 'réfléchis…', b: 'L174' }),
-    ch('L174', 305, 850, 'processor : Async ou remote chunking', g, { size: 18 }), ch('L175', 745, 850, '2 500 · puis 2 501 (dernière : 2 499)', g, { size: 18 }), ch('L176', 1185, 850, 'taskExecutor manquant', g, { size: 22 }), ch('L177', 1620, 850, 'sans bail : perdues', g, { size: 22 }),
-    ch('L178', 1500, 990, 'Module 8 : production →', o, { size: 26 }),
+    ic('L179', 250, 300, 'clock', g, { sz: 70 }), tx('L179', 250, 400, '06:00', { size: 36, fam: MONO, c: g }),
+    pl('L180', 650, 240, 1, 'mesurer · multithread (reader sûr) · async (processor lent)', g, { size: 22 }), pl('L181', 650, 320, 2, 'partitionnement (reprise précise) · remote chunking (processor goulot)', b, { size: 20 }), pl('L182', 650, 400, 3, 'SKIP LOCKED + bail : instances interchangeables', o, { size: 22 }),
+    cd('L183', 100, 500, 410, 300, 'Exercice 1', ['40 min, fichier de 4 Go, calcul de 30 ms/ligne : goulot, approches ?'], b, { size: 20 }), cd('L184', 540, 500, 410, 300, 'Exercice 2', ['min 1, max 10 000, 4 partitions : plages ? Avec 10 002 ?'], o, { size: 20 }),
+    cd('L185', 980, 500, 410, 300, 'Exercice 3', ['8 partitions, aucun gain : quelle ligne manque ?'], p, { size: 20 }), cd('L186', 1420, 500, 400, 300, 'Exercice 4', ['Instance plantée après 100 lignes réservées : avec / sans bail ?'], r, { size: 20 }),
+    bar('L187', 960, 930, 800, 36, [['L187', 1], ['L188', 0]], y, { label: 'réfléchis…', b: 'L188' }),
+    ch('L188', 305, 850, 'processor : Async ou remote chunking', g, { size: 18 }), ch('L189', 745, 850, '2 500 · puis 2 501 (dernière : 2 499)', g, { size: 18 }), ch('L190', 1185, 850, 'taskExecutor manquant', g, { size: 22 }), ch('L191', 1620, 850, 'sans bail : perdues', g, { size: 22 }),
+    ch('L192', 1500, 990, 'Module 8 : production →', o, { size: 26 }),
   ],
-  cues: [{ a: 'L174', s: 'success' }, { a: 'L178', s: 'levelup', g: -10 }],
+  cues: [{ a: 'L188', s: 'success' }, { a: 'L192', s: 'levelup', g: -10 }],
+});
+
+// ---------- Scène 10 : thread-safe, de quoi parle-t-on ? (insérée après la scène 3, numéro 4, les suivantes sont décalées d'un cran) ----------
+SCENES[4] = mk({
+  label: 'THREAD-SAFE', color: o, part: '7.3b · THREAD-SAFE, DE QUOI PARLE-T-ON ?',
+  els: [
+    tx('L054', 960, 330, 'Thread-safe ?', { size: 110, c: o, glow: true, fam: DISP, b: 'L055' }),
+    tx('L055', 960, 300, 'plusieurs threads, en même temps', { size: 52, c: w, b: 'L056' }), tx('L055', 960, 400, 'résultat toujours juste', { size: 52, c: g, glow: true, b: 'L056' }),
+    bx('L056', 300, 340, 300, 100, 'compteur = 5', b, { b: 'L057' }),
+    bx('L056', 800, 240, 460, 90, 'thread A : lit 5, écrit 6', o, { size: 24, b: 'L057' }), bx('L056', 800, 440, 460, 90, 'thread B : lit 5, écrit 6', o, { size: 24, b: 'L057' }),
+    ar('L056', 450, 300, 560, 250, w, { b: 'L057' }), ar('L056', 450, 380, 560, 430, w, { b: 'L057' }),
+    bx('L056', 1400, 340, 340, 100, 'compteur = 6', r, { b: 'L057' }), ar('L056', 1040, 240, 1230, 320, w, { b: 'L057' }), ar('L056', 1040, 440, 1230, 360, w, { b: 'L057' }),
+    ch('L056', 1400, 440, 'attendu : 7', r, { size: 28, b: 'L057' }),
+    stp('L057', 960, 330, 'CONDITION DE COURSE', r, { size: 64, b: 'L058' }), tx('L057', 960, 460, 'aucune exception · pas à chaque exécution', { size: 32, c: d, b: 'L058' }),
+    bx('L058', 560, 330, 560, 110, 'état modifiable partagé', r, { size: 26, b: 'L059' }), bx('L058', 1360, 330, 520, 110, 'sans état', g, { size: 28, b: 'L059' }),
+    ch('L058', 560, 440, 'compteur · liste · position · fichier ouvert', r, { size: 24, b: 'L059' }), ch('L058', 1360, 440, 'rien à protéger', g, { size: 26, b: 'L059' }),
+    ch('L059', 960, 250, '4 threads · 4 chunks', b, { size: 30, b: 'L064' }),
+    bx('L059', 480, 520, 360, 100, 'reader', b, { b: 'L064' }), bx('L059', 960, 520, 360, 100, 'processor', p, { b: 'L064' }), bx('L059', 1440, 520, 360, 100, 'writer', o, { b: 'L064' }),
+    ar('L059', 900, 290, 520, 465, w, { b: 'L064' }), ar('L059', 960, 290, 960, 465, w, { b: 'L064' }), ar('L059', 1020, 290, 1400, 465, w, { b: 'L064' }),
+    ch('L060', 480, 630, 'état : une position', r, { size: 26, b: 'L064' }), ch('L061', 960, 630, 'sûr si sans état', g, { size: 26, b: 'L064' }), ch('L062', 1440, 630, 'JDBC oui · fichier non', o, { size: 26, b: 'L064' }),
+    ch('L063', 960, 780, '@StepScope : 1 instance par step, pas par thread', o, { size: 30, b: 'L064' }),
+    ch('L065', 960, 330, 'faux : incrémentations perdues', r, { size: 48, b: 'L066' }),
+    cd('L066', 100, 200, 540, 260, '1 · Sans état', ['aucun champ modifiable'], g, { b: 'L067' }),
+    cd('L066', 690, 200, 540, 260, '2 · AtomicLong', ['si tu dois vraiment compter'], b, { b: 'L067' }),
+    cd('L066', 1280, 200, 540, 260, '3 · StepExecution', ['readCount, writeCount : tenus par Spring Batch'], p, { b: 'L067' }),
+    stp('L067', 960, 360, 'AUCUN ÉTAT MODIFIABLE PARTAGÉ', g, { size: 50 }), tx('L067', 960, 480, 'sinon : protéger, ou partitionner', { size: 36, c: w }),
+  ],
+  quiz: [{ q: 'L064', a: 'L065', question: 'Ton processor garde un compteur dans un champ entier, et le step utilise 4 threads. Que vaut le compteur à la fin ?', choices: ['exact', 'faux', 'toujours trop grand'], win: 1, answer: 'Faux, souvent trop petit : les incrémentations se perdent, sans erreur. Avec un chunk rejoué, il peut aussi être trop grand.' }],
+  cues: [{ a: 'L056', s: 'error' }, { a: 'L057', s: 'error' }, { a: 'L063', s: 'pop' }, { a: 'L067', s: 'success' }],
 });
