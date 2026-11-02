@@ -1,0 +1,1388 @@
+[
+ {
+  "id": "L001",
+  "scene": 0,
+  "expr": "calme, accroche",
+  "text": "Imagine que ton premier job tourne parfaitement, le lundi. Le mardi, le rapport affiche un total deux fois trop grand. Aucune erreur dans les journaux."
+ },
+ {
+  "id": "L002",
+  "scene": 0,
+  "expr": "pédagogue",
+  "text": "Ce bug existe. Il s'appelle le double comptage, et il vient d'un seul mot : singleton. On va le provoquer, le comprendre, et l'éviter."
+ },
+ {
+  "id": "L003",
+  "scene": 0,
+  "expr": "rappel",
+  "text": "Avant, trois rappels du premier module. Le JobRepository écrit dans PostgreSQL chaque début et chaque fin de job et de step."
+ },
+ {
+  "id": "L004",
+  "scene": 0,
+  "expr": "rappel",
+  "text": "Une JobInstance, c'est un job plus ses paramètres identifiants. Mêmes paramètres, même instance, et si elle est terminée, on ne la rejoue pas."
+ },
+ {
+  "id": "L005",
+  "scene": 0,
+  "expr": "rappel",
+  "text": "Et le JobOperator étend le JobLauncher : il offre start, restart, stop et abandon."
+ },
+ {
+  "id": "L006",
+  "scene": 0,
+  "expr": "annonce",
+  "text": "La question de ce module : comment écrire un vrai premier job, et comment le lancer sans surprise ? Six étapes pour y répondre."
+ },
+ {
+  "id": "L007",
+  "scene": 1,
+  "expr": "besoin",
+  "text": "Mon besoin : exécuter un traitement dans un job. Mais un traitement, ça peut vouloir dire deux choses très différentes."
+ },
+ {
+  "id": "L008",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Première chose : une action unique. Nettoyer une table, déplacer un fichier, appeler un service. On fait ça une fois, et c'est fini."
+ },
+ {
+  "id": "L009",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Deuxième chose : un grand nombre d'éléments à lire, à transformer et à écrire, par paquets. Un million de lignes d'un fichier vers une base."
+ },
+ {
+  "id": "L010",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Spring Batch propose un modèle pour chacun. Pour l'action unique, la tasklet. Pour le volume, le chunk."
+ },
+ {
+  "id": "L011",
+  "scene": 1,
+  "expr": "technique",
+  "text": "Le chunk, on le verra au module suivant. Il s'appuie sur trois interfaces : un lecteur, un processeur et un écrivain."
+ },
+ {
+  "id": "L012",
+  "scene": 1,
+  "expr": "technique",
+  "text": "La tasklet, elle, n'a qu'une seule méthode. Une seule action, dans une seule transaction."
+ },
+ {
+  "id": "L013",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Un détail important : si la tasklet retourne CONTINUABLE, Spring Batch la rappelle, dans une nouvelle transaction. Avec FINISHED, le step est terminé."
+ },
+ {
+  "id": "L014",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Un exemple concret : supprimer un million de lignes anciennes. Une seule instruction, c'est une seule transaction géante, qui peut saturer la base."
+ },
+ {
+  "id": "L015",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Avec CONTINUABLE, tu supprimes mille lignes à la fois. À chaque tour, une transaction courte, validée, puis on recommence."
+ },
+ {
+  "id": "L016",
+  "scene": 1,
+  "expr": "technique",
+  "text": "La condition de sortie : quand la suppression ne touche plus aucune ligne, tu retournes FINISHED."
+ },
+ {
+  "id": "L017",
+  "scene": 1,
+  "expr": "défi, direct",
+  "text": "Question. Que se passe-t-il si ta tasklet retourne toujours CONTINUABLE ?"
+ },
+ {
+  "id": "L018",
+  "scene": 1,
+  "expr": "posé",
+  "text": "Une boucle infinie : une transaction par tour, et le job ne se termine jamais. C'est le piège numéro sept de ce module."
+ },
+ {
+  "id": "L019",
+  "scene": 1,
+  "expr": "règle",
+  "text": "Retiens : une tasklet, c'est une action dans une transaction. Un chunk, c'est une boucle lire, traiter, écrire."
+ },
+ {
+  "id": "L020",
+  "scene": 1,
+  "expr": "défi, direct",
+  "text": "Question rapide. Tu dois supprimer chaque nuit les lignes de plus de trente jours dans une table. Tasklet ou chunk ?"
+ },
+ {
+  "id": "L021",
+  "scene": 1,
+  "expr": "posé",
+  "text": "Une tasklet : c'est une seule instruction, pas un flux d'éléments à lire et à écrire. Si tu devais transformer chaque ligne, ce serait un chunk."
+ },
+ {
+  "id": "L022",
+  "scene": 1,
+  "expr": "pont",
+  "text": "Reste une question : qui déclenche tout ça ? Regarde la chaîne complète."
+ },
+ {
+  "id": "L023",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "À gauche, un déclencheur : une ligne de commande, un appel REST, un planificateur. Ce n'est pas Spring Batch."
+ },
+ {
+  "id": "L024",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Au milieu, le JobOperator, qui lance. Puis le job et ses steps, qui s'exécutent. Et le JobRepository, qui enregistre tout dans PostgreSQL."
+ },
+ {
+  "id": "L025",
+  "scene": 1,
+  "expr": "règle",
+  "text": "Un batch n'est pas un planificateur. Spring Batch exécute et enregistre. Quelqu'un d'autre décide de l'heure."
+ },
+ {
+  "id": "L026",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Trois exemples de déclencheurs : le cron d'un serveur, un CronJob Kubernetes, ou l'appel REST d'un ordonnanceur. Dans tous les cas, Spring Batch reçoit une demande, avec des paramètres."
+ },
+ {
+  "id": "L027",
+  "scene": 1,
+  "expr": "règle",
+  "text": "Ne mets jamais de planificateur dans le job lui-même. Avec deux instances de l'application, tu lancerais le traitement deux fois."
+ },
+ {
+  "id": "L028",
+  "scene": 1,
+  "expr": "récapitulatif",
+  "text": "En résumé : deux modèles de step, et un lanceur qui n'est pas un planificateur. Passons au premier : écrivons une tasklet."
+ },
+ {
+  "id": "L029",
+  "scene": 2,
+  "expr": "besoin",
+  "text": "Mon besoin : une tasklet qui affiche un message avec la date de traitement. Et que je puisse tester seule."
+ },
+ {
+  "id": "L030",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Au premier module, on a écrit une lambda. Cette fois, une classe, parce qu'une classe a un nom, des dépendances injectées, et se teste seule."
+ },
+ {
+  "id": "L031",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Je commence par Component : Spring détecte la classe au démarrage et en fait un bean. Sans cela, il faudrait la déclarer à la main."
+ },
+ {
+  "id": "L032",
+  "scene": 2,
+  "expr": "explicatif, appuyé",
+  "text": "Puis StepScope. Retiens cette annotation : on y revient en détail. Le bean n'est pas créé au démarrage, mais à chaque exécution du step."
+ },
+ {
+  "id": "L033",
+  "scene": 2,
+  "expr": "technique",
+  "text": "La classe implémente Tasklet, qui n'a qu'une méthode : execute."
+ },
+ {
+  "id": "L034",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Un journal, parce qu'en batch les logs sont souvent la seule interface visible."
+ },
+ {
+  "id": "L035",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Un champ final pour la date : sa valeur est fixée à la construction, et ne change plus pendant l'exécution."
+ },
+ {
+  "id": "L036",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Et le constructeur reçoit la date par une expression, jobParameters runDate. C'est du SpEL, le langage d'expression de Spring."
+ },
+ {
+  "id": "L037",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Cette expression est évaluée au moment où le step démarre, quand les paramètres du lancement sont connus."
+ },
+ {
+  "id": "L038",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Au démarrage de l'application, ces paramètres n'existent pas encore. Sans StepScope, l'expression échoue."
+ },
+ {
+  "id": "L039",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Un mot sur SpEL : c'est un mini-langage d'expressions. Ici, jobParameters est un dictionnaire des paramètres du lancement, et on lit la clé runDate."
+ },
+ {
+  "id": "L040",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Il existe aussi JobScope : le bean vit le temps du job entier, au lieu du step. Pour une tasklet dans un seul step, StepScope suffit."
+ },
+ {
+  "id": "L041",
+  "scene": 2,
+  "expr": "technique",
+  "text": "La méthode execute reçoit la contribution du step et le contexte du chunk."
+ },
+ {
+  "id": "L042",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Avec la contribution, j'accède à la StepExecution : son nom, ses compteurs, son contexte."
+ },
+ {
+  "id": "L043",
+  "scene": 2,
+  "expr": "règle",
+  "text": "Et je retourne FINISHED : le step est terminé. CONTINUABLE rappellerait la méthode, dans une nouvelle transaction."
+ },
+ {
+  "id": "L044",
+  "scene": 2,
+  "expr": "défi, direct",
+  "text": "Question. Que se passe-t-il si je retire StepScope, mais que je garde l'expression avec jobParameters ?"
+ },
+ {
+  "id": "L045",
+  "scene": 2,
+  "expr": "posé",
+  "text": "Le contexte ne démarre pas : au moment de créer le bean, les paramètres du lancement n'existent pas. L'erreur arrive avant même qu'un job soit lancé."
+ },
+ {
+  "id": "L046",
+  "scene": 2,
+  "expr": "récapitulatif",
+  "text": "En résumé : une classe, un bean, StepScope, une date reçue par SpEL, et FINISHED."
+ },
+ {
+  "id": "L047",
+  "scene": 2,
+  "expr": "besoin",
+  "text": "Lançons le job pour la date du premier novembre, et regardons ce qui se passe."
+ },
+ {
+  "id": "L048",
+  "scene": 2,
+  "expr": "technique",
+  "text": "La console affiche d'abord le lancement du job, puis notre message, avec la date et le nom du step, puis le statut final : terminé. Extrait indicatif."
+ },
+ {
+  "id": "L049",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Dans la base, une instance pour le job helloJob, une exécution terminée, et un paramètre runDate, identifiant."
+ },
+ {
+  "id": "L050",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Relançons avec la même date : exception, JobInstanceAlreadyCompleteException. L'instance est fermée, comme on l'a vu au premier module."
+ },
+ {
+  "id": "L051",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Avec une autre date, c'est une autre instance, qui s'exécute normalement. Deux dates, deux instances, deux messages."
+ },
+ {
+  "id": "L052",
+  "scene": 2,
+  "expr": "pont",
+  "text": "La tasklet est écrite. Il faut maintenant l'attacher à un step, et le step à un job."
+ },
+ {
+  "id": "L053",
+  "scene": 3,
+  "expr": "besoin",
+  "text": "Mon besoin : un job qui contient un step qui exécute cette tasklet. Et sans fabrique : les builders de la version six."
+ },
+ {
+  "id": "L054",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Je déclare une classe de configuration : ses méthodes Bean fabriquent des objets gérés par Spring."
+ },
+ {
+  "id": "L055",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Chaque méthode Bean produit un bean, singleton par défaut. Ici, le step et le job sont des descriptions immuables : un singleton convient très bien."
+ },
+ {
+  "id": "L056",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Le JobRepository du premier module est injecté par type."
+ },
+ {
+  "id": "L057",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Le gestionnaire de transactions encadrera la tasklet."
+ },
+ {
+  "id": "L058",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Et la tasklet est injectée aussi. Mais attention : ce que tu reçois n'est pas l'objet réel. C'est un proxy. On y revient dans la partie cinq."
+ },
+ {
+  "id": "L059",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Pourquoi un proxy ici ? Parce que le step doit recevoir quelque chose tout de suite, au démarrage. Le proxy est cette chose : il attend que le step démarre pour fabriquer la vraie tasklet."
+ },
+ {
+  "id": "L060",
+  "scene": 3,
+  "expr": "règle",
+  "text": "Retiens : tu ne manipules jamais la vraie tasklet directement. Tu passes toujours par le proxy."
+ },
+ {
+  "id": "L061",
+  "scene": 3,
+  "expr": "technique",
+  "text": "StepBuilder, avec un nom et le dépôt. En version six, on construit directement le builder : il n'y a plus de fabrique."
+ },
+ {
+  "id": "L062",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Puis tasklet, avec la tasklet et son gestionnaire de transactions. Et build produit le step."
+ },
+ {
+  "id": "L063",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Le job, maintenant. Spring injecte le step par type, et par son nom de méthode quand il y en a plusieurs."
+ },
+ {
+  "id": "L064",
+  "scene": 3,
+  "expr": "technique",
+  "text": "JobBuilder, avec le nom du job. C'est ce nom que tu retrouveras dans la table des instances."
+ },
+ {
+  "id": "L065",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Start désigne le premier step. Plus tard, on enchaînera avec next. Et build produit le job."
+ },
+ {
+  "id": "L066",
+  "scene": 3,
+  "expr": "règle",
+  "text": "Un job, un step, une tasklet, et aucune fabrique. Voilà ce qui a changé par rapport aux versions précédentes."
+ },
+ {
+  "id": "L067",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Un point qu'on oublie : le nom du step est la clé de ses exécutions en base. Si tu le renommes, tu perds le lien avec l'historique."
+ },
+ {
+  "id": "L068",
+  "scene": 3,
+  "expr": "règle",
+  "text": "Les noms de job et de step sont des contrats. On ne les renomme pas à la légère."
+ },
+ {
+  "id": "L069",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Et le gestionnaire de transactions, pourquoi le passer ? Parce que la tasklet s'exécute dans une transaction, et c'est lui qui l'ouvre et la ferme."
+ },
+ {
+  "id": "L070",
+  "scene": 3,
+  "expr": "défi, direct",
+  "text": "Dans la table des instances, quel nom de job vois-tu apparaître après un lancement : le nom de la classe, du bean, ou celui passé au builder ?"
+ },
+ {
+  "id": "L071",
+  "scene": 3,
+  "expr": "posé",
+  "text": "Celui passé au JobBuilder : helloJob. Le nom de la classe ou de la méthode n'a aucune importance pour la base."
+ },
+ {
+  "id": "L072",
+  "scene": 3,
+  "expr": "pont",
+  "text": "Il reste à lancer ce job. D'abord le plus simple : avec le JobOperator."
+ },
+ {
+  "id": "L073",
+  "scene": 4,
+  "expr": "besoin",
+  "text": "Mon besoin : lancer helloJob pour une date donnée, depuis mon code."
+ },
+ {
+  "id": "L074",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Je crée un service : un bean de la couche métier, sans état, avec des dépendances en champs final."
+ },
+ {
+  "id": "L075",
+  "scene": 4,
+  "expr": "technique",
+  "text": "J'injecte le JobOperator et le job, par le constructeur. C'est la forme recommandée : pas d'annotation sur les champs."
+ },
+ {
+  "id": "L076",
+  "scene": 4,
+  "expr": "technique",
+  "text": "JobParametersBuilder fabrique des paramètres typés."
+ },
+ {
+  "id": "L077",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Et runDate est un paramètre identifiant par défaut. C'est lui qui définit la JobInstance : retour sur le premier module."
+ },
+ {
+  "id": "L078",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Puis start, qui lance le job, attend la fin, et renvoie l'exécution terminée."
+ },
+ {
+  "id": "L079",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Un lancement synchrone : l'appel ne rend la main qu'à la fin du job."
+ },
+ {
+  "id": "L080",
+  "scene": 4,
+  "expr": "pédagogue",
+  "text": "Pour un job de deux secondes, aucun souci. Pour un job de vingt minutes, ton contrôleur reste bloqué vingt minutes."
+ },
+ {
+  "id": "L081",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Regarde le même appel avec un chronomètre. Deux secondes pour un job rapide. Mille deux cents secondes pour un job de vingt minutes."
+ },
+ {
+  "id": "L082",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Pendant tout ce temps, le thread du serveur reste occupé. Avec cent utilisateurs, ton serveur n'a plus de thread libre."
+ },
+ {
+  "id": "L083",
+  "scene": 4,
+  "expr": "défi, direct",
+  "text": "Question. Pour un job de vingt minutes, vaut-il mieux appeler start dans le contrôleur, ou le soumettre à un autre thread ?"
+ },
+ {
+  "id": "L084",
+  "scene": 4,
+  "expr": "posé",
+  "text": "Le soumettre à un autre thread, et répondre tout de suite. C'est ce qu'on fait juste après."
+ },
+ {
+  "id": "L085",
+  "scene": 4,
+  "expr": "pont",
+  "text": "Alors, comment lancer sans bloquer ?"
+ },
+ {
+  "id": "L086",
+  "scene": 4,
+  "expr": "besoin",
+  "text": "Mon besoin : une API qui répond tout de suite, pendant que le job tourne, et que je puisse interroger plus tard."
+ },
+ {
+  "id": "L087",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Première idée : appeler start directement dans le contrôleur. Ça marche, mais la requête attend la fin du job. C'est le piège."
+ },
+ {
+  "id": "L088",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Deuxième idée : on soumet l'appel à un autre thread. Le thread HTTP est libéré immédiatement."
+ },
+ {
+  "id": "L089",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Pour cela, un exécuteur de threads virtuels, disponible depuis Java vingt et un : un thread par lancement, presque sans coût."
+ },
+ {
+  "id": "L090",
+  "scene": 4,
+  "expr": "technique",
+  "text": "D'abord les deux records : la requête avec la date, et la réponse avec l'adresse où suivre l'exécution."
+ },
+ {
+  "id": "L091",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Un POST, parce que lancer un job modifie l'état du système. Un GET doit pouvoir être rejoué sans effet."
+ },
+ {
+  "id": "L092",
+  "scene": 4,
+  "expr": "défi, direct",
+  "text": "Question. Pourquoi un POST, et pas un GET, pour lancer le job ?"
+ },
+ {
+  "id": "L093",
+  "scene": 4,
+  "expr": "posé",
+  "text": "Parce qu'un GET doit pouvoir être rejoué sans effet. Un navigateur, un robot, un préchargement peuvent le déclencher sans que personne le veuille. Un POST, lui, est une action volontaire."
+ },
+ {
+  "id": "L094",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Je soumets le lancement à l'exécuteur, puis je réponds tout de suite : deux cent deux, Accepted."
+ },
+ {
+  "id": "L095",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Ce code signifie : j'ai bien reçu ta demande, le traitement n'est pas terminé."
+ },
+ {
+  "id": "L096",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Et la requête de suivi : un GET, en lecture seule. Il interroge le dépôt avec le nom du job et ses paramètres."
+ },
+ {
+  "id": "L097",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Comme l'état vit dans PostgreSQL, le suivi survit à un redémarrage de l'application."
+ },
+ {
+  "id": "L098",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Et le switch avec case null traite explicitement l'absence d'exécution."
+ },
+ {
+  "id": "L099",
+  "scene": 4,
+  "expr": "besoin",
+  "text": "Faisons l'essai complet, depuis un terminal. Je lance un POST avec la date, et la réponse arrive tout de suite : deux cent deux, avec l'adresse de suivi."
+ },
+ {
+  "id": "L100",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Un GET juste après : STARTED. Le job tourne encore."
+ },
+ {
+  "id": "L101",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Un GET quelques minutes plus tard : COMPLETED. Le job est terminé."
+ },
+ {
+  "id": "L102",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Maintenant je redémarre l'application. Le GET répond toujours, avec le même état. Parce que l'état vit dans PostgreSQL, pas dans la mémoire de l'application."
+ },
+ {
+  "id": "L103",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Et si j'envoie deux POST avec la même date, le second échoue proprement : l'instance est déjà terminée, ou déjà en cours."
+ },
+ {
+  "id": "L104",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Attention à un point : dans le lancement asynchrone, si l'appel échoue, personne ne le voit. Il faut journaliser l'exception et lire l'état dans le dépôt."
+ },
+ {
+  "id": "L105",
+  "scene": 4,
+  "expr": "défi, direct",
+  "text": "Question. L'appelant reçoit la main avant la fin du job. Dans quel état est l'exécution à cet instant : STARTING ou STARTED, ou COMPLETED ?"
+ },
+ {
+  "id": "L106",
+  "scene": 4,
+  "expr": "posé",
+  "text": "STARTING ou STARTED. Elle n'est pas terminée. C'est pour cela qu'on interroge ensuite le dépôt."
+ },
+ {
+  "id": "L107",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Il existe aussi une variante : un lanceur qui crée lui-même le thread, TaskExecutorJobOperator. On la verra en production, plus loin dans la formation."
+ },
+ {
+  "id": "L108",
+  "scene": 4,
+  "expr": "récapitulatif",
+  "text": "En résumé : un service sans état, un POST, un deux cent deux, et un suivi par interrogation."
+ },
+ {
+  "id": "L109",
+  "scene": 4,
+  "expr": "besoin",
+  "text": "Comment tester ça ? Un utilitaire de test lance le job. Et surtout, on le lance deux fois dans le même test. Exemple indicatif."
+ },
+ {
+  "id": "L110",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Un test qui lance une seule fois passe toujours. C'est au deuxième lancement que le double comptage apparaît, parce que le singleton a survécu."
+ },
+ {
+  "id": "L111",
+  "scene": 4,
+  "expr": "règle",
+  "text": "Dans un test de job, vérifie toujours le deuxième lancement, avec une autre date. Il révèle les états cachés."
+ },
+ {
+  "id": "L112",
+  "scene": 4,
+  "expr": "pont",
+  "text": "Tout ça repose sur une idée : les beans Spring ne sont pas tous créés de la même façon. C'est la partie la plus importante du module."
+ },
+ {
+  "id": "L113",
+  "scene": 5,
+  "expr": "besoin",
+  "text": "Mon besoin : comprendre à quel moment exact Spring fabrique mes objets. Parce que de là dépend tout ce qui va suivre."
+ },
+ {
+  "id": "L114",
+  "scene": 5,
+  "expr": "image concrète",
+  "text": "Imagine un restaurant. La cuisine prépare un plat, le serveur l'apporte, le client le mange, et on débarrasse. Un bean suit les mêmes étapes."
+ },
+ {
+  "id": "L115",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Un : l'instanciation. Spring appelle le constructeur. Deux : l'injection des dépendances."
+ },
+ {
+  "id": "L116",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Trois : les callbacks de type Aware, comme BeanNameAware, qui donnent au bean accès à son environnement."
+ },
+ {
+  "id": "L117",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Quatre : le post-processeur, avant l'initialisation. Cinq : l'initialisation elle-même, avec PostConstruct."
+ },
+ {
+  "id": "L118",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Six : le post-processeur, après l'initialisation. C'est ici, et seulement ici, que les proxys sont créés."
+ },
+ {
+  "id": "L119",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Sept : le bean est prêt. Huit : à l'arrêt du contexte, il est détruit, avec PreDestroy."
+ },
+ {
+  "id": "L120",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Pour voir un proxy, affiche la classe de l'objet injecté. Tu ne vois pas PrintMessageTasklet, mais un nom avec CGLIB à la fin."
+ },
+ {
+  "id": "L121",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "C'est la sous-classe générée par Spring. Elle ressemble à ta classe, mais elle intercepte les appels."
+ },
+ {
+  "id": "L122",
+  "scene": 5,
+  "expr": "règle",
+  "text": "Retiens deux conséquences. Ce que tu reçois par injection est parfois un proxy, pas ton objet. Et une action qui dépend des paramètres du lancement ne peut pas se faire à l'étape deux d'un singleton."
+ },
+ {
+  "id": "L123",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Pourquoi ? Parce qu'à l'étape deux, aucun lancement n'a encore eu lieu. Il n'y a pas encore de paramètres à lire."
+ },
+ {
+  "id": "L124",
+  "scene": 5,
+  "expr": "défi, direct",
+  "text": "Question. À quelle étape le proxy d'un bean StepScope est-il créé ?"
+ },
+ {
+  "id": "L125",
+  "scene": 5,
+  "expr": "posé",
+  "text": "À l'étape six, après l'initialisation. La vraie instance, elle, n'est créée qu'au démarrage du step."
+ },
+ {
+  "id": "L126",
+  "scene": 5,
+  "expr": "pont",
+  "text": "Voyons maintenant ce que Spring fait de différent entre un singleton et un bean en StepScope."
+ },
+ {
+  "id": "L127",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Par défaut, un bean est un singleton : un seul objet pour toute l'application, créé au démarrage, partagé par tous les appelants."
+ },
+ {
+  "id": "L128",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Partagé par tous les threads et tous les lancements. Donc tout champ modifiable est un état partagé."
+ },
+ {
+  "id": "L129",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Avec StepScope, Spring change de stratégie. Au démarrage, il ne crée pas la tasklet. Il crée à la place un proxy."
+ },
+ {
+  "id": "L130",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Un proxy, c'est une sous-classe générée, qui prend la place du bean dans tous les points d'injection."
+ },
+ {
+  "id": "L131",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Quand le step démarre, le proxy demande au contexte d'instancier la vraie tasklet. À ce moment, l'expression jobParameters peut être résolue."
+ },
+ {
+  "id": "L132",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Chaque appel de méthode sur le proxy est délégué à l'instance de l'exécution courante."
+ },
+ {
+  "id": "L133",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Et à la fin du step, l'instance est détruite. L'exécution suivante en aura une neuve."
+ },
+ {
+  "id": "L134",
+  "scene": 6,
+  "expr": "règle",
+  "text": "Le proxy vit toujours, les instances sont éphémères."
+ },
+ {
+  "id": "L135",
+  "scene": 6,
+  "expr": "pédagogue",
+  "text": "Un dernier détail, qui vient du proxy : si une méthode appelle une autre méthode de la même classe, l'appel contourne le proxy."
+ },
+ {
+  "id": "L136",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Voici le piège de l'appel interne. Ta méthode a appelle ta méthode b. Dans le code, ça s'écrit this point b : l'appel ne passe pas par le proxy."
+ },
+ {
+  "id": "L137",
+  "scene": 6,
+  "expr": "règle",
+  "text": "Spring ne peut intercepter que les appels qui passent par le proxy. Un appel interne est invisible pour lui."
+ },
+ {
+  "id": "L138",
+  "scene": 6,
+  "expr": "règle",
+  "text": "Pour avoir la bonne instance, injecte le bean depuis l'extérieur."
+ },
+ {
+  "id": "L139",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Pour résumer les portées : singleton, un objet pour toute l'application. JobScope, un objet par job. StepScope, un objet par step."
+ },
+ {
+  "id": "L140",
+  "scene": 6,
+  "expr": "règle",
+  "text": "Plus la portée est étroite, plus l'objet peut dépendre des paramètres du lancement, et moins il garde d'état entre deux exécutions."
+ },
+ {
+  "id": "L141",
+  "scene": 6,
+  "expr": "pont",
+  "text": "Voyons maintenant ce qui se passe quand on oublie tout cela. Je vais te montrer le bug du double comptage."
+ },
+ {
+  "id": "L142",
+  "scene": 7,
+  "expr": "besoin",
+  "text": "Mon besoin : une tasklet qui compte les éléments traités. Cent éléments à chaque lancement."
+ },
+ {
+  "id": "L143",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Voici le code. Un champ processed, initialisé à zéro. À chaque exécution, j'ajoute cent, et j'affiche le total."
+ },
+ {
+  "id": "L144",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Cette classe est un Component, sans StepScope. Donc un singleton."
+ },
+ {
+  "id": "L145",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Premier lancement : cent éléments traités, le journal affiche cent. Parfait."
+ },
+ {
+  "id": "L146",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Deuxième lancement, dans la même application : cent éléments traités. Mais le journal affiche deux cents."
+ },
+ {
+  "id": "L147",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "Aucune exception, aucun avertissement. Le rapport double alors que rien n'a été traité en plus."
+ },
+ {
+  "id": "L148",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Pourquoi ? Parce que le singleton survit entre deux lancements, et qu'il garde son champ."
+ },
+ {
+  "id": "L149",
+  "scene": 7,
+  "expr": "défi, direct",
+  "text": "Question. Troisième lancement, toujours cent éléments. Qu'affiche le journal ?"
+ },
+ {
+  "id": "L150",
+  "scene": 7,
+  "expr": "posé",
+  "text": "Trois cents. Le compteur continue de grandir à chaque lancement, tant que l'application reste vivante."
+ },
+ {
+  "id": "L151",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Trois parades, par ordre de préférence. Première : pas d'état dans les composants partagés. Le compteur vit dans la StepExecution ou dans l'ExecutionContext."
+ },
+ {
+  "id": "L152",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Deuxième : StepScope. Le composant est neuf à chaque exécution du step."
+ },
+ {
+  "id": "L153",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Troisième : réinitialiser l'état au début de chaque exécution. C'est fragile : on finit toujours par l'oublier."
+ },
+ {
+  "id": "L154",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Voyons la première parade en code. Le compteur ne vit plus dans le composant, mais dans la StepExecution : contribution point incrementWriteCount, cent."
+ },
+ {
+  "id": "L155",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Le total est dans la base. Il se reprend après un crash, et il ne dépend d'aucun objet qui survit en mémoire."
+ },
+ {
+  "id": "L156",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Deuxième parade : StepScope sur la tasklet. Une seule annotation, et le champ repart de zéro à chaque exécution."
+ },
+ {
+  "id": "L157",
+  "scene": 7,
+  "expr": "défi, direct",
+  "text": "Question. Quelle parade est la plus sûre ?"
+ },
+ {
+  "id": "L158",
+  "scene": 7,
+  "expr": "posé",
+  "text": "La première. Pas d'état du tout : il n'y a rien à oublier de réinitialiser, et rien à partager."
+ },
+ {
+  "id": "L159",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "Et un test qui lance le job une seule fois passe toujours. Le bug n'apparaît qu'au deuxième lancement, dans la même application."
+ },
+ {
+  "id": "L160",
+  "scene": 7,
+  "expr": "règle",
+  "text": "Tout test d'un job qui garde un état doit lancer le job au moins deux fois."
+ },
+ {
+  "id": "L161",
+  "scene": 7,
+  "expr": "pont",
+  "text": "On y reviendra avec les processeurs. Reste un dernier point : ce que Spring Boot fait, tout seul, au démarrage."
+ },
+ {
+  "id": "L162",
+  "scene": 8,
+  "expr": "besoin",
+  "text": "Mon besoin : démarrer mon application sans que mes jobs partent tout seuls."
+ },
+ {
+  "id": "L163",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Par défaut, Spring Boot lance tous les jobs déclarés au démarrage, une seule fois, sans paramètre."
+ },
+ {
+  "id": "L164",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "C'est pratique pour un Hello World. C'est dangereux pour une application qui expose une API, ou plusieurs jobs."
+ },
+ {
+  "id": "L165",
+  "scene": 8,
+  "expr": "technique",
+  "text": "Concrètement : après la construction du contexte, mais avant que l'application soit prête à servir. Si le job est long, l'application paraît bloquée au démarrage."
+ },
+ {
+  "id": "L166",
+  "scene": 8,
+  "expr": "technique",
+  "text": "Voici ce qu'on voit dans les journaux, avec le lancement automatique : le job helloJob est lancé au démarrage, avec des paramètres vides. Extrait indicatif."
+ },
+ {
+  "id": "L167",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "Et comme la date est absente, la tasklet reçoit null, et le résultat est faux, ou une erreur, avant même que tu aies lancé quoi que ce soit."
+ },
+ {
+  "id": "L168",
+  "scene": 8,
+  "expr": "technique",
+  "text": "La propriété spring point batch point job point enabled à false désactive ce comportement."
+ },
+ {
+  "id": "L169",
+  "scene": 8,
+  "expr": "technique",
+  "text": "Et spring point batch point job point name sélectionne un seul job à lancer."
+ },
+ {
+  "id": "L170",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Sans la première ligne, Spring Boot lancerait helloJob seul à chaque démarrage, sans runDate. L'échec serait journalisé avant même que l'API ne réponde."
+ },
+ {
+  "id": "L171",
+  "scene": 8,
+  "expr": "pédagogue",
+  "text": "Il y a pourtant un cas où ce comportement est voulu : un job d'initialisation, qui charge un référentiel une seule fois à l'installation."
+ },
+ {
+  "id": "L172",
+  "scene": 8,
+  "expr": "défi, direct",
+  "text": "Question. Tu as deux jobs dans l'application et tu veux lancer seulement l'un des deux au démarrage. Quelle propriété ajoutes-tu ?"
+ },
+ {
+  "id": "L173",
+  "scene": 8,
+  "expr": "posé",
+  "text": "Le nom du job : spring point batch point job point name. Et enabled reste à true."
+ },
+ {
+  "id": "L174",
+  "scene": 8,
+  "expr": "pont",
+  "text": "Voyons trois situations réelles où tout cela s'assemble."
+ },
+ {
+  "id": "L175",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Premier cas : l'import du matin. Un CronJob Kubernetes appelle POST jobs hello chaque jour à deux heures, avec la date du jour."
+ },
+ {
+  "id": "L176",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "L'API répond deux cent deux aussitôt. Le job tourne. Et le tableau de bord appelle le GET pour suivre l'état."
+ },
+ {
+  "id": "L177",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Si le planificateur déclenche par erreur deux fois, le second appel échoue proprement : JobInstanceAlreadyComplete ou JobExecutionAlreadyRunning."
+ },
+ {
+  "id": "L178",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Deuxième cas : le job à la demande. Un gestionnaire demande, depuis une interface web, de recalculer les soldes du mois."
+ },
+ {
+  "id": "L179",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "La requête ne peut pas attendre vingt minutes. Lancement asynchrone, retour immédiat, suivi par interrogation."
+ },
+ {
+  "id": "L180",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Troisième cas : le job d'initialisation, qui profite du lancement automatique, avec le nom du job."
+ },
+ {
+  "id": "L181",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Un quatrième cas : le job échoue à trois heures du matin. Au matin, on relance avec la même date."
+ },
+ {
+  "id": "L182",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "C'est la même instance, donc une nouvelle exécution, et une reprise, comme on l'a vu au premier module."
+ },
+ {
+  "id": "L183",
+  "scene": 9,
+  "expr": "règle",
+  "text": "Voilà pourquoi la date métier est identifiante : elle fait l'instance, et elle rend la reprise possible."
+ },
+ {
+  "id": "L184",
+  "scene": 9,
+  "expr": "pont",
+  "text": "Il ne reste plus qu'à voir les dix pièges de ce module."
+ },
+ {
+  "id": "L185",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Dix pièges, avec pour chacun ce qui se passe et la parade. Les cinq premiers touchent le lancement et le singleton."
+ },
+ {
+  "id": "L186",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Un : oublier de désactiver le lancement automatique. Tous les jobs partent au démarrage, sans paramètre."
+ },
+ {
+  "id": "L187",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : des jobs inattendus dans les journaux au démarrage, avec des paramètres vides."
+ },
+ {
+  "id": "L188",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce que Spring Boot est généreux par défaut. Tout ce qui est déclaré est exécuté."
+ },
+ {
+  "id": "L189",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Deux : lancer un job long de façon synchrone dans une requête HTTP. La requête reste bloquée, le client finit par relancer."
+ },
+ {
+  "id": "L190",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un client qui expire, et le même job lancé deux fois."
+ },
+ {
+  "id": "L191",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce qu'en local, le job dure deux secondes. En production, il dure vingt minutes."
+ },
+ {
+  "id": "L192",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Trois : un champ modifiable dans un singleton. Le double comptage entre deux lancements."
+ },
+ {
+  "id": "L193",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un total qui augmente d'un lancement à l'autre, sans autre changement."
+ },
+ {
+  "id": "L194",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce que le premier lancement est toujours correct. Le défaut n'apparaît qu'ensuite."
+ },
+ {
+  "id": "L195",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Quatre : l'expression jobParameters sur un bean qui n'est pas en StepScope. Échec au démarrage du contexte."
+ },
+ {
+  "id": "L196",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : l'application ne démarre pas, avec une erreur sur une propriété jobParameters."
+ },
+ {
+  "id": "L197",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce que le bean se crée au démarrage de l'application, et que les paramètres arrivent plus tard."
+ },
+ {
+  "id": "L198",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Cinq : appeler une méthode de StepScope depuis la même classe. L'appel contourne le proxy."
+ },
+ {
+  "id": "L199",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un comportement différent selon qu'on appelle la méthode de l'intérieur ou de l'extérieur."
+ },
+ {
+  "id": "L200",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce que le code est écrit en pensant à l'objet, et pas au proxy qui est devant."
+ },
+ {
+  "id": "L201",
+  "scene": 11,
+  "expr": "pont",
+  "text": "Les cinq suivants touchent la tasklet et la gestion des erreurs."
+ },
+ {
+  "id": "L202",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Six : une tasklet qui retourne null au lieu d'un statut. Exception à l'exécution."
+ },
+ {
+  "id": "L203",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : une exception sur le statut de retour, dès la fin de la méthode."
+ },
+ {
+  "id": "L204",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce qu'on écrit une tasklet en vitesse, et qu'on oublie le retour."
+ },
+ {
+  "id": "L205",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Sept : une tasklet qui retourne CONTINUABLE sans condition d'arrêt. Boucle infinie, une transaction par tour."
+ },
+ {
+  "id": "L206",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un job qui ne se termine jamais, et des milliers de validations en base."
+ },
+ {
+  "id": "L207",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : on teste avec un petit volume, et la condition de sortie semble inutile."
+ },
+ {
+  "id": "L208",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Huit : lancer avec un GET. Un robot, un navigateur ou un préchargement relance le job."
+ },
+ {
+  "id": "L209",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : le job se lance sans que personne ne l'ait demandé."
+ },
+ {
+  "id": "L210",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce qu'un GET est plus pratique à tester dans un navigateur."
+ },
+ {
+  "id": "L211",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Neuf : engloutir l'exception d'un lancement asynchrone. L'échec est invisible."
+ },
+ {
+  "id": "L212",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un job en échec en base, et aucune trace dans les journaux."
+ },
+ {
+  "id": "L213",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce qu'un try catch vide semble silencieux et propre. Il l'est : trop."
+ },
+ {
+  "id": "L214",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Dix : un paramètre horodaté, en paramètre identifiant. Chaque relance est une nouvelle instance, et la reprise devient impossible."
+ },
+ {
+  "id": "L215",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : des instances qui se multiplient pour le même jour."
+ },
+ {
+  "id": "L216",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce qu'on veut une date unique à chaque lancement, et qu'on oublie ce que ça coûte."
+ },
+ {
+  "id": "L217",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Un bug silencieux typique : un test qui lance le job une fois et passe toujours."
+ },
+ {
+  "id": "L218",
+  "scene": 11,
+  "expr": "règle",
+  "text": "Le double comptage n'apparaît qu'au deuxième lancement, dans la même application."
+ },
+ {
+  "id": "L219",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Reprenons notre rapport du mardi, avec son total deux fois trop grand. Tu sais maintenant d'où il vient : un singleton qui garde un champ."
+ },
+ {
+  "id": "L220",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Une tasklet est une action dans une transaction. Un step et un job se construisent avec les builders de la version six."
+ },
+ {
+  "id": "L221",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Un lancement synchrone bloque. Un lancement asynchrone rend deux cent deux, et se suit par interrogation."
+ },
+ {
+  "id": "L222",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Un singleton est partagé. Un bean en StepScope est neuf à chaque step, derrière un proxy."
+ },
+ {
+  "id": "L223",
+  "scene": 12,
+  "expr": "défi",
+  "text": "Trois exercices pour finir. Un : la classe CountingTasklet est lancée trois fois dans la même application. Qu'affiche-t-elle la troisième fois ? Propose deux corrections."
+ },
+ {
+  "id": "L224",
+  "scene": 12,
+  "expr": "défi",
+  "text": "Deux : pourquoi l'expression jobParameters échoue-t-elle sur un singleton, et pas en StepScope ?"
+ },
+ {
+  "id": "L225",
+  "scene": 12,
+  "expr": "défi",
+  "text": "Trois : une collègue a mis start dans son contrôleur, et la requête dure vingt minutes. Explique ce qui se passe, et comment corriger."
+ },
+ {
+  "id": "L226",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "En un mot : un singleton garde l'état, un proxy et StepScope le rendent éphémère, et un job lancé deux fois dans les tests le révèle."
+ },
+ {
+  "id": "L227",
+  "scene": 12,
+  "expr": "pause",
+  "text": "Prends le temps d'y réfléchir."
+ },
+ {
+  "id": "L228",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Correction de l'exercice un. Trois cents. Corrections : un composant sans état avec le compteur dans la StepExecution, ou StepScope."
+ },
+ {
+  "id": "L229",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Exercice deux. L'expression est évaluée au démarrage de l'application, quand les paramètres n'existent pas. En StepScope, elle est évaluée au démarrage du step."
+ },
+ {
+  "id": "L230",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Exercice trois. Le lancement est synchrone : la requête attend la fin du job. Il faut soumettre le lancement à un autre thread, répondre deux cent deux, et suivre l'état par interrogation."
+ },
+ {
+  "id": "L231",
+  "scene": 12,
+  "expr": "transition",
+  "text": "Dans le module suivant, tu passes au chunk : lire un fichier CSV, le transformer, et l'écrire dans PostgreSQL, par paquets."
+ }
+]
