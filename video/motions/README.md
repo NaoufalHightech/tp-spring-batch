@@ -21,10 +21,12 @@ python tools/voxtral_local.py episodes/m1_fondations                            
 |---|---|---|---|---|
 | 1 | écrit : 298 lignes, 46 min estimées | écrit : 21 scènes, vérifié (ancres, rendu sans erreur) | à faire | à faire |
 | 2 | écrit : 231 lignes, ≈ 36 min estimées | écrit : 13 scènes, vérifié | à faire | à faire |
+| 2B | écrit : 111 lignes, ≈ 17 min estimées (videur, chef de chantier, carnet) | écrit : 9 scènes, vérifié | à faire | à faire |
 | 3 | écrit : 223 lignes, ≈ 33 min estimées | écrit : 14 scènes, vérifié | à faire | à faire |
 | 3B | écrit : 132 lignes, ≈ 20 min estimées | écrit : 9 scènes, vérifié | à faire | à faire |
+| 3C | écrit : 97 lignes, ≈ 16 min estimées (vulgarisé : photocopieur, facteur, brouillon) | écrit : 6 scènes, vérifié | à faire | à faire |
 | 4 | écrit : 151 lignes, ≈ 22 min estimées | écrit : 13 scènes, vérifié | à faire | à faire |
-| 5 | écrit : 158 lignes, ≈ 22 min estimées | écrit : 11 scènes, vérifié | à faire | à faire |
+| 5 | écrit : 178 lignes, ≈ 26 min estimées (vulgarisé : colis, aiguillage, chef d'orchestre, jeu, péage) | écrit : 11 scènes, vérifié | à faire | à faire |
 | 6 | écrit : 176 lignes, ≈ 25 min estimées | écrit : 12 scènes, vérifié | à faire | à faire |
 | 7 | écrit : 192 lignes, ≈ 30 min estimées | écrit : 14 scènes, vérifié | à faire | à faire |
 | 8 | écrit : 175 lignes, ≈ 26 min estimées | écrit : 13 scènes, vérifié | à faire | à faire |

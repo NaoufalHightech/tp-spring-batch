@@ -3,946 +3,1066 @@
   "id": "L001",
   "scene": 0,
   "expr": "calme, accroche",
-  "text": "Le chargement du soir a échoué. L'alerte est partie, elle a réussi. Et le job apparaît en vert dans le tableau de bord. Personne n'a rien vu de la nuit."
+  "text": "Imagine : le chargement du soir a échoué. L'alerte est partie, elle a réussi. Et le matin, le tableau de bord affiche ton job en vert. Personne n'a rien vu de la nuit."
  },
  {
   "id": "L002",
   "scene": 0,
   "expr": "pédagogue",
-  "text": "Ce bug existe, et il vient d'une seule ligne : une branche d'erreur terminée par end au lieu de fail. Aujourd'hui, on apprend à orchestrer proprement."
+  "text": "Ce bug vient d'une seule ligne : une branche d'erreur terminée par end, au lieu de fail. Aujourd'hui, tu apprends à orchestrer un job pour que ça n'arrive plus."
  },
  {
   "id": "L003",
   "scene": 0,
   "expr": "rappel",
-  "text": "Un rappel du module un. Chaque step terminé écrit son statut et son code de sortie dans batch step execution. Un flux conditionnel n'y change rien."
+  "text": "Un rappel du module un. Chaque step terminé écrit son statut et son code de sortie dans batch step execution."
  },
  {
   "id": "L004",
   "scene": 0,
   "expr": "rappel",
-  "text": "Un rappel du module deux. Les beans Step, Flow et Job sont des singletons sans état : ils décrivent le graphe. L'exécution vit dans les JobExecution."
+  "text": "Et du module deux : les beans Step, Flow et Job sont des plans, des singletons sans état. L'exécution, elle, vit dans les JobExecution."
  },
  {
   "id": "L005",
   "scene": 0,
-  "expr": "annonce",
-  "text": "Sept étapes : du pipeline au graphe, deux statuts, un flux conditionnel, le decider, la machine à états, le split, et les pièges."
+  "expr": "pédagogue",
+  "text": "Ce module est plein de mots techniques. Alors je te propose cinq images, une par grande idée. Garde-les en tête : elles te guideront jusqu'au code."
  },
  {
   "id": "L006",
+  "scene": 0,
+  "expr": "explicatif",
+  "text": "Le colis, pour comprendre les deux statuts. L'aiguillage ferroviaire, pour le flux conditionnel. Le chef d'orchestre, pour le decider."
+ },
+ {
+  "id": "L007",
+  "scene": 0,
+  "expr": "explicatif",
+  "text": "Le jeu de société, pour comprendre le moteur. Et le péage d'autoroute, pour faire passer des flux en parallèle."
+ },
+ {
+  "id": "L008",
+  "scene": 0,
+  "expr": "annonce",
+  "text": "Sept étapes : du pipeline au graphe, les deux statuts, l'aiguillage, le decider, le moteur, le split, et les pièges."
+ },
+ {
+  "id": "L009",
   "scene": 1,
   "expr": "besoin",
   "text": "Mon besoin : un traitement de nuit qui ne se contente pas d'enchaîner des steps en ligne droite."
  },
  {
-  "id": "L007",
-  "scene": 1,
-  "expr": "explicatif",
-  "text": "Jusqu'ici, un job était une suite : step A, puis step B. Si A échoue, le job s'arrête."
- },
- {
-  "id": "L008",
-  "scene": 1,
-  "expr": "explicatif",
-  "text": "Un vrai traitement se ramifie. On charge le fichier. Puis on regarde l'issue."
- },
- {
-  "id": "L009",
-  "scene": 1,
-  "expr": "explicatif",
-  "text": "Réussi : on produit le rapport de rapprochement. Réussi avec trop de rejets : on prévient l'équipe. Échec : on prévient aussi."
- },
- {
   "id": "L010",
   "scene": 1,
-  "expr": "appuyé",
-  "text": "Un job est donc un graphe d'états : des steps, des décisions, des groupes parallèles, reliés par des transitions."
+  "expr": "pédagogue",
+  "text": "Jusqu'ici, ton job était un train sur une voie unique : step A, puis step B, puis step C. Si A déraille, tout s'arrête."
  },
  {
   "id": "L011",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Un vrai traitement se ramifie. On charge le fichier, et on regarde comment ça s'est passé."
+ },
+ {
+  "id": "L012",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Tout s'est bien passé : on produit le rapport. Beaucoup de lignes rejetées : on prévient l'équipe. Échec : on prévient aussi."
+ },
+ {
+  "id": "L013",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Voilà la vue d'ensemble. Un job n'est plus une ligne, c'est un réseau : des gares, qui sont les steps, et des aiguillages qui décident où va le train."
+ },
+ {
+  "id": "L014",
+  "scene": 1,
+  "expr": "pédagogue",
+  "text": "Retiens le plan : une gare de départ, le chargement ; trois directions possibles ; et des terminus, succès ou échec."
+ },
+ {
+  "id": "L015",
   "scene": 1,
   "expr": "technique",
   "text": "L'écriture simple : start a, next b, next c. Si a échoue, le job s'arrête."
  },
  {
-  "id": "L012",
+  "id": "L016",
   "scene": 1,
   "expr": "technique",
-  "text": "L'écriture conditionnelle : on, avec un code, to, un step. Et from, pour reprendre depuis un step."
+  "text": "L'écriture conditionnelle : on, avec un code, to, un step. Et from, pour repartir d'une gare précise."
  },
  {
-  "id": "L013",
-  "scene": 1,
-  "expr": "explicatif",
-  "text": "On choisit la suite selon l'issue de a. C'est ce qui permet les alertes, les chemins d'erreur et les branches métier."
- },
- {
-  "id": "L014",
+  "id": "L017",
   "scene": 1,
   "expr": "défi, direct",
   "text": "Question. Dans un enchaînement simple, le step a échoue. Que fait le job ?"
  },
  {
-  "id": "L015",
+  "id": "L018",
   "scene": 1,
   "expr": "posé",
   "text": "Il s'arrête. Pour réagir à l'échec, il faut un flux conditionnel."
  },
  {
-  "id": "L016",
+  "id": "L019",
   "scene": 1,
   "expr": "pont",
-  "text": "Pour écrire ces transitions, il faut comprendre deux statuts qu'on confond tout le temps."
- },
- {
-  "id": "L017",
-  "scene": 2,
-  "expr": "besoin",
-  "text": "Mon besoin : comprendre ce que compare exactement un on, dans une transition."
- },
- {
-  "id": "L018",
-  "scene": 2,
-  "expr": "explicatif",
-  "text": "Il y a deux notions différentes. D'abord le BatchStatus : une énumération fixe, décidée par le framework."
- },
- {
-  "id": "L019",
-  "scene": 2,
-  "expr": "technique",
-  "text": "Les valeurs : STARTING, STARTED, STOPPING, STOPPED, FAILED, COMPLETED, ABANDONED. Il sert à l'état technique et à la reprise."
+  "text": "Pour écrire ces aiguillages, il faut d'abord comprendre deux statuts qu'on confond tout le temps."
  },
  {
   "id": "L020",
   "scene": 2,
-  "expr": "explicatif",
-  "text": "Ensuite l'ExitStatus : un texte libre, un code. Il sert à aiguiller le flux et à informer l'extérieur."
+  "expr": "besoin",
+  "text": "Mon besoin : savoir ce que regarde exactement un on, quand je décris une transition."
  },
  {
   "id": "L021",
   "scene": 2,
-  "expr": "technique",
-  "text": "Valeurs courantes : COMPLETED, FAILED, STOPPED, NOOP. Ou ton propre code, par exemple COMPLETED WITH REJECTS."
+  "expr": "pédagogue",
+  "text": "Imagine un colis. Il voyage, et il porte deux informations bien distinctes."
  },
  {
   "id": "L022",
   "scene": 2,
-  "expr": "règle",
-  "text": "Retiens : les transitions comparent le code de l'ExitStatus, pas le BatchStatus."
+  "expr": "pédagogue",
+  "text": "La première, c'est l'état du colis : en cours, livré, perdu. C'est le transporteur qui le décide. Toi, tu n'y touches pas."
  },
  {
   "id": "L023",
   "scene": 2,
   "expr": "explicatif",
-  "text": "Par défaut, les deux coïncident : un step réussi a un ExitStatus COMPLETED. C'est ce qui entretient la confusion."
+  "text": "Dans Spring Batch, ça s'appelle le BatchStatus. C'est le framework qui le gère."
  },
  {
   "id": "L024",
   "scene": 2,
-  "expr": "appuyé",
-  "text": "Dès que tu poses un code personnalisé, ils divergent."
+  "expr": "pédagogue",
+  "text": "La seconde, c'est le mot écrit par le livreur sur le bordereau : livré au voisin, boîte pleine, porte cassée. Le livreur écrit ce qu'il veut."
  },
  {
   "id": "L025",
   "scene": 2,
-  "expr": "besoin",
-  "text": "Cas concret : aiguiller selon un fait métier. Le chargement a réussi, mais avec trop de lignes rejetées."
+  "expr": "explicatif",
+  "text": "Dans Spring Batch, ça s'appelle l'ExitStatus. Et celui-là, tu peux le personnaliser."
  },
  {
   "id": "L026",
   "scene": 2,
-  "expr": "technique",
-  "text": "Un listener de step, appelé après le step. Il implémente StepExecutionListener."
+  "expr": "règle",
+  "text": "Et voici la règle d'or : un on regarde toujours le mot du livreur, l'ExitStatus. Jamais l'état du colis."
  },
  {
   "id": "L027",
   "scene": 2,
   "expr": "technique",
-  "text": "afterStep retourne l'ExitStatus final : c'est le moment de le modifier."
+  "text": "Les valeurs du BatchStatus : STARTING, STARTED, STOPPING, STOPPED, FAILED, COMPLETED, ABANDONED. Il sert à l'état technique, et à la reprise."
  },
  {
   "id": "L028",
   "scene": 2,
-  "expr": "appuyé",
-  "text": "On ne touche pas à un step déjà en échec : son code FAILED reste celui du framework."
+  "expr": "technique",
+  "text": "L'ExitStatus est un code, un texte libre : COMPLETED, FAILED, STOPPED, NOOP, ou ton propre mot, par exemple COMPLETED WITH REJECTS."
  },
  {
   "id": "L029",
   "scene": 2,
-  "expr": "technique",
-  "text": "Sinon, si le nombre de lignes filtrées dépasse cent, on retourne un code personnalisé."
+  "expr": "explicatif",
+  "text": "Par défaut, les deux coïncident : un step réussi a un BatchStatus COMPLETED, et un livreur qui écrit COMPLETED. C'est ce qui entretient la confusion."
  },
  {
   "id": "L030",
   "scene": 2,
   "expr": "appuyé",
-  "text": "Le BatchStatus reste inchangé : COMPLETED. Seul le code de sortie change."
+  "text": "Dès que le livreur écrit un mot personnalisé, les deux divergent : le colis est livré, mais le bordereau dit autre chose."
  },
  {
   "id": "L031",
   "scene": 2,
-  "expr": "règle",
-  "text": "La reprise se base sur le BatchStatus. L'aiguillage se base sur l'ExitStatus."
+  "expr": "besoin",
+  "text": "Cas concret : le chargement a réussi, mais avec cent cinquante lignes rejetées. Je veux que le flux le sache."
  },
  {
   "id": "L032",
   "scene": 2,
-  "expr": "explicatif",
-  "text": "Sans code personnalisé, le step prend un ExitStatus équivalent à son BatchStatus."
+  "expr": "technique",
+  "text": "Je donne la parole au livreur : un listener de step, appelé après le step. Il implémente StepExecutionListener."
  },
  {
   "id": "L033",
   "scene": 2,
-  "expr": "défi, direct",
-  "text": "Question. Le step a réussi, mais le listener a posé COMPLETED WITH REJECTS. Que valent le BatchStatus et l'ExitStatus ?"
+  "expr": "technique",
+  "text": "afterStep retourne l'ExitStatus final. C'est le moment d'écrire un autre mot sur le bordereau."
  },
  {
   "id": "L034",
   "scene": 2,
-  "expr": "posé",
-  "text": "BatchStatus COMPLETED. ExitStatus COMPLETED WITH REJECTS. Le step a réussi techniquement, mais le code dit autre chose."
+  "expr": "appuyé",
+  "text": "Un colis perdu reste perdu : si le step a échoué, on ne touche pas à son code FAILED."
  },
  {
   "id": "L035",
   "scene": 2,
-  "expr": "pont",
-  "text": "Il faut maintenant que le flux sache quoi faire de ce code."
+  "expr": "technique",
+  "text": "Sinon, si le nombre de lignes filtrées dépasse cent, le livreur écrit un code personnalisé."
  },
  {
   "id": "L036",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Le colis est bien livré : le BatchStatus reste COMPLETED. Seul le mot sur le bordereau change."
+ },
+ {
+  "id": "L037",
+  "scene": 2,
+  "expr": "règle",
+  "text": "La reprise lit l'état du colis, le BatchStatus. L'aiguillage lit le bordereau, l'ExitStatus."
+ },
+ {
+  "id": "L038",
+  "scene": 2,
+  "expr": "défi, direct",
+  "text": "Question. Le step a réussi, mais le listener a écrit COMPLETED WITH REJECTS. Que valent le BatchStatus et l'ExitStatus ?"
+ },
+ {
+  "id": "L039",
+  "scene": 2,
+  "expr": "posé",
+  "text": "BatchStatus COMPLETED. ExitStatus COMPLETED WITH REJECTS. Colis livré, mais le bordereau dit autre chose."
+ },
+ {
+  "id": "L040",
+  "scene": 2,
+  "expr": "pont",
+  "text": "Il faut maintenant que le réseau sache lire ce bordereau. C'est le rôle des aiguillages."
+ },
+ {
+  "id": "L041",
   "scene": 3,
   "expr": "besoin",
   "text": "Mon besoin : charger le fichier, produire le rapport si tout va bien, prévenir l'équipe sinon."
  },
  {
-  "id": "L037",
-  "scene": 3,
-  "expr": "technique",
-  "text": "Le builder du job, comme au module deux. Je démarre avec loadBankStep."
- },
- {
-  "id": "L038",
-  "scene": 3,
-  "expr": "technique",
-  "text": "Son retour est maintenant un builder de flux, et non plus un job linéaire."
- },
- {
-  "id": "L039",
-  "scene": 3,
-  "expr": "technique",
-  "text": "Si l'ExitStatus de loadBankStep vaut COMPLETED, on va à bankReportStep."
- },
- {
-  "id": "L040",
-  "scene": 3,
-  "expr": "technique",
-  "text": "Puis on reprend depuis loadBankStep pour déclarer une autre transition. Si le code est FAILED, on va à alertStep."
- },
- {
-  "id": "L041",
-  "scene": 3,
-  "expr": "appuyé",
-  "text": "Après alertStep, quelle que soit l'issue, étoile, le job se termine en échec, avec fail."
- },
- {
   "id": "L042",
   "scene": 3,
-  "expr": "appuyé",
-  "text": "Sans cela, un job dont le chargement a échoué pourrait finir réussi, parce que l'alerte, elle, a réussi."
+  "expr": "pédagogue",
+  "text": "Dessinons le réseau avant d'écrire du code. Une gare de départ : le chargement."
  },
  {
   "id": "L043",
   "scene": 3,
-  "expr": "technique",
-  "text": "Encore une reprise depuis loadBankStep. Et le filet de sécurité : tout autre code échoue explicitement."
+  "expr": "pédagogue",
+  "text": "Si la voie est libre, le train file vers la gare du rapport. S'il déraille, il est aiguillé vers la gare de l'alerte."
  },
  {
   "id": "L044",
   "scene": 3,
-  "expr": "appuyé",
-  "text": "Un code personnalisé oublié, STOPPED, UNKNOWN : sans ce filet, le flux reste sans issue."
+  "expr": "pédagogue",
+  "text": "Et un filet de sécurité : si le train prend une direction que personne n'avait prévue, on arrête tout le réseau."
  },
  {
   "id": "L045",
   "scene": 3,
   "expr": "technique",
-  "text": "Le end termine la définition du flux. Et build produit le job."
+  "text": "Maintenant, le code, ligne par ligne. Le train part de la gare : start, loadBankStep."
  },
  {
   "id": "L046",
   "scene": 3,
-  "expr": "explicatif",
-  "text": "Le step d'alerte est une tasklet. Elle retrouve l'exécution du job en cours à partir de sa contribution."
+  "expr": "technique",
+  "text": "Son retour est un builder de flux : on peut maintenant déclarer des aiguillages."
  },
  {
   "id": "L047",
   "scene": 3,
   "expr": "technique",
-  "text": "On y cherche l'exécution du step de chargement : ses compteurs sont déjà enregistrés."
+  "text": "Si le mot du livreur est COMPLETED, la voie est libre : le train va vers bankReportStep."
  },
  {
   "id": "L048",
   "scene": 3,
   "expr": "technique",
-  "text": "Le message indique le lot, le nombre de lignes rejetées, et le nombre de lignes lues."
+  "text": "Pour déclarer un autre aiguillage, on revient à la gare de départ, avec from loadBankStep. Si le train a déraillé, FAILED, il va vers alertStep."
  },
  {
   "id": "L049",
   "scene": 3,
-  "expr": "explicatif",
-  "text": "AlertSender est une interface applicative, courriel ou messagerie d'équipe. Le composant reste sans état, comme au module quatre."
+  "expr": "appuyé",
+  "text": "Après l'alerte, quelle que soit l'issue, étoile, le job se termine en échec, avec fail."
  },
  {
   "id": "L050",
   "scene": 3,
-  "expr": "explicatif",
-  "text": "Un mot sur les motifs. Étoile remplace n'importe quelle suite de caractères. Point d'interrogation, un seul caractère."
+  "expr": "appuyé",
+  "text": "Sans cela, le job pourrait finir réussi : l'alerte, elle, a réussi. Alerte verte, job vert, alors que le chargement est rouge."
  },
  {
   "id": "L051",
   "scene": 3,
-  "expr": "appuyé",
-  "text": "Quand plusieurs motifs correspondent, le plus précis l'emporte. COMPLETED avant COMP étoile, avant étoile. L'ordre d'écriture ne compte pas."
+  "expr": "technique",
+  "text": "On revient encore à la gare de départ, et on pose le filet de sécurité : tout autre code arrête le réseau, explicitement."
  },
  {
   "id": "L052",
   "scene": 3,
-  "expr": "explicatif",
-  "text": "Et les fins de flux. End termine en réussite. Fail termine en échec. StopAndRestart arrête le job, et prépare une reprise."
+  "expr": "appuyé",
+  "text": "Un code personnalisé oublié, STOPPED, UNKNOWN : sans ce filet, le train reste sans voie."
  },
  {
   "id": "L053",
   "scene": 3,
-  "expr": "défi, direct",
-  "text": "Question. Le code COMPLETED WITH REJECTS arrive, et aucune transition ne le prévoit. Que se passe-t-il, avec le filet étoile ?"
+  "expr": "technique",
+  "text": "Le end ferme la définition du réseau, et build produit le job."
  },
  {
   "id": "L054",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "L'alerte est une tasklet. Elle retrouve le job en cours à partir de sa contribution."
+ },
+ {
+  "id": "L055",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Elle y cherche l'exécution du step de chargement : ses compteurs sont déjà enregistrés."
+ },
+ {
+  "id": "L056",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Le message donne le lot, le nombre de lignes rejetées, et le nombre de lignes lues."
+ },
+ {
+  "id": "L057",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "AlertSender est une interface applicative : courriel, messagerie d'équipe. Le composant reste sans état, comme au module quatre."
+ },
+ {
+  "id": "L058",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Un mot sur les panneaux. Étoile remplace n'importe quelle suite de caractères. Point d'interrogation, un seul caractère."
+ },
+ {
+  "id": "L059",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Quand plusieurs panneaux conviennent, le plus précis l'emporte. COMPLETED avant COMP étoile, avant étoile. L'ordre d'écriture ne compte pas."
+ },
+ {
+  "id": "L060",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Trois façons de terminer le réseau. End : terminus, réussite. Fail : terminus, échec. StopAndRestart : le train s'arrête en gare, prêt à repartir."
+ },
+ {
+  "id": "L061",
+  "scene": 3,
+  "expr": "défi, direct",
+  "text": "Question. Le code COMPLETED WITH REJECTS arrive, et aucun aiguillage ne le prévoit. Que se passe-t-il, avec le filet étoile ?"
+ },
+ {
+  "id": "L062",
   "scene": 3,
   "expr": "posé",
   "text": "Le filet l'attrape : le job se termine en échec, explicitement. Sans le filet, le moteur lève une erreur : Next state not found."
  },
  {
-  "id": "L055",
+  "id": "L063",
   "scene": 3,
   "expr": "règle",
   "text": "Une branche d'erreur se termine par fail, quand la panne doit rester visible dans batch job execution."
  },
  {
-  "id": "L056",
+  "id": "L064",
   "scene": 3,
   "expr": "explicatif",
-  "text": "C'est la façon dont le flux se termine qui fixe l'état final du job. Pas le step qui a échoué."
+  "text": "C'est la façon dont le réseau se termine qui fixe l'état final du job. Pas le step qui a échoué."
  },
  {
-  "id": "L057",
+  "id": "L065",
   "scene": 3,
   "expr": "pont",
-  "text": "Parfois, le code de sortie ne suffit pas. On veut décider à partir d'un chiffre."
+  "text": "Parfois, le mot du livreur ne suffit pas : on veut décider à partir d'un chiffre. Il faut un arbitre."
  },
  {
-  "id": "L058",
+  "id": "L066",
   "scene": 4,
   "expr": "besoin",
   "text": "Mon besoin : aiguiller selon un compteur, par exemple le nombre de lignes rejetées."
  },
  {
-  "id": "L059",
-  "scene": 4,
-  "expr": "explicatif",
-  "text": "Un JobExecutionDecider est une décision pure, sans traitement. Il lit l'état et retourne un code."
- },
- {
-  "id": "L060",
-  "scene": 4,
-  "expr": "technique",
-  "text": "Un Component, sans StepScope. Je reviens sur ce point dans un instant."
- },
- {
-  "id": "L061",
-  "scene": 4,
-  "expr": "technique",
-  "text": "L'interface a une seule méthode : decide. Elle reçoit le JobExecution complet, et le StepExecution du dernier step exécuté."
- },
- {
-  "id": "L062",
-  "scene": 4,
-  "expr": "technique",
-  "text": "Il lit un compteur dans le contexte du step. Le getLong avec une valeur par défaut évite l'erreur si la clé manque."
- },
- {
-  "id": "L063",
-  "scene": 4,
-  "expr": "technique",
-  "text": "Un code libre : FlowExecutionStatus joue le rôle d'ExitStatus pour les décisions."
- },
- {
-  "id": "L064",
-  "scene": 4,
-  "expr": "technique",
-  "text": "Aucun rejet : NO REJECTS. Plus de cent : TOO MANY REJECTS. Entre les deux : FEW REJECTS."
- },
- {
-  "id": "L065",
-  "scene": 4,
-  "expr": "explicatif",
-  "text": "Le branchement. Après loadBankStep, on passe par la décision, avec next."
- },
- {
-  "id": "L066",
-  "scene": 4,
-  "expr": "technique",
-  "text": "Chaque code renvoyé a sa transition. NO REJECTS et FEW REJECTS vont au rapport."
- },
- {
   "id": "L067",
   "scene": 4,
-  "expr": "technique",
-  "text": "TOO MANY REJECTS va à l'alerte. Et le filet étoile fait échouer tout le reste."
+  "expr": "pédagogue",
+  "text": "Imagine un chef d'orchestre, ou un arbitre. Il ne joue d'aucun instrument. Il se place entre deux morceaux, et il décide de la suite."
  },
  {
   "id": "L068",
   "scene": 4,
-  "expr": "explicatif",
-  "text": "La décision n'écrit rien en base : ce n'est pas un step."
+  "expr": "pédagogue",
+  "text": "Le decider fait pareil : il se place entre deux steps. Il lit un compteur, le nombre de rejets, et il dit : on continue, ou on alerte l'équipe."
  },
  {
   "id": "L069",
   "scene": 4,
   "expr": "appuyé",
-  "text": "Pourquoi pas de StepScope ? Un StepScope n'existe que pendant l'exécution d'un step. Le decider est appelé entre deux steps."
+  "text": "Il ne traite aucune donnée, et il n'écrit rien en base : ce n'est pas un step."
  },
  {
   "id": "L070",
+  "scene": 4,
+  "expr": "technique",
+  "text": "En code, c'est un JobExecutionDecider. Un Component, sans StepScope. J'explique pourquoi dans un instant."
+ },
+ {
+  "id": "L071",
+  "scene": 4,
+  "expr": "technique",
+  "text": "L'interface n'a qu'une méthode : decide. Elle reçoit le JobExecution complet, et le StepExecution du dernier step exécuté."
+ },
+ {
+  "id": "L072",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Il lit un compteur dans le contexte du step. Le getLong avec une valeur par défaut évite l'erreur si la clé manque."
+ },
+ {
+  "id": "L073",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Il répond avec un code libre : FlowExecutionStatus joue le rôle d'ExitStatus pour les décisions."
+ },
+ {
+  "id": "L074",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Aucun rejet : NO REJECTS. Plus de cent : TOO MANY REJECTS. Entre les deux : FEW REJECTS."
+ },
+ {
+  "id": "L075",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Le branchement : après loadBankStep, on passe par l'arbitre, avec next."
+ },
+ {
+  "id": "L076",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Chaque code renvoyé a sa direction. NO REJECTS et FEW REJECTS vont au rapport."
+ },
+ {
+  "id": "L077",
+  "scene": 4,
+  "expr": "technique",
+  "text": "TOO MANY REJECTS va à l'alerte. Et le filet étoile fait échouer tout le reste."
+ },
+ {
+  "id": "L078",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Pourquoi pas de StepScope ? Un StepScope n'existe que pendant qu'un step s'exécute. Or l'arbitre intervient entre deux steps."
+ },
+ {
+  "id": "L079",
   "scene": 4,
   "expr": "appuyé",
   "text": "À ce moment, aucun contexte de step n'est ouvert. Un decider en StepScope provoque une erreur : aucun contexte actif."
  },
  {
-  "id": "L071",
+  "id": "L080",
   "scene": 4,
   "expr": "explicatif",
-  "text": "Que faire alors ? Un singleton sans état, c'est le choix par défaut."
+  "text": "Le choix par défaut : un singleton sans état."
  },
  {
-  "id": "L072",
+  "id": "L081",
   "scene": 4,
   "expr": "explicatif",
-  "text": "S'il a besoin des paramètres du lancement, JobScope existe : créé par exécution de job. Mais préfère lire les arguments reçus."
+  "text": "S'il a besoin des paramètres du lancement, JobScope existe : une instance par exécution de job. Mais préfère lire les arguments reçus."
  },
  {
-  "id": "L073",
+  "id": "L082",
   "scene": 4,
   "expr": "règle",
   "text": "Un decider est pur : il lit, il décide, il ne modifie rien."
  },
  {
-  "id": "L074",
+  "id": "L083",
   "scene": 4,
   "expr": "défi, direct",
   "text": "Question. Quand utiliser un decider plutôt qu'un code de sortie ?"
  },
  {
-  "id": "L075",
+  "id": "L084",
   "scene": 4,
   "expr": "posé",
-  "text": "Le code de sortie convient à une règle simple et propre au step. Le decider, quand la décision combine plusieurs sources, ou doit se tester seule."
- },
- {
-  "id": "L076",
-  "scene": 4,
-  "expr": "pont",
-  "text": "Voyons maintenant comment le moteur de flux fait tout cela."
- },
- {
-  "id": "L077",
-  "scene": 5,
-  "expr": "besoin",
-  "text": "Mon besoin : comprendre comment le moteur choisit l'état suivant."
- },
- {
-  "id": "L078",
-  "scene": 5,
-  "expr": "explicatif",
-  "text": "Un job construit avec des flux est une SimpleFlow : un ensemble d'états, et une table de transitions."
- },
- {
-  "id": "L079",
-  "scene": 5,
-  "expr": "technique",
-  "text": "Cinq temps. D'abord, exécuter l'état : le step tourne, laisse sa StepExecution en base."
- },
- {
-  "id": "L080",
-  "scene": 5,
-  "expr": "technique",
-  "text": "Ensuite, produire un statut : le code de l'ExitStatus du step, par exemple COMPLETED."
- },
- {
-  "id": "L081",
-  "scene": 5,
-  "expr": "technique",
-  "text": "Puis chercher la transition. Motifs candidats : COMPLETED, COMP étoile, étoile. Le plus précis gagne."
- },
- {
-  "id": "L082",
-  "scene": 5,
-  "expr": "technique",
-  "text": "Puis l'état suivant : bankReportStep. Et on recommence, jusqu'à un état de fin."
- },
- {
-  "id": "L083",
-  "scene": 5,
-  "expr": "explicatif",
-  "text": "Il y a cinq sortes d'états. StepState exécute un step. DecisionState exécute un decider."
- },
- {
-  "id": "L084",
-  "scene": 5,
-  "expr": "explicatif",
-  "text": "SplitState lance plusieurs flux sur des threads. FlowState exécute un sous-flux. EndState termine le job."
+  "text": "Le code de sortie convient à une règle simple, propre au step. Le decider, quand la décision combine plusieurs sources, ou doit se tester seule."
  },
  {
   "id": "L085",
-  "scene": 5,
-  "expr": "explicatif",
-  "text": "Le statut produit vient, selon l'état, du code d'ExitStatus du step, du FlowExecutionStatus du decider, ou d'une agrégation pour le split."
+  "scene": 4,
+  "expr": "pont",
+  "text": "Voyons maintenant comment le moteur fait tout cela. Pour ça, un jeu de société."
  },
  {
   "id": "L086",
+  "scene": 5,
+  "expr": "besoin",
+  "text": "Mon besoin : comprendre comment le moteur choisit l'étape suivante."
+ },
+ {
+  "id": "L087",
+  "scene": 5,
+  "expr": "pédagogue",
+  "text": "Pense à un jeu de société. Tu es sur une case : c'est un step."
+ },
+ {
+  "id": "L088",
+  "scene": 5,
+  "expr": "pédagogue",
+  "text": "Tu lances le dé : tu exécutes le step."
+ },
+ {
+  "id": "L089",
+  "scene": 5,
+  "expr": "pédagogue",
+  "text": "Tu lis le chiffre : c'est l'ExitStatus."
+ },
+ {
+  "id": "L090",
+  "scene": 5,
+  "expr": "pédagogue",
+  "text": "Tu regardes le plateau : la table des transitions te dit sur quelle case aller."
+ },
+ {
+  "id": "L091",
+  "scene": 5,
+  "expr": "pédagogue",
+  "text": "Et tu recommences, jusqu'à la case arrivée."
+ },
+ {
+  "id": "L092",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Techniquement, un job construit avec des flux est une SimpleFlow : un ensemble d'états, et une table de transitions. C'est notre plateau."
+ },
+ {
+  "id": "L093",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Cinq temps. Un : exécuter l'état. Le step tourne, et laisse sa StepExecution en base."
+ },
+ {
+  "id": "L094",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Deux : produire un statut. Le code de l'ExitStatus du step, par exemple COMPLETED."
+ },
+ {
+  "id": "L095",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Trois : chercher la transition sur le plateau. Panneaux candidats : COMPLETED, COMP étoile, étoile. Le plus précis gagne."
+ },
+ {
+  "id": "L096",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Quatre et cinq : aller à la case suivante, bankReportStep, et recommencer, jusqu'à une case de fin."
+ },
+ {
+  "id": "L097",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Il y a cinq sortes de cases. La case étape, StepState, exécute un step. La case décision, DecisionState, appelle un decider."
+ },
+ {
+  "id": "L098",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "La case carrefour, SplitState, lance plusieurs flux sur des threads. La case sous-plateau, FlowState, exécute un sous-flux. La case arrivée, EndState, termine le job."
+ },
+ {
+  "id": "L099",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Le chiffre lu vient, selon la case : de l'ExitStatus du step, du code du decider, ou d'une agrégation pour le carrefour."
+ },
+ {
+  "id": "L100",
   "scene": 5,
   "expr": "appuyé",
   "text": "Deux erreurs révèlent la mécanique. La première : Next state not found, avec le code reçu."
  },
  {
-  "id": "L087",
+  "id": "L101",
   "scene": 5,
   "expr": "explicatif",
-  "text": "À l'exécution, un état a produit un code pour lequel aucune transition ne correspond. Le job échoue immédiatement."
+  "text": "Le dé a donné un chiffre qui n'est écrit sur aucune flèche du plateau. À l'exécution, le job échoue immédiatement."
  },
  {
-  "id": "L088",
+  "id": "L102",
   "scene": 5,
   "expr": "appuyé",
-  "text": "La seconde : No end state was found. À la construction, un flux dont toutes les transitions mènent à un autre état, sans jamais finir."
+  "text": "La seconde : No end state was found."
  },
  {
-  "id": "L089",
+  "id": "L103",
   "scene": 5,
   "expr": "explicatif",
-  "text": "Le job est refusé au lancement. Il faut au moins une transition sans suite : end, fail ou stopAndRestart."
+  "text": "C'est un plateau sans case arrivée. Le job est refusé au lancement : il faut au moins une transition sans suite, end, fail ou stopAndRestart."
  },
  {
-  "id": "L090",
+  "id": "L104",
   "scene": 5,
   "expr": "défi, direct",
   "text": "Question. Un flux n'a aucune transition vers une fin. Quand l'erreur apparaît-elle : à la construction, ou à l'exécution ?"
  },
  {
-  "id": "L091",
+  "id": "L105",
   "scene": 5,
   "expr": "posé",
   "text": "À la construction : le job est refusé au lancement. L'autre erreur, Next state not found, apparaît à l'exécution."
  },
  {
-  "id": "L092",
+  "id": "L106",
   "scene": 5,
   "expr": "pont",
-  "text": "Dernier outil de ce module : faire tourner des flux en parallèle."
+  "text": "Dernier outil de ce module : faire passer plusieurs flux en même temps. Direction le péage."
  },
  {
-  "id": "L093",
+  "id": "L107",
   "scene": 6,
   "expr": "besoin",
   "text": "Mon besoin : charger les comptes et les opérations en même temps, puis consolider."
  },
  {
-  "id": "L094",
+  "id": "L108",
   "scene": 6,
-  "expr": "explicatif",
-  "text": "Un Split lance plusieurs flux en parallèle, puis attend qu'ils soient tous terminés."
+  "expr": "pédagogue",
+  "text": "Imagine l'autoroute qui arrive au péage. Elle se sépare en deux voies : c'est le Split."
  },
  {
-  "id": "L095",
+  "id": "L109",
+  "scene": 6,
+  "expr": "pédagogue",
+  "text": "Chaque voie a son guichet : c'est un thread. Deux voies, deux guichets, deux voitures qui passent en même temps."
+ },
+ {
+  "id": "L110",
+  "scene": 6,
+  "expr": "pédagogue",
+  "text": "Et personne ne repart tant que les deux voitures ne sont pas passées : c'est une barrière de synchronisation."
+ },
+ {
+  "id": "L111",
   "scene": 6,
   "expr": "technique",
-  "text": "D'abord un TaskExecutor : le pool de threads qui exécutera les flux. Un singleton partagé, comme au module deux."
+  "text": "En code, d'abord un TaskExecutor : le pool de threads, donc nos guichets. Un singleton partagé, comme au module deux."
  },
  {
-  "id": "L096",
+  "id": "L112",
   "scene": 6,
   "expr": "technique",
   "text": "Un préfixe de nom de thread : les journaux montrent flow un, flow deux. Indispensable pour diagnostiquer."
  },
  {
-  "id": "L097",
+  "id": "L113",
   "scene": 6,
   "expr": "technique",
-  "text": "Deux threads : autant que de flux parallèles à la fois. Pas de file d'attente."
+  "text": "Deux threads : autant que de voies parallèles. Pas de file d'attente."
  },
  {
-  "id": "L098",
+  "id": "L114",
   "scene": 6,
   "expr": "explicatif",
-  "text": "Un pool plus petit ferait attendre les flux. Un pool illimité saturerait la base."
+  "text": "Un pool plus petit ferait attendre les voitures. Un pool illimité saturerait la base."
  },
  {
-  "id": "L099",
+  "id": "L115",
   "scene": 6,
   "expr": "technique",
-  "text": "Un Flow est un sous-graphe réutilisable. Ici, chacun ne contient qu'un step."
+  "text": "Un Flow est un sous-graphe réutilisable : une voie. Ici, chaque voie ne contient qu'un step."
  },
  {
-  "id": "L100",
+  "id": "L116",
   "scene": 6,
   "expr": "technique",
-  "text": "Puis split, avec l'exécuteur, et add, avec les deux flux. Chacun tourne sur un thread du pool."
+  "text": "Puis split, avec l'exécuteur, et add, avec les deux flux. Chacun passe sur un guichet du pool."
  },
  {
-  "id": "L101",
+  "id": "L117",
   "scene": 6,
   "expr": "technique",
   "text": "Le job démarre avec ce groupe parallèle, puis enchaîne avec consolidateStep."
  },
  {
-  "id": "L102",
+  "id": "L118",
   "scene": 6,
   "expr": "règle",
-  "text": "consolidateStep ne démarre qu'après la fin des deux flux. Le split est une barrière de synchronisation."
+  "text": "consolidateStep ne démarre qu'après la fin des deux flux. Le split est une barrière."
  },
  {
-  "id": "L103",
+  "id": "L119",
   "scene": 6,
   "expr": "explicatif",
-  "text": "Un thread par flux. Chaque flux ouvre ses propres transactions, ses propres connexions. Les steps parallèles ne partagent pas de transaction."
+  "text": "Chaque guichet ouvre ses propres transactions et ses propres connexions. Les steps parallèles ne partagent pas de transaction."
  },
  {
-  "id": "L104",
+  "id": "L120",
   "scene": 6,
   "expr": "explicatif",
   "text": "Chaque step est enregistré séparément dans batch step execution."
  },
  {
-  "id": "L105",
+  "id": "L121",
   "scene": 6,
   "expr": "appuyé",
   "text": "Les singletons utilisés dans plusieurs flux sont partagés entre threads. Tout état modifiable dedans est une course, comme au module quatre."
  },
  {
-  "id": "L106",
+  "id": "L122",
   "scene": 6,
-  "expr": "appuyé",
-  "text": "Deux limites distinctes : le pool de threads, et le pool de connexions. Chaque flux a besoin de plusieurs connexions, plus une pour le JobRepository."
+  "expr": "pédagogue",
+  "text": "Maintenant, le point qui piège tout le monde. Chaque voiture a besoin de tickets : ce sont les connexions à la base."
  },
  {
-  "id": "L107",
+  "id": "L123",
+  "scene": 6,
+  "expr": "pédagogue",
+  "text": "Admettons trois tickets par voiture, plus un ticket pour le contrôleur, le JobRepository. Deux voitures, trois tickets chacune, plus un : sept tickets."
+ },
+ {
+  "id": "L124",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Avec sept tickets, tout passe. Avec seulement cinq, chaque voiture en prend deux, attend le troisième, que l'autre détient. Plus personne n'avance : c'est le blocage."
+ },
+ {
+  "id": "L125",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Et si tu ouvres une troisième voie, avec sept tickets ? Deux voitures prennent leurs trois tickets. La troisième attend que l'une libère les siens."
+ },
+ {
+  "id": "L126",
   "scene": 6,
   "expr": "défi, direct",
   "text": "Question. Deux flux parallèles utilisent chacun trois connexions, plus une pour le JobRepository. Quel minimum de connexions dans le pool ?"
  },
  {
-  "id": "L108",
+  "id": "L127",
   "scene": 6,
   "expr": "posé",
   "text": "Sept : deux fois trois, plus une. Moins, et les flux se bloquent en attendant une connexion détenue par un autre."
  },
  {
-  "id": "L109",
+  "id": "L128",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Deux limites distinctes, donc : le pool de threads, les guichets, et le pool de connexions, les tickets."
+ },
+ {
+  "id": "L129",
   "scene": 6,
   "expr": "explicatif",
   "text": "Si un flux échoue et l'autre réussit, le split produit le statut le plus grave : échec. Le job échoue."
  },
  {
-  "id": "L110",
+  "id": "L130",
   "scene": 6,
   "expr": "appuyé",
   "text": "À la reprise, seul le step en échec est rejoué. Les steps terminés ne le sont pas."
  },
  {
-  "id": "L111",
+  "id": "L131",
   "scene": 6,
   "expr": "explicatif",
   "text": "Un split parallélise des steps différents. Pour accélérer un même step sur de gros volumes, c'est le multithread ou le partitionnement, plus loin dans la formation."
  },
  {
-  "id": "L112",
+  "id": "L132",
   "scene": 6,
   "expr": "pont",
   "text": "Voyons trois situations réelles."
  },
  {
-  "id": "L113",
+  "id": "L133",
   "scene": 7,
   "expr": "explicatif",
   "text": "Premier cas : l'import avec alerte. Si plus de cent lignes sont rejetées, le rapport est remplacé par une alerte."
  },
  {
-  "id": "L114",
+  "id": "L134",
   "scene": 7,
   "expr": "appuyé",
   "text": "Et le job termine en échec, pour que la supervision le voie. Un code de sortie ou un decider en est le moyen."
  },
  {
-  "id": "L115",
+  "id": "L135",
   "scene": 7,
   "expr": "explicatif",
   "text": "Deuxième cas : deux sources indépendantes. Les comptes dans un fichier, les opérations dans une base."
  },
  {
-  "id": "L116",
+  "id": "L136",
   "scene": 7,
   "expr": "appuyé",
   "text": "Elles se chargent en même temps : le temps total est celui du plus long, non la somme. La consolidation attend les deux."
  },
  {
-  "id": "L117",
+  "id": "L137",
   "scene": 7,
   "expr": "explicatif",
   "text": "Troisième cas : le bon chemin selon le jour. Un job de fin de mois exécute une clôture supplémentaire seulement le dernier jour ouvré."
  },
  {
-  "id": "L118",
+  "id": "L138",
   "scene": 7,
   "expr": "explicatif",
   "text": "Un decider lit la date, et renvoie MONTH END ou NORMAL. Il aiguille vers la clôture, ou directement vers le rapport."
  },
  {
-  "id": "L119",
+  "id": "L139",
   "scene": 7,
   "expr": "pont",
   "text": "Voyons les dix pièges."
  },
  {
-  "id": "L120",
+  "id": "L140",
   "scene": 8,
   "expr": "pédagogue",
   "text": "Dix pièges, avec pour chacun ce qui se passe, la parade, et comment le repérer."
  },
  {
-  "id": "L121",
+  "id": "L141",
   "scene": 8,
   "expr": "appuyé",
   "text": "Un : un ExitStatus personnalisé non aiguillé. Le job échoue sans exécuter ce qu'on attendait."
  },
  {
-  "id": "L122",
+  "id": "L142",
   "scene": 8,
   "expr": "pédagogue",
   "text": "Comment le repérer : un message Next state not found, avec le code personnalisé dedans."
  },
  {
-  "id": "L123",
+  "id": "L143",
   "scene": 8,
   "expr": "appuyé",
   "text": "Deux : confondre BatchStatus et ExitStatus. Un on FAILED qui ne se déclenche pas."
  },
  {
-  "id": "L124",
+  "id": "L144",
   "scene": 8,
   "expr": "pédagogue",
   "text": "Comment le repérer : un step COMPLETED en base, avec un exit code qui n'est pas celui attendu."
  },
  {
-  "id": "L125",
+  "id": "L145",
   "scene": 8,
   "expr": "appuyé",
   "text": "Trois : un decider en StepScope. Erreur de contexte, aucun step n'est actif."
  },
  {
-  "id": "L126",
+  "id": "L146",
   "scene": 8,
   "expr": "pédagogue",
   "text": "Comment le repérer : une exception de scope dès la résolution du decider."
  },
  {
-  "id": "L127",
+  "id": "L147",
   "scene": 8,
   "expr": "appuyé",
   "text": "Quatre : un split avec un exécuteur mal dimensionné. Saturation de la base, ou flux qui attendent."
  },
  {
-  "id": "L128",
+  "id": "L148",
   "scene": 8,
   "expr": "pédagogue",
   "text": "Comment le repérer : des threads qui attendent, ou une base saturée de connexions."
  },
  {
-  "id": "L129",
+  "id": "L149",
   "scene": 8,
   "expr": "appuyé",
   "text": "Cinq : un pool de connexions inférieur aux besoins des flux parallèles. Blocage."
  },
  {
-  "id": "L130",
+  "id": "L150",
   "scene": 8,
   "expr": "pédagogue",
   "text": "Comment le repérer : un job figé, avec un pool à zéro connexion libre."
  },
  {
-  "id": "L131",
+  "id": "L151",
   "scene": 9,
   "expr": "pont",
   "text": "Les cinq suivants touchent la terminaison, l'état partagé et les motifs."
  },
  {
-  "id": "L132",
+  "id": "L152",
   "scene": 9,
   "expr": "appuyé",
   "text": "Six : une branche d'erreur terminée par end. L'alerte réussit, le job apparaît réussi."
  },
  {
-  "id": "L133",
+  "id": "L153",
   "scene": 9,
   "expr": "pédagogue",
   "text": "Comment le repérer : un job COMPLETED en base, alors que le chargement a échoué."
  },
  {
-  "id": "L134",
+  "id": "L154",
   "scene": 9,
   "expr": "appuyé",
   "text": "Sept : un état partagé entre flux parallèles. Un singleton modifié par deux threads."
  },
  {
-  "id": "L135",
+  "id": "L155",
   "scene": 9,
   "expr": "pédagogue",
   "text": "Comment le repérer : des totaux faux, différents à chaque lancement."
  },
  {
-  "id": "L136",
+  "id": "L156",
   "scene": 9,
   "expr": "appuyé",
   "text": "Huit : un decider avec des effets de bord ou des requêtes lourdes. Réévalué à chaque reprise."
  },
  {
-  "id": "L137",
+  "id": "L157",
   "scene": 9,
   "expr": "pédagogue",
   "text": "Comment le repérer : une alerte envoyée deux fois, après une reprise."
  },
  {
-  "id": "L138",
+  "id": "L158",
   "scene": 9,
   "expr": "appuyé",
   "text": "Neuf : des motifs mal compris. COMP étoile capte aussi COMPLETED WITH REJECTS. Le plus précis gagne, pas le premier écrit."
  },
  {
-  "id": "L139",
+  "id": "L159",
   "scene": 9,
   "expr": "pédagogue",
   "text": "Comment le repérer : un step exécuté dans la mauvaise branche, après l'ajout d'un nouveau code."
  },
  {
-  "id": "L140",
+  "id": "L160",
   "scene": 9,
   "expr": "appuyé",
   "text": "Dix : un flux construit sans état final. No end state was found. Le job est refusé."
  },
  {
-  "id": "L141",
+  "id": "L161",
   "scene": 9,
   "expr": "pédagogue",
   "text": "Comment le repérer : une erreur dès le démarrage, avant tout lancement."
  },
  {
-  "id": "L142",
+  "id": "L162",
   "scene": 9,
   "expr": "explicatif",
   "text": "Pour tester un flux, un test par issue : COMPLETED, FAILED, COMPLETED WITH REJECTS, et un code inconnu."
  },
  {
-  "id": "L143",
+  "id": "L163",
   "scene": 9,
   "expr": "appuyé",
   "text": "À chaque fois, on vérifie quels steps ont été exécutés, dans batch step execution."
  },
  {
-  "id": "L144",
+  "id": "L164",
   "scene": 9,
   "expr": "pédagogue",
   "text": "Pourquoi on y tombe : parce qu'un seul chemin, le chemin heureux, est testé."
  },
  {
-  "id": "L145",
+  "id": "L165",
   "scene": 10,
   "expr": "pédagogue",
   "text": "Reprenons notre job vert, avec un chargement échoué. Tu sais maintenant comment le rendre rouge."
  },
  {
-  "id": "L146",
+  "id": "L166",
   "scene": 10,
   "expr": "récapitulatif",
-  "text": "Un job est un graphe. Les transitions comparent l'ExitStatus. Le BatchStatus sert à la reprise."
+  "text": "Un job est un réseau. Un aiguillage lit le mot du livreur, l'ExitStatus. L'état du colis, le BatchStatus, sert à la reprise."
  },
  {
-  "id": "L147",
+  "id": "L167",
   "scene": 10,
   "expr": "récapitulatif",
-  "text": "Le decider décide d'après un chiffre, sans StepScope. Le split parallélise, avec un pool borné."
+  "text": "Le chef d'orchestre, le decider, décide d'après un chiffre, sans StepScope. Le péage, le split, parallélise, avec des guichets et des tickets en nombre suffisant."
  },
  {
-  "id": "L148",
+  "id": "L168",
   "scene": 10,
   "expr": "récapitulatif",
   "text": "Toute branche d'erreur se termine par fail, avec un filet étoile."
  },
  {
-  "id": "L149",
+  "id": "L169",
   "scene": 10,
   "expr": "défi",
   "text": "Quatre exercices. Un : le step réussit, le listener pose COMPLETED WITH REJECTS. Quels statuts, et quelle suite avec le flux du module ?"
  },
  {
-  "id": "L150",
+  "id": "L170",
   "scene": 10,
   "expr": "défi",
   "text": "Deux : pourquoi un decider ne peut-il pas être en StepScope ? Donne deux façons correctes de lui fournir ce dont il a besoin."
  },
  {
-  "id": "L151",
+  "id": "L171",
   "scene": 10,
   "expr": "défi",
   "text": "Trois : deux flux parallèles utilisent chacun trois connexions, plus une pour le JobRepository. Quel minimum ? Pourquoi un pool de vingt threads n'accélère rien ?"
  },
  {
-  "id": "L152",
+  "id": "L172",
   "scene": 10,
   "expr": "défi",
   "text": "Quatre : un job dont la branche d'erreur se termine par end est réussi alors que le chargement a échoué. Comment le détecter, et le corriger ?"
  },
  {
-  "id": "L153",
+  "id": "L173",
   "scene": 10,
   "expr": "pause",
   "text": "Prends le temps d'y réfléchir."
  },
  {
-  "id": "L154",
+  "id": "L174",
   "scene": 10,
   "expr": "explicatif",
   "text": "Correction un. BatchStatus COMPLETED, ExitStatus COMPLETED WITH REJECTS. Le filet étoile fait échouer le job. Sans filet, Next state not found."
  },
  {
-  "id": "L155",
+  "id": "L175",
   "scene": 10,
   "expr": "explicatif",
   "text": "Correction deux. Le decider tourne entre deux steps, hors de tout contexte de step. Un singleton sans état, ou JobScope, ou lire les arguments."
  },
  {
-  "id": "L156",
+  "id": "L176",
   "scene": 10,
   "expr": "explicatif",
   "text": "Correction trois. Sept connexions. Un pool de vingt threads n'accélère rien : il n'y a que deux flux."
  },
  {
-  "id": "L157",
+  "id": "L177",
   "scene": 10,
   "expr": "explicatif",
   "text": "Correction quatre. Un job COMPLETED avec un step du chargement en FAILED. On corrige en terminant la branche par fail."
  },
  {
-  "id": "L158",
+  "id": "L178",
   "scene": 10,
   "expr": "transition",
   "text": "Au module suivant, tu apprends la fiabilité : skip, retry, restart et l'arrêt gracieux."

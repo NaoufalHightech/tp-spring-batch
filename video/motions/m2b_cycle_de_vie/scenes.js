@@ -229,15 +229,16 @@ SCENES[1] = mk({
       ['L008', 'new DefaultJobParametersValidator(', w],
       ['L009', '    new String[] {"runDate"},     // obligatoire', g],
       ['L009', '    new String[] {"format"});     // facultatif', b],
-      ['L011', 'new JobBuilder("statementJob", jobRepository).validator(statementValidator)', p]], { size: 22, accent: b, b: 'L015' }),
-    ch('L010', 1650, 330, 'autre clé : refusée', r, { size: 22, b: 'L015' }),
-    ch('L012', 1650, 420, 'InvalidJobParametersException', r, { size: 20, b: 'L015' }), ch('L012', 1650, 470, 'ex-JobParametersInvalidException', d, { size: 18, b: 'L015' }),
-    code('L013', 100, 520, 1300, 150, 'validateur métier', [['L013', 'public void validate(JobParameters p) {', w], ['L013', '  if (!ok(p)) throw new InvalidJobParametersException("runDate invalide");', r], ['L013', '}', w]], { size: 21, accent: o, b: 'L015' }),
-    ch('L014', 1650, 560, 'CompositeJobParametersValidator', p, { size: 18, b: 'L015' }),
-    ch('L016', 960, 330, "refusé : mode n'est pas autorisé", r, { size: 40, b: 'L017' }),
-    tx('L017', 960, 900, '2B.2 · Rappel : une nouvelle instance →', { size: 46, c: y }),
+      ['L011', 'new JobBuilder("statementJob", jobRepository).validator(statementValidator)', p]], { size: 22, accent: b, b: 'L018' }),
+    ch('L010', 1650, 330, 'autre clé : refusée', r, { size: 22, b: 'L018' }),
+    ch('L012', 1650, 420, 'InvalidJobParametersException', r, { size: 20, b: 'L018' }), ch('L012', 1650, 470, 'ex-JobParametersInvalidException', d, { size: 18, b: 'L018' }),
+    code('L013', 100, 520, 1300, 150, 'validateur métier', [['L013', 'public void validate(JobParameters p) {', w], ['L013', '  if (!ok(p)) throw new InvalidJobParametersException("runDate invalide");', r], ['L013', '}', w]], { size: 21, accent: o, b: 'L018' }),
+    ch('L014', 1650, 560, 'CompositeJobParametersValidator', p, { size: 18, b: 'L018' }),
+    ch('L019', 960, 330, "refusé : mode n'est pas autorisé", r, { size: 40, b: 'L020' }),
+    tx('L020', 960, 900, '2B.2 · Rappel : une nouvelle instance →', { size: 46, c: y }),
+    code('L015', 100, 700, 1300, 110, 'paramètre non identifiant', [['L015', '.addString("startedBy", user, false)   // identifying = false', C.text]], { size: 24, accent: b, b: 'L018' }),
   ],
-  quiz: [{ q: 'L015', a: 'L016', question: 'Un job déclare runDate obligatoire et format facultatif. On le lance avec runDate et un paramètre mode. Que se passe-t-il ?', choices: ['il démarre', 'il est refusé', 'mode est ignoré'], win: 1, answer: "Le lancement est refusé : mode n'est pas dans les clés autorisées. Le job ne démarre pas." }],
+  quiz: [{ q: 'L016', a: 'L017', question: 'Tu oublies un paramètre obligatoire, runDate. Que fait le videur ?', choices: ['il démarre quand même', 'il refuse le lancement', 'il met runDate à null'], win: 1, answer: 'Il refuse le lancement : InvalidJobParametersException, et aucun step ne s\'exécute.' }, { q: 'L018', a: 'L019', question: 'Un job déclare runDate obligatoire et format facultatif. On le lance avec runDate et un paramètre mode. Que se passe-t-il ?', choices: ['il démarre', 'il est refusé', 'mode est ignoré'], win: 1, answer: "Le lancement est refusé : mode n'est pas dans les clés autorisées. Le job ne démarre pas." }],
   cues: [{ a: 'L008', s: 'blip' }, { a: 'L010', s: 'error' }, { a: 'L012', s: 'error' }],
 });
 
@@ -245,91 +246,133 @@ SCENES[1] = mk({
 SCENES[2] = mk({
   label: 'RAPPEL RUNID', color: y, part: '2B.2 · UNE NOUVELLE INSTANCE À LA DEMANDE',
   els: [
-    ch('L018', 960, 330, 'reporting à la demande · même date · un clic de plus', o, { size: 32, b: 'L020' }),
-    pa('L019', 260, 470, 1400, 'comment forcer une nouvelle instance, sans casser la reprise ?', { size: 42, c: w, b: 'L020' }),
-    bx('L020', 480, 330, 460, 110, 'RunIdIncrementer', p, { size: 26, b: 'L023' }), ar('L020', 720, 330, 1170, 330, p, { b: 'L023' }), bx('L020', 1440, 330, 460, 110, 'run.id = 1, 2, 3…', p, { size: 26, b: 'L023' }),
-    ch('L021', 960, 470, 'identifiant : nouvelle valeur, nouvelle instance · reprise intacte', g, { size: 26, b: 'L023' }),
-    code('L022', 100, 560, 1400, 110, 'builder', [['L022', 'new JobBuilder("reportJob", jobRepository).incrementer(new RunIdIncrementer())', w]], { size: 22, accent: p, b: 'L023' }),
-    bx('L023', 480, 330, 520, 100, 'startNextInstance()', g, { size: 26, b: 'L025' }), ch('L023', 480, 430, "appelle l'incrémenteur", g, { size: 24, b: 'L025' }),
-    bx('L023', 1380, 330, 600, 100, 'start(job, params) · runner Boot 4.1', r, { size: 22, b: 'L025' }), ch('L023', 1380, 430, "n'appelle pas l'incrémenteur", r, { size: 24, b: 'L025' }),
-    ch('L024', 960, 560, 'validateur : ajouter run.id aux clés facultatives', o, { size: 28, b: 'L025' }),
-    stp('L025', 960, 360, 'ANNEXE 1', y, { size: 80 }), tx('L025', 960, 480, 'le détail, le code, la requête SQL', { size: 34, c: w }),
-    tx('L026', 960, 900, '2B.3 · Les listeners →', { size: 48, c: o }),
+    ch('L021', 960, 330, 'reporting à la demande · même date · un clic de plus', o, { size: 32, b: 'L023' }),
+    pa('L022', 260, 470, 1400, 'comment forcer une nouvelle instance, sans casser la reprise ?', { size: 42, c: w, b: 'L023' }),
+    bx('L023', 480, 330, 460, 110, 'RunIdIncrementer', p, { size: 26, b: 'L026' }), ar('L023', 720, 330, 1170, 330, p, { b: 'L026' }), bx('L023', 1440, 330, 460, 110, 'run.id = 1, 2, 3…', p, { size: 26, b: 'L026' }),
+    ch('L024', 960, 470, 'identifiant : nouvelle valeur, nouvelle instance · reprise intacte', g, { size: 26, b: 'L026' }),
+    code('L025', 100, 560, 1400, 110, 'builder', [['L025', 'new JobBuilder("reportJob", jobRepository).incrementer(new RunIdIncrementer())', w]], { size: 22, accent: p, b: 'L026' }),
+    bx('L026', 480, 330, 520, 100, 'startNextInstance()', g, { size: 26, b: 'L030' }), ch('L026', 480, 430, "appelle l'incrémenteur", g, { size: 24, b: 'L030' }),
+    bx('L026', 1380, 330, 600, 100, 'start(job, params) · runner Boot 4.1', r, { size: 22, b: 'L030' }), ch('L026', 1380, 430, "n'appelle pas l'incrémenteur", r, { size: 24, b: 'L030' }),
+    ch('L027', 960, 560, 'validateur : ajouter run.id aux clés facultatives', o, { size: 28, b: 'L030' }),
+    stp('L030', 960, 360, 'ANNEXE 1', y, { size: 80 }), tx('L030', 960, 480, 'le détail, le code, la requête SQL', { size: 34, c: w }),
+    tx('L031', 960, 900, '2B.3 · Les listeners →', { size: 48, c: o }),
   ],
-  cues: [{ a: 'L020', s: 'pop' }, { a: 'L023', s: 'blip' }, { a: 'L025', s: 'success' }],
+  quiz: [{ q: 'L028', a: 'L029', question: 'Ton job a un RunIdIncrementer, et Spring Boot 4.1 le lance au démarrage. Le run.id est-il ajouté ?', choices: ['oui', 'non', 'seulement au premier lancement'], win: 1, answer: "Non : le lancement automatique appelle JobOperator.start, sans incrémenteur. Pour l'avoir, appelle startNextInstance." }],
+  cues: [{ a: 'L023', s: 'pop' }, { a: 'L026', s: 'blip' }, { a: 'L030', s: 'success' }],
 });
 
 // ---------- Scène 3 : les listeners ----------
 SCENES[3] = mk({
   label: 'LISTENERS', color: o, part: '2B.3 · LE CHEF DE CHANTIER',
   els: [
-    ch('L027', 960, 330, 'début et fin du job, sans ouvrir les journaux', o, { size: 34, b: 'L028' }),
-    code('L028', 100, 200, 1400, 330, 'StatementJobListener.java', [
-      ['L028', 'public class StatementJobListener implements JobExecutionListener {', w],
-      ['L028', '  @Override public void beforeJob(JobExecution e) { log.info("Début"); }', g],
-      ['L030', '  @Override public void afterJob(JobExecution e) {', o],
-      ['L031', '    if (e.getStatus() == BatchStatus.COMPLETED) { log.info("Terminé"); }', g],
-      ['L031', '    else { alertTeam(e); }', r],
-      ['L031', '  }', w], ['L031', '}', w]], { size: 21, accent: o, b: 'L034' }),
-    ch('L029', 1690, 330, 'méthodes par défaut : vides', d, { size: 20, b: 'L034' }),
-    ch('L030', 1690, 420, 'appelé même après un échec', o, { size: 20, b: 'L034' }),
-    ch('L032', 1690, 510, 'notifier · nettoyer · libérer', g, { size: 20, b: 'L034' }),
-    ch('L033', 1690, 600, '.listener(objet)', b, { size: 20, b: 'L034' }), ch('L033', 1690, 650, '@BeforeJob · @AfterJob', b, { size: 20, b: 'L034' }),
-    ch('L035', 960, 330, 'oui : afterJob, avec le statut FAILED', g, { size: 40, b: 'L036' }),
-    ch('L036', 960, 330, 'listener court et sûr', o, { size: 40, b: 'L037' }),
-    code('L037', 100, 220, 1400, 150, 'StepExecutionListener', [['L037', 'void beforeStep(StepExecution s)', b], ['L038', "ExitStatus afterStep(StepExecution s)   // peut changer l'issue", o]], { size: 24, accent: o, b: 'L039' }),
-    tx('L039', 960, 900, '2B.4 · Les consignes →', { size: 48, c: p }),
+    ch('L032', 960, 330, 'début et fin du job, sans ouvrir les journaux', o, { size: 34, b: 'L033' }),
+    code('L033', 100, 200, 1400, 330, 'StatementJobListener.java', [
+      ['L033', 'public class StatementJobListener implements JobExecutionListener {', w],
+      ['L033', '  @Override public void beforeJob(JobExecution e) { log.info("Début"); }', g],
+      ['L035', '  @Override public void afterJob(JobExecution e) {', o],
+      ['L036', '    if (e.getStatus() == BatchStatus.COMPLETED) { log.info("Terminé"); }', g],
+      ['L036', '    else { alertTeam(e); }', r],
+      ['L036', '  }', w], ['L036', '}', w]], { size: 21, accent: o, b: 'L039' }),
+    ch('L034', 1690, 330, 'méthodes par défaut : vides', d, { size: 20, b: 'L039' }),
+    ch('L035', 1690, 420, 'appelé même après un échec', o, { size: 20, b: 'L039' }),
+    ch('L037', 1690, 510, 'notifier · nettoyer · libérer', g, { size: 20, b: 'L039' }),
+    ch('L038', 1690, 600, '.listener(objet)', b, { size: 20, b: 'L039' }), ch('L038', 1690, 650, '@BeforeJob · @AfterJob', b, { size: 20, b: 'L039' }),
+    ch('L040', 960, 330, 'oui : afterJob, avec le statut FAILED', g, { size: 40, b: 'L041' }),
+    ch('L041', 960, 330, 'listener court et sûr', o, { size: 40, b: 'L044' }),
+    code('L044', 100, 220, 1400, 150, 'StepExecutionListener', [['L044', 'void beforeStep(StepExecution s)', b], ['L045', "ExitStatus afterStep(StepExecution s)   // peut changer l'issue", o]], { size: 24, accent: o, b: 'L046' }),
+    tx('L046', 960, 900, '2B.4 · Les consignes →', { size: 48, c: p }),
+    code('L042', 100, 200, 1700, 190, 'psql', [['L042', 'SELECT job_execution_id, status, exit_code FROM batch_job_execution ORDER BY 1 DESC LIMIT 3;', C.text], ['L043', '  42 | FAILED    | FAILED', r], ['L043', '  41 | COMPLETED | COMPLETED', g]], { size: 24, accent: r, b: 'L044' }),
   ],
-  quiz: [{ q: 'L034', a: 'L035', question: 'Le job échoue au deuxième step. La méthode afterJob est-elle appelée ?', choices: ['non', 'oui, avec FAILED', 'oui, avec COMPLETED'], win: 1, answer: 'Oui, avec le statut FAILED. C\'est voulu : un job qui échoue doit aussi nettoyer.' }],
-  cues: [{ a: 'L028', s: 'blip' }, { a: 'L030', s: 'pop' }, { a: 'L031', s: 'success' }],
+  quiz: [{ q: 'L039', a: 'L040', question: 'Le job échoue au deuxième step. La méthode afterJob est-elle appelée ?', choices: ['non', 'oui, avec FAILED', 'oui, avec COMPLETED'], win: 1, answer: 'Oui, avec le statut FAILED. C\'est voulu : un job qui échoue doit aussi nettoyer.' }],
+  cues: [{ a: 'L033', s: 'blip' }, { a: 'L035', s: 'pop' }, { a: 'L036', s: 'success' }],
 });
 
 // ---------- Scène 4 : les consignes ----------
 SCENES[4] = mk({
   label: 'CONSIGNES', color: p, part: "2B.4 · PASSER UNE CONSIGNE D'UN STEP À L'AUTRE",
   els: [
-    bx('L040', 480, 330, 420, 110, 'step chargement', b, { b: 'L041' }), ch('L040', 480, 430, 'compte 12 480 lignes', g, { size: 24, b: 'L041' }), ar('L040', 700, 330, 1220, 330, w, { b: 'L041' }),
-    bx('L040', 1440, 330, 420, 110, 'step contrôle', g, { b: 'L041' }), ch('L040', 1440, 430, 'doit connaître ce total', o, { size: 24, b: 'L041' }),
-    bx('L041', 480, 330, 420, 110, 'carnet du step 1', b, { b: 'L045' }), bx('L041', 1000, 330, 420, 110, 'carnet du step 2', g, { b: 'L045' }), bx('L041', 1500, 330, 380, 110, 'carnet du job', p, { size: 26, b: 'L045' }),
-    ch('L042', 740, 450, 'non visible', r, { size: 24, b: 'L043' }),
-    ar('L043', 480, 260, 1500, 260, p, { b: 'L045' }), ch('L043', 990, 215, 'promotion', p, { size: 26, b: 'L045' }),
-    code('L044', 100, 520, 1400, 140, 'promotion', [['L044', 'var listener = new ExecutionContextPromotionListener();', w], ['L044', 'listener.setKeys(new String[] {"totalLines"});', g]], { size: 23, accent: p, b: 'L048' }),
-    ch('L045', 960, 710, '.listener(promotion) sur le step', b, { size: 26, b: 'L048' }),
-    ch('L046', 960, 780, 'par défaut : seulement si le step a réussi', g, { size: 26, b: 'L048' }),
-    ch('L047', 960, 850, 'setStrict(true) : échoue si la clé est absente', o, { size: 26, b: 'L048' }),
-    ch('L049', 960, 330, 'null : la note est restée dans le carnet du step 1', r, { size: 36, b: 'L050' }),
-    tx('L050', 960, 900, '2B.5 · Réutiliser et outils →', { size: 48, c: g }),
+    bx('L047', 480, 330, 420, 110, 'step chargement', b, { b: 'L048' }), ch('L047', 480, 430, 'compte 12 480 lignes', g, { size: 24, b: 'L048' }), ar('L047', 700, 330, 1220, 330, w, { b: 'L048' }),
+    bx('L047', 1440, 330, 420, 110, 'step contrôle', g, { b: 'L048' }), ch('L047', 1440, 430, 'doit connaître ce total', o, { size: 24, b: 'L048' }),
+    bx('L048', 480, 330, 420, 110, 'carnet du step 1', b, { b: 'L052' }), bx('L048', 1000, 330, 420, 110, 'carnet du step 2', g, { b: 'L052' }), bx('L048', 1500, 330, 380, 110, 'carnet du job', p, { size: 26, b: 'L052' }),
+    ch('L049', 740, 450, 'non visible', r, { size: 24, b: 'L050' }),
+    ar('L050', 480, 260, 1500, 260, p, { b: 'L052' }), ch('L050', 990, 215, 'promotion', p, { size: 26, b: 'L052' }),
+    code('L051', 100, 520, 1400, 140, 'promotion', [['L051', 'var listener = new ExecutionContextPromotionListener();', w], ['L051', 'listener.setKeys(new String[] {"totalLines"});', g]], { size: 23, accent: p, b: 'L057' }),
+    ch('L052', 960, 710, '.listener(promotion) sur le step', b, { size: 26, b: 'L057' }),
+    ch('L053', 960, 780, 'par défaut : seulement si le step a réussi', g, { size: 26, b: 'L057' }),
+    ch('L054', 960, 850, 'setStrict(true) : échoue si la clé est absente', o, { size: 26, b: 'L057' }),
+    ch('L058', 960, 330, 'null : la note est restée dans le carnet du step 1', r, { size: 36, b: 'L059' }),
+    tx('L059', 960, 900, '2B.5 · Réutiliser et outils →', { size: 48, c: g }),
+    code('L055', 100, 200, 1700, 170, 'psql', [['L055', 'SELECT short_context FROM batch_job_execution_context ORDER BY job_execution_id DESC LIMIT 1;', C.text], ['L056', '{"totalLines":12480}', g]], { size: 24, accent: g, b: 'L057' }),
   ],
-  quiz: [{ q: 'L048', a: 'L049', question: 'Le step 1 écrit totalLines dans son carnet, sans promotion. Que lit le step 2 ?', choices: ['0', 'null', '12 480'], win: 1, answer: 'null : la note est restée dans le carnet du step 1. Sans promotion, personne d\'autre ne la voit.' }],
-  cues: [{ a: 'L040', s: 'blip' }, { a: 'L042', s: 'error' }, { a: 'L043', s: 'success' }],
+  quiz: [{ q: 'L057', a: 'L058', question: 'Le step 1 écrit totalLines dans son carnet, sans promotion. Que lit le step 2 ?', choices: ['0', 'null', '12 480'], win: 1, answer: 'null : la note est restée dans le carnet du step 1. Sans promotion, personne d\'autre ne la voit.' }],
+  cues: [{ a: 'L047', s: 'blip' }, { a: 'L049', s: 'error' }, { a: 'L050', s: 'success' }],
 });
 
 // ---------- Scène 5 : réutiliser, outils, lancement ----------
 SCENES[5] = mk({
   label: 'RÉUTILISER ET OUTILS', color: g, part: '2B.5 · RÉUTILISER DES STEPS, OUTILS TOUT FAITS',
   els: [
-    ch('L051', 960, 330, 'la même suite de steps dans plusieurs jobs', g, { size: 34, b: 'L052' }),
-    tb('L052', 100, 200, [300, 760, 660], ['option', 'dans le repository', 'image'], [
-      row('L052', ['flow', 'les steps, comme écrits dans le job', 'plan photocopié'], b),
-      row('L053', ['FlowStep', 'une ligne de plus', 'le plan, avec un titre'], o),
-      row('L054', ['JobStep', 'un autre job, sa propre instance', 'un sous-traitant'], p)], { size: 24, rh: 62, b: 'L057' }),
-    code('L055', 100, 480, 1500, 130, 'JobStep', [['L055', 'new StepBuilder("initStep", jobRepository).job(preProcessingJob)', w], ['L055', '    .parametersExtractor(new DefaultJobParametersExtractor()).build();', g]], { size: 22, accent: g, b: 'L057' }),
-    stp('L056', 960, 720, 'UN SEUL NIVEAU DE JOBSTEP', r, { size: 44, b: 'L057' }),
-    ch('L057', 960, 330, 'appeler du code existant, sans écrire de tasklet', b, { size: 34, b: 'L058' }),
-    tb('L058', 100, 200, [560, 820, 340], ['tasklet', 'rôle', 'attention'], [
-      row('L058', ['MethodInvokingTaskletAdapter', 'appelle une méthode de bean, une fois', ''], g),
-      row('L059', ['CallableTaskletAdapter', 'exécute un Callable', 'le step attend'], o),
-      row('L060', ['SystemCommandTasklet', 'lance une commande du système', 'timeout !'], r)], { size: 22, rh: 60, b: 'L064' }),
-    code('L061', 100, 460, 1500, 110, 'SystemCommandTasklet', [['L061', 'shell.setCommand("tar", "czf", "archive.tgz", "export/");   // en morceaux, sans shell', w]], { size: 22, accent: o, b: 'L064' }),
-    code('L062', 100, 610, 1500, 130, 'garde-fous', [['L062', 'shell.setTimeout(60_000);  shell.setInterruptOnCancel(true);', g]], { size: 22, accent: g, b: 'L064' }),
-    ch('L063', 960, 800, 'SystemProcessExitCodeMapper : code de sortie → statut', p, { size: 24, b: 'L064' }),
-    bx('L064', 480, 330, 560, 110, 'JobLauncherApplicationRunner', b, { size: 22, b: 'L066' }), ar('L064', 760, 330, 1000, 330, w, { b: 'L066' }), bx('L064', 1440, 330, 560, 110, 'JobExecutionExitCodeGenerator', g, { size: 20, b: 'L066' }),
-    ch('L065', 960, 470, 'spring.batch.job.name : choisir le job', y, { size: 28, b: 'L066' }), ch('L065', 960, 540, 'cron, orchestrateur : le code de sortie dit si ça a réussi', g, { size: 24, b: 'L066' }),
-    pl('L066', 300, 330, 1, 'run.id oublié dans le validateur', r, { size: 26 }), pl('L066', 300, 400, 2, 'afterJob sans tester le statut', r, { size: 26 }),
-    pl('L067', 300, 480, 3, 'note non promue', r, { size: 26 }), pl('L067', 300, 550, 4, 'JobStep sans extracteur', r, { size: 26 }),
-    pl('L068', 300, 630, 5, 'SystemCommandTasklet sans timeout', r, { size: 26 }), pl('L068', 300, 700, 6, 'anciens noms copiés', r, { size: 26 }),
-    ch('L069', 1500, 540, 'Exercices 1 à 5', b, { size: 32 }),
-    tx('L070', 960, 900, 'Module 3 : le chunk →', { size: 48, c: p }),
+    ch('L060', 960, 330, 'la même suite de steps dans plusieurs jobs', g, { size: 34, b: 'L061' }),
+    tb('L061', 100, 200, [300, 760, 660], ['option', 'dans le repository', 'image'], [
+      row('L061', ['flow', 'les steps, comme écrits dans le job', 'plan photocopié'], b),
+      row('L062', ['FlowStep', 'une ligne de plus', 'le plan, avec un titre'], o),
+      row('L063', ['JobStep', 'un autre job, sa propre instance', 'un sous-traitant'], p)], { size: 24, rh: 62, b: 'L066' }),
+    code('L064', 100, 480, 1500, 130, 'JobStep', [['L064', 'new StepBuilder("initStep", jobRepository).job(preProcessingJob)', w], ['L064', '    .parametersExtractor(new DefaultJobParametersExtractor()).build();', g]], { size: 22, accent: g, b: 'L066' }),
+    stp('L065', 960, 720, 'UN SEUL NIVEAU DE JOBSTEP', r, { size: 44, b: 'L066' }),
+    ch('L066', 960, 330, 'appeler du code existant, sans écrire de tasklet', b, { size: 34, b: 'L067' }),
+    tb('L067', 100, 200, [560, 820, 340], ['tasklet', 'rôle', 'attention'], [
+      row('L067', ['MethodInvokingTaskletAdapter', 'appelle une méthode de bean, une fois', ''], g),
+      row('L068', ['CallableTaskletAdapter', 'exécute un Callable', 'le step attend'], o),
+      row('L071', ['SystemCommandTasklet', 'lance une commande du système', 'timeout !'], r)], { size: 22, rh: 60, b: 'L075' }),
+    code('L072', 100, 460, 1500, 110, 'SystemCommandTasklet', [['L072', 'shell.setCommand("tar", "czf", "archive.tgz", "export/");   // en morceaux, sans shell', w]], { size: 22, accent: o, b: 'L075' }),
+    code('L073', 100, 610, 1500, 130, 'garde-fous', [['L073', 'shell.setTimeout(60_000);  shell.setInterruptOnCancel(true);', g]], { size: 22, accent: g, b: 'L075' }),
+    ch('L074', 960, 800, 'SystemProcessExitCodeMapper : code de sortie → statut', p, { size: 24, b: 'L075' }),
+    bx('L075', 480, 330, 560, 110, 'JobLauncherApplicationRunner', b, { size: 22, b: 'L077' }), ar('L075', 760, 330, 1000, 330, w, { b: 'L077' }), bx('L075', 1440, 330, 560, 110, 'JobExecutionExitCodeGenerator', g, { size: 20, b: 'L077' }),
+    ch('L076', 960, 470, 'spring.batch.job.name : choisir le job', y, { size: 28, b: 'L077' }), ch('L076', 960, 540, 'cron, orchestrateur : le code de sortie dit si ça a réussi', g, { size: 24, b: 'L077' }),
   ],
-  cues: [{ a: 'L052', s: 'pop' }, { a: 'L056', s: 'error' }, { a: 'L064', s: 'blip' }, { a: 'L070', s: 'levelup', g: -10 }],
+  quiz: [{ q: 'L069', a: 'L070', question: 'CallableTaskletAdapter exécute ton code sur un autre thread. Le step avance-t-il en parallèle ?', choices: ['oui', 'non', 'seulement en cas d\'échec'], win: 1, answer: 'Non : le step attend la fin du Callable. Un autre thread, mais aucun gain de temps.' }],
+  cues: [{ a: 'L061', s: 'pop' }, { a: 'L065', s: 'error' }, { a: 'L075', s: 'blip' }, { a: 'L076', s: 'pop' }],
+});
+
+const PH2 = ['#', 'Piège', 'Ce qui se passe', 'Parade'], PC2 = [80, 560, 600, 480];
+
+SCENES[6] = mk({
+  label: 'TOP10_1', color: r, part: 'TOP 10 DES PIÈGES (1/2)',
+  els: [
+    tb('L077', 100, 190, PC2, PH2, [
+      row('L078', ['1', 'validateur sans run.id', 'lancement refusé', 'run.id en clé facultative'], r), row('L080', ['2', 'afterJob sans tester le statut', 'réussite annoncée après un échec', 'tester BatchStatus'], r),
+      row('L082', ['3', 'note non promue', 'null dans le step suivant', 'ExecutionContextPromotionListener'], r), row('L084', ['4', 'clé promue absente, strict faux', 'valeur manquante, sans erreur', 'setStrict(true)'], o),
+      row('L086', ['5', 'listener qui lève une exception', 'issue du job perturbée', 'listener court, try/catch'], o)], { size: 21, rh: 70, noBold: true }),
+    extrait2('L079', 'L080', [['InvalidJobParametersException : … run.id', r]]), extrait2('L081', 'L082', [['Terminé : 0 lignes          job status = FAILED', r]]),
+    extrait2('L083', 'L084', [['totalLines = null', r]]), extrait2('L085', 'L086', [['contrôle : 0 lignes lues, aucune erreur', r]]), extrait2('L087', null, [['Exception in afterJob : MailException', r]]),
+  ],
+  cues: [{ a: 'L078', s: 'pop' }, { a: 'L080', s: 'pop' }, { a: 'L082', s: 'pop' }, { a: 'L084', s: 'pop' }, { a: 'L086', s: 'pop' }],
+});
+
+SCENES[7] = mk({
+  label: 'TOP10_2', color: r, part: 'TOP 10 DES PIÈGES (2/2)',
+  els: [
+    tb('L088', 100, 190, PC2, PH2, [
+      row('L088', ['6', 'chaîne de JobStep', 'impossible de suspendre un job intermédiaire', 'un seul niveau'], o), row('L090', ['7', 'JobStep sans extracteur', 'job enfant sans paramètres', 'DefaultJobParametersExtractor'], r),
+      row('L092', ['8', 'Callable pris pour du parallélisme', 'le step attend', 'split ou multithread'], o), row('L094', ['9', 'SystemCommandTasklet sans timeout', 'step bloqué', 'setTimeout'], r),
+      row('L096', ['10', 'anciens noms copiés', 'erreur de compilation', 'noms de la 6.0.6'], o)], { size: 21, rh: 70, noBold: true }),
+    extrait2('L089', 'L090', [['batch_job_instance : parentJob, childJob, grandChildJob', r]]), extrait2('L091', 'L092', [['InvalidJobParametersException : runDate manquant (job enfant)', r]]),
+    extrait2('L093', 'L094', [['durée : 120 s = 60 s + 60 s', r]]), extrait2('L095', 'L096', [['step démarré à 02:00          toujours STARTED à 09:00', r]]), extrait2('L097', null, [['error: cannot find symbol      class JobParametersInvalidException', r]]),
+  ],
+  cues: [{ a: 'L088', s: 'pop' }, { a: 'L090', s: 'pop' }, { a: 'L092', s: 'pop' }, { a: 'L094', s: 'pop' }, { a: 'L096', s: 'pop' }],
+});
+
+SCENES[8] = mk({
+  label: 'BILAN', color: g, part: 'BILAN ET EXERCICES',
+  els: [
+    bx('L098', 400, 300, 300, 100, 'videur', b, { b: 'L100' }), bx('L098', 800, 300, 340, 100, 'chef de chantier', o, { size: 24, b: 'L100' }), bx('L098', 1200, 300, 300, 100, 'carnet', p, { b: 'L100' }),
+    ch('L099', 960, 460, 'flow · FlowStep · JobStep · RunIdIncrementer (Annexe 1)', y, { size: 26, b: 'L100' }),
+    cd('L100', 100, 500, 330, 300, 'Exercice 1', ['runDate + mode : que se passe-t-il ? Avec RunIdIncrementer ?'], b, { size: 20 }), cd('L101', 450, 500, 330, 300, 'Exercice 2', ['Job en échec au step 2 : listeners appelés ? statut ?'], o, { size: 20 }),
+    cd('L102', 800, 500, 330, 300, 'Exercice 3', ['totalLines null au step 2 : que manque-t-il ? setStrict ?'], p, { size: 20 }), cd('L103', 1150, 500, 330, 300, 'Exercice 4', ['FlowStep ou JobStep : la différence dans batch_job_instance ?'], g, { size: 20 }),
+    cd('L104', 1500, 500, 330, 300, 'Exercice 5', ['Commande en morceaux : pourquoi plus sûr ?'], r, { size: 20 }),
+    bar('L105', 960, 930, 800, 36, [['L105', 1], ['L106', 0]], y, { label: 'réfléchis…', b: 'L106' }),
+    ch('L106', 305, 850, 'refusé : mode inconnu', g, { size: 20 }), ch('L107', 700, 850, 'afterJob : FAILED', g, { size: 22 }), ch('L108', 1050, 850, 'promotion oubliée', g, { size: 22 }), ch('L109', 1400, 850, 'JobStep : nouvelle instance', g, { size: 20 }), ch('L110', 1700, 850, 'pas de shell', g, { size: 22 }),
+    ch('L111', 1500, 990, 'Module 3 : le chunk →', o, { size: 26 }),
+  ],
+  cues: [{ a: 'L106', s: 'success' }, { a: 'L111', s: 'levelup', g: -10 }],
 });

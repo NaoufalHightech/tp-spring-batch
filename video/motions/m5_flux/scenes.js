@@ -197,172 +197,252 @@ function mk(spec) {
 }
 
 
-// ======================= Module 2 : scènes (ancres sur le début des lignes) =======================
-// code(ancre, x, y, w, h, titre, [[ancre, texte, couleur]...], options)
+// ======================= Module 5 : scènes (les cinq images : colis, aiguillage, chef d'orchestre, jeu, péage) =======================
 const code = (a, x, y, w_, h, title, rows, o_ = {}) => tm(a, x, y, w_, h, title, rows.map(([an, s, c]) => ({ a: an, s, c: c || C.text })), { size: 21, accent: g, ...o_ });
 const extrait2 = (a, b_, rows) => tm(a, 100, 700, 1720, 250, 'extrait indicatif', rows.map(([s, c]) => ({ a, s, c })), { size: 22, accent: r, b: b_ });
-const side = (a, y_, s, c_, o_ = {}) => ch(a, 1600, y_, s, c_, { size: 24, ...o_ });
-
 const PH2 = ['#', 'Piège', 'Ce qui se passe', 'Parade'], PC2 = [80, 600, 560, 480];
 const row = (a, cells, c) => ({ a, cells, c });
 const pills = (a, items, y_, sz = 22) => items.map(([n, s, c_, x]) => pl(a, x, y_, n, s, c_, { size: sz }));
 
+// ---------- Scène 0 : ouverture et les cinq images ----------
 SCENES[0] = mk({
-  label: 'OUVERTURE', color: r,
+  label: 'OUVERTURE', color: r, part: '5 · FLUX ET ORCHESTRATION',
   els: [
-    bx('L001', 330, 330, 440, 130, 'chargement', r, { sub: 'ÉCHEC', size: 34 }), bx('L001', 960, 330, 440, 130, 'alerte', g, { sub: 'envoyée : réussie', size: 34 }), bx('L001', 1590, 330, 440, 130, 'job', g, { sub: 'tableau de bord : vert', size: 34 }),
-    ar('L001', 560, 330, 740, 330, d), ar('L001', 1190, 330, 1370, 330, d), ch('L002', 960, 540, '.end()  au lieu de  .fail()', r, { size: 44 }),
-    ch('L003', 500, 700, 'chaque step laisse sa trace : status, exit_code', b, { size: 26 }), ch('L004', 1400, 700, 'Step, Flow, Job : singletons sans état', p, { size: 26 }),
-    ...pills('L005', [[1, 'graphe', g, 130], [2, 'statuts', b, 400], [3, 'flux', p, 670], [4, 'decider', o, 910], [5, 'états', g, 1170], [6, 'split', b, 1430], [7, 'pièges', r, 1700]], 960, 20),
+    bx('L001', 360, 330, 360, 100, 'chargement : ÉCHEC', r, { size: 24, b: 'L002' }), bx('L001', 960, 330, 360, 100, 'alerte : OK', g, { b: 'L002' }), bx('L001', 1560, 330, 360, 100, 'job : COMPLETED', g, { size: 24, b: 'L002' }),
+    ch('L001', 960, 470, "personne n'a rien vu de la nuit", y, { size: 30, b: 'L002' }),
+    code('L002', 160, 220, 1600, 150, 'BankFlowJob', [['L002', '.from(loadBankStep).on("FAILED").to(alertStep)', C.text], ['L002', '        .on("*").end()      // au lieu de fail()', r]], { size: 28, accent: r, b: 'L003' }),
+    tb('L003', 100, 220, [500, 300, 500], ['step', 'status', 'exit_code'], [row('L003', ['loadBankStep', 'COMPLETED', 'COMPLETED'], g)], { size: 26, rh: 60, b: 'L005' }),
+    ch('L004', 960, 520, 'plans (singletons sans état) · exécution : JobExecution', b, { size: 28, b: 'L005' }),
+    tx('L005', 960, 180, 'cinq images pour tout retenir', { size: 44, c: o, b: 'L008' }),
+    cd('L006', 100, 250, 320, 300, 'Le colis', ['BatchStatus et ExitStatus'], o, { b: 'L008' }), cd('L006', 440, 250, 320, 300, "L'aiguillage", ['le flux conditionnel'], p, { b: 'L008' }), cd('L006', 780, 250, 320, 300, "Le chef d'orchestre", ['le decider'], b, { b: 'L008' }),
+    cd('L007', 1120, 250, 320, 300, 'Le jeu de société', ['la machine à états'], g, { b: 'L008' }), cd('L007', 1460, 250, 320, 300, "Le péage", ['le split, threads et connexions'], y, { b: 'L008' }),
+    ...pills('L008', [[1, 'graphe', b, 120], [2, 'colis', o, 400], [3, 'aiguillage', p, 680], [4, 'decider', b, 980], [5, 'moteur', g, 1260], [6, 'péage', y, 1520], [7, 'pièges', r, 1760]], 480, 22),
   ],
-  cues: [{ a: 'L001', s: 'error' }, { a: 'L002', s: 'alarm', g: -12 }, { a: 'L005', s: 'blip' }],
+  cues: [{ a: 'L001', s: 'error' }, { a: 'L002', s: 'pop' }, { a: 'L006', s: 'blip' }, { a: 'L008', s: 'blip' }],
 });
 
+// ---------- Scène 1 : du pipeline au graphe ----------
 SCENES[1] = mk({
-  label: 'GRAPHE', color: g, part: '5.1 · DU PIPELINE AU GRAPHE',
+  label: 'GRAPHE', color: b, part: '5.1 · DU PIPELINE AU GRAPHE',
   els: [
-    bx('L007', 400, 330, 260, 100, 'step A', g, { b: 'L008' }), bx('L007', 960, 330, 260, 100, 'step B', g, { b: 'L008' }), ar('L007', 540, 330, 820, 330, d, { b: 'L008' }), ch('L006', 960, 200, 'pas seulement en ligne droite', y, { size: 28, b: 'L008' }), cr('L007', 400, 330, 40, r, { b: 'L008' }),
-    bx('L008', 960, 270, 380, 100, 'loadBankStep', b, { size: 30 }),
-    bx('L009', 420, 520, 420, 100, 'bankReportStep', g, { size: 26 }), bx('L009', 960, 520, 420, 100, 'alertStep (trop de rejets)', o, { size: 24 }), bx('L009', 1500, 520, 420, 100, 'alertStep (échec)', r, { size: 26 }),
-    ar('L009', 860, 320, 560, 470, g), ar('L009', 960, 320, 960, 470, o), ar('L009', 1060, 320, 1380, 470, r),
-    ch('L009', 480, 400, 'COMPLETED', g, { size: 20 }), ch('L009', 960, 410, 'COMPLETED_WITH_REJECTS', o, { size: 18 }), ch('L009', 1440, 400, 'FAILED', r, { size: 20 }),
-    ch('L010', 960, 620, "un job = un graphe d'états", y, { size: 30 }), ch('L013', 960, 670, 'alertes · chemins d\'erreur · branches métier', d, { size: 22 }),
-    code('L011', 100, 710, 1700, 230, 'écritures', [['L011', '.start(a).next(b).next(c)               // si a échoue, le job s\'arrête', C.text], ['L012', '.start(a).on("COMPLETED").to(b).from(a).on("FAILED").to(c)', g]], { size: 24 }),
-    ch('L016', 1550, 1000, 'deux statuts →', b, { size: 26 }),
+    bx('L009', 360, 330, 260, 100, 'A', b, { b: 'L011' }), ar('L009', 490, 330, 670, 330, w, { b: 'L011' }), bx('L009', 800, 330, 260, 100, 'B', b, { b: 'L011' }), ar('L009', 930, 330, 1110, 330, w, { b: 'L011' }), bx('L009', 1240, 330, 260, 100, 'C', b, { b: 'L011' }),
+    ch('L010', 960, 470, "voie unique : si A déraille, tout s'arrête", r, { size: 30, b: 'L011' }), cr('L010', 190, 330, 26, r, { b: 'L011' }),
+    bx('L011', 360, 330, 380, 100, 'chargement', b, { b: 'L015' }), ch('L011', 360, 420, 'gare de départ', d, { size: 22, b: 'L015' }),
+    ar('L012', 560, 330, 840, 230, g, { b: 'L015' }), ar('L012', 560, 330, 840, 330, o, { b: 'L015' }), ar('L012', 560, 330, 840, 430, r, { b: 'L015' }),
+    bx('L012', 1020, 230, 340, 90, 'rapport', g, { size: 26, b: 'L015' }), bx('L012', 1020, 330, 340, 90, 'alerte : trop de rejets', o, { size: 22, b: 'L015' }), bx('L012', 1020, 430, 340, 90, 'alerte : échec', r, { size: 24, b: 'L015' }),
+    bx('L014', 1560, 230, 220, 80, 'succès', g, { size: 24, b: 'L015' }), bx('L014', 1560, 430, 220, 80, 'échec', r, { size: 24, b: 'L015' }), ar('L014', 1200, 230, 1450, 230, g, { b: 'L015' }), ar('L014', 1200, 430, 1450, 430, r, { b: 'L015' }),
+    ch('L013', 960, 580, 'gares = steps · aiguillages = décisions', y, { size: 32, b: 'L015' }), ch('L014', 960, 650, 'une gare de départ · trois directions · des terminus', g, { size: 28, b: 'L015' }),
+    code('L015', 100, 200, 1300, 110, 'enchaînement simple', [['L015', '.start(a).next(b).next(c)', C.text]], { size: 30, accent: b, b: 'L017' }),
+    code('L016', 100, 350, 1500, 140, 'enchaînement conditionnel', [['L016', '.start(a).on("COMPLETED").to(b)', C.text], ['L016', '.from(a).on("FAILED").to(c)', C.text]], { size: 26, accent: p, b: 'L017' }),
+    ch('L018', 960, 330, "il s'arrête : il faut un flux conditionnel", o, { size: 40, b: 'L019' }),
+    tx('L019', 960, 900, '5.2 · Le colis →', { size: 48, c: o }),
   ],
-  quiz: [{ q: 'L014', a: 'L015', question: "Dans un enchaînement simple, le step a échoue. Que fait le job ?", choices: ['il continue', "il s'arrête", 'il alerte'], win: 1, answer: "Il s'arrête. Pour réagir à l'échec, il faut un flux conditionnel." }],
-  cues: [{ a: 'L009', s: 'pop' }],
+  quiz: [{ q: 'L017', a: 'L018', question: 'Dans un enchaînement simple, le step a échoue. Que fait le job ?', choices: ['il continue', "il s'arrête", 'il saute b'], win: 1, answer: "Il s'arrête. Pour réagir à l'échec, il faut un flux conditionnel." }],
+  cues: [{ a: 'L010', s: 'error' }, { a: 'L012', s: 'pop' }, { a: 'L014', s: 'blip' }],
 });
 
+// ---------- Scène 2 : le colis ----------
 SCENES[2] = mk({
-  label: 'BATCH_EXIT_STATUS', color: b, part: '5.2 · BATCHSTATUS CONTRE EXITSTATUS',
+  label: 'COLIS', color: o, part: "5.2 · BATCHSTATUS ET EXITSTATUS : L'HISTOIRE DU COLIS",
   els: [
-    ch('L017', 960, 170, 'que compare un on(...) ?', y, { size: 26 }),
-    tx('L018', 150, 240, 'BatchStatus : énumération fixe, décidée par le framework', { size: 24, fam: MONO, c: b, align: 'left' }),
-    ...['STARTING', 'STARTED', 'STOPPING', 'STOPPED', 'FAILED', 'COMPLETED', 'ABANDONED'].map((s, i) => ch('L019', 260 + i * 235, 300, s, i === 4 ? r : i === 5 ? g : b, { size: 20 })),
-    tx('L020', 150, 400, 'ExitStatus : texte libre, sert à aiguiller le flux', { size: 24, fam: MONO, c: o, align: 'left' }),
-    ...['COMPLETED', 'FAILED', 'STOPPED', 'NOOP', 'COMPLETED_WITH_REJECTS'].map((s, i) => ch('L021', 260 + i * 330, 460, s, i === 4 ? o : d, { size: 20 })),
-    ch('L022', 960, 540, 'les transitions comparent le code de ExitStatus', y, { size: 30 }), ch('L023', 500, 600, 'par défaut : coïncident', g, { size: 24 }), ch('L024', 1400, 600, 'code personnalisé : divergent', o, { size: 24 }),
-    ch('L025', 1680, 690, 'chargement réussi, 150 rejets', b, { size: 22 }),
-    code('L026', 100, 680, 1350, 280, 'RejectsExitListener', [['L026', 'implements StepExecutionListener', C.text], ['L027', 'public ExitStatus afterStep(StepExecution stepExecution) {', y], ['L028', '  if (status != COMPLETED) return stepExecution.getExitStatus();', C.text], ['L029', '  return stepExecution.getFilterCount() > MAX_REJECTS', o], ['L029', '      ? new ExitStatus("COMPLETED_WITH_REJECTS") : …', o]], { size: 21 }),
-    ch('L030', 1650, 790, 'BatchStatus : COMPLETED', g, { size: 20 }), ch('L030', 1650, 850, 'ExitStatus : COMPLETED_WITH_REJECTS', o, { size: 18 }), ch('L031', 1650, 920, 'reprise : BatchStatus · aiguillage : ExitStatus', y, { size: 16 }),
-    ch('L032', 1680, 750, 'sans code : ExitStatus = BatchStatus', d, { size: 18 }), ch('L035', 1500, 1000, 'le flux conditionnel →', p, { size: 26 }),
+    ch('L020', 960, 330, 'que regarde exactement un on ?', o, { size: 38, b: 'L021' }),
+    bx('L021', 960, 290, 280, 130, 'COLIS', o, { size: 40, b: 'L027' }),
+    cd('L022', 100, 420, 720, 270, 'État du colis · BatchStatus', ['en cours · livré · perdu', 'décidé par le transporteur : le framework', "toi, tu n'y touches pas"], b, { b: 'L027' }),
+    cd('L024', 1100, 420, 720, 270, 'Mot du livreur · ExitStatus', ['« livré au voisin » · « boîte pleine »', 'le livreur écrit ce qu\'il veut', 'celui-là, tu peux le personnaliser'], o, { b: 'L027' }),
+    ar('L023', 880, 350, 540, 420, b, { b: 'L027' }), ar('L025', 1040, 350, 1380, 420, o, { b: 'L027' }),
+    ch('L026', 960, 760, "un on lit toujours le mot du livreur : l'ExitStatus", g, { size: 32, b: 'L027' }),
+    tb('L027', 100, 200, [420], ['BatchStatus (fixe)'], [row('L027', ['STARTING'], b), row('L027', ['STARTED'], b), row('L027', ['STOPPING'], b), row('L027', ['STOPPED'], b), row('L027', ['FAILED'], r), row('L027', ['COMPLETED'], g), row('L027', ['ABANDONED'], d)], { size: 24, rh: 52, b: 'L029' }),
+    tb('L028', 700, 200, [620], ['ExitStatus (libre)'], [row('L028', ['COMPLETED'], g), row('L028', ['FAILED'], r), row('L028', ['STOPPED'], o), row('L028', ['NOOP'], d), row('L028', ['COMPLETED_WITH_REJECTS'], y)], { size: 24, rh: 52, b: 'L029' }),
+    bx('L029', 500, 330, 440, 90, 'BatchStatus COMPLETED', b, { size: 22, b: 'L031' }), bx('L029', 500, 450, 440, 90, 'ExitStatus COMPLETED', g, { size: 22, b: 'L031' }), ch('L029', 960, 390, 'identiques par défaut', d, { size: 24, b: 'L030' }),
+    bx('L030', 1440, 330, 520, 90, 'BatchStatus COMPLETED', b, { size: 22, b: 'L031' }), bx('L030', 1440, 450, 520, 90, 'ExitStatus COMPLETED_WITH_REJECTS', y, { size: 20, b: 'L031' }), ch('L030', 960, 560, 'colis livré, mais le bordereau dit autre chose', o, { size: 28, b: 'L031' }),
+    ch('L031', 960, 330, 'chargement réussi · 150 lignes rejetées', o, { size: 36, b: 'L032' }),
+    code('L032', 100, 200, 1400, 340, 'RejectsExitListener', [
+      ['L032', 'public class RejectsExitListener implements StepExecutionListener {', C.text],
+      ['L033', '  @Override public ExitStatus afterStep(StepExecution stepExecution) {', g],
+      ['L034', '    if (stepExecution.getStatus() != BatchStatus.COMPLETED) return stepExecution.getExitStatus();', o],
+      ['L035', '    if (stepExecution.getFilterCount() > MAX_REJECTS)', b],
+      ['L035', '      return new ExitStatus("COMPLETED_WITH_REJECTS");', y],
+      ['L036', '    return stepExecution.getExitStatus();', C.text], ['L036', '  }', C.text], ['L036', '}', C.text]], { size: 20, accent: o, b: 'L038' }),
+    ch('L033', 1690, 330, 'le bordereau : modifiable ici', b, { size: 20, b: 'L038' }), ch('L034', 1690, 420, 'un colis perdu reste perdu', r, { size: 20, b: 'L038' }), ch('L036', 1690, 510, 'BatchStatus : inchangé', g, { size: 20, b: 'L038' }),
+    ch('L037', 960, 640, 'reprise : BatchStatus · aiguillage : ExitStatus', y, { size: 32, b: 'L038' }),
+    bx('L039', 560, 330, 440, 100, 'BatchStatus COMPLETED', b, { size: 22, b: 'L040' }), bx('L039', 1360, 330, 560, 100, 'ExitStatus COMPLETED_WITH_REJECTS', y, { size: 20, b: 'L040' }),
+    tx('L040', 960, 900, "5.3 · L'aiguillage →", { size: 48, c: p }),
   ],
-  quiz: [{ q: 'L033', a: 'L034', question: 'Le step a réussi, le listener pose COMPLETED_WITH_REJECTS. Que vaut le BatchStatus ?', choices: ['COMPLETED', 'FAILED', 'COMPLETED_WITH_REJECTS'], win: 0, answer: 'BatchStatus COMPLETED, ExitStatus COMPLETED_WITH_REJECTS : réussi techniquement, mais le code dit autre chose.' }],
-  cues: [{ a: 'L022', s: 'stamp' }, { a: 'L030', s: 'pop' }],
+  quiz: [{ q: 'L038', a: 'L039', question: 'Le step a réussi, mais le listener a écrit COMPLETED_WITH_REJECTS. Que valent le BatchStatus et l\'ExitStatus ?', choices: ['COMPLETED / COMPLETED', 'COMPLETED / COMPLETED_WITH_REJECTS', 'FAILED / COMPLETED_WITH_REJECTS'], win: 1, answer: 'BatchStatus COMPLETED, ExitStatus COMPLETED_WITH_REJECTS : colis livré, mais le bordereau dit autre chose.' }],
+  cues: [{ a: 'L022', s: 'pop' }, { a: 'L024', s: 'pop' }, { a: 'L026', s: 'success' }, { a: 'L030', s: 'blip' }],
 });
 
+// ---------- Scène 3 : l'aiguillage ferroviaire ----------
 SCENES[3] = mk({
-  label: 'FLUX_CONDITIONNEL', color: p, part: '5.3 · UN FLUX CONDITIONNEL, LIGNE PAR LIGNE',
+  label: 'AIGUILLAGE', color: p, part: "5.3 · UN FLUX CONDITIONNEL : L'AIGUILLAGE FERROVIAIRE",
   els: [
-    code('L037', 100, 190, 1300, 500, 'BankFlowJob', [
-      ['L037', 'new JobBuilder("bankFlowJob", jobRepository)', C.text], ['L037', '    .start(loadBankStep)', y], ['L039', '        .on("COMPLETED").to(bankReportStep)', g], ['L040', '    .from(loadBankStep)'], ['L040', '        .on("FAILED").to(alertStep)', o],
-      ['L041', '            .on("*").fail()', r], ['L043', '    .from(loadBankStep)'], ['L043', '        .on("*").fail()   // filet de sécurité', r], ['L045', '    .end().build();']], { size: 21 }),
-    ch('L036', 1600, 240, 'rapport si tout va bien, alerte sinon', d, { size: 22 }), ch('L038', 1600, 310, 'builder de flux', b, { size: 22 }), ch('L042', 1600, 380, 'alerte verte + job vert : faux', r, { size: 22 }), ch('L044', 1600, 450, 'code oublié, STOPPED, UNKNOWN', r, { size: 22 }),
-    ch('L050', 1600, 520, '* : toute suite · ? : un caractère', b, { size: 20 }), ch('L051', 1600, 590, 'le plus précis gagne', g, { size: 22 }), ch('L052', 1600, 660, 'end · fail · stopAndRestart', y, { size: 22 }),
-    code('L046', 100, 720, 1300, 220, 'FinanceAlertTasklet', [['L046', 'job = contribution.getStepExecution().getJobExecution();', C.text], ['L047', 'load = … filter(s -> s.getStepName().equals("loadBankStep"));', b], ['L048', 'alertSender.toFinanceTeam("… %d lignes rejetées sur %d lues");', o]], { size: 21 }),
-    ch('L049', 1600, 780, 'composant sans état', g, { size: 22 }), ch('L055', 960, 1000, 'branche d\'erreur : fail', y, { size: 26 }), ch('L056', 1600, 850, 'la fin du flux fixe l\'état du job', y, { size: 22 }), ch('L057', 1650, 960, 'le decider →', o, { size: 24 }),
+    ch('L041', 960, 230, 'chargement · rapport si tout va bien · alerte sinon', d, { size: 28, b: 'L042' }),
+    bx('L042', 300, 430, 300, 110, 'chargement', b, { b: 'L045' }), ch('L042', 300, 520, 'gare de départ', y, { size: 22, b: 'L045' }),
+    bx('L043', 900, 300, 300, 90, 'rapport', g, { b: 'L045' }), bx('L043', 900, 560, 300, 90, 'alerte', o, { b: 'L045' }),
+    ar('L043', 450, 400, 750, 320, g, { b: 'L045' }), ar('L043', 450, 460, 750, 540, o, { b: 'L045' }), ch('L043', 560, 330, 'voie libre', g, { size: 22, b: 'L045' }), ch('L043', 560, 560, 'déraillé', o, { size: 22, b: 'L045' }),
+    bx('L044', 1500, 430, 300, 100, 'arrêt du réseau', r, { b: 'L045' }), ar('L044', 450, 430, 1350, 430, r, { dash: true, b: 'L045' }), ch('L044', 900, 430, 'voie imprévue', r, { size: 22, b: 'L045' }),
+    code('L045', 100, 190, 1300, 430, 'BankFlowJob', [
+      ['L045', 'new JobBuilder("bankFlowJob", jobRepository)', C.text], ['L045', '    .start(loadBankStep)', y],
+      ['L047', '        .on("COMPLETED").to(bankReportStep)', g],
+      ['L048', '    .from(loadBankStep)', C.text], ['L048', '        .on("FAILED").to(alertStep)', o],
+      ['L049', '            .on("*").fail()', r],
+      ['L051', '    .from(loadBankStep)', C.text], ['L051', '        .on("*").fail()   // filet de sécurité', r],
+      ['L053', '    .end().build();', C.text]], { size: 21, accent: p }),
+    ch('L045', 1650, 240, 'le train part de la gare', y, { size: 22 }), ch('L046', 1650, 300, 'builder de flux', b, { size: 22 }), ch('L047', 1650, 360, 'voie libre : vers le rapport', g, { size: 22 }),
+    ch('L048', 1650, 430, 'retour à la gare : déraillé, alerte', o, { size: 20 }), ch('L050', 1650, 500, 'alerte verte + job vert : faux', r, { size: 22 }),
+    ch('L051', 1650, 570, 'filet : arrêt de tout le réseau', r, { size: 22 }), ch('L052', 1650, 640, 'code oublié : train sans voie', r, { size: 22 }),
+    ch('L058', 1650, 710, '* : toute suite · ? : un caractère', b, { size: 20 }), ch('L059', 1650, 780, 'le plus précis gagne', g, { size: 22 }), ch('L060', 1650, 850, 'end · fail · stopAndRestart', y, { size: 22 }),
+    code('L054', 100, 650, 1300, 220, 'FinanceAlertTasklet', [['L054', 'job = contribution.getStepExecution().getJobExecution();', C.text], ['L055', 'load = … filter(s -> s.getStepName().equals("loadBankStep"));', b], ['L056', 'alertSender.toFinanceTeam("… %d lignes rejetées sur %d lues");', o]], { size: 21, accent: o }),
+    ch('L057', 1650, 920, 'composant sans état', g, { size: 22 }),
+    ch('L063', 960, 940, "branche d'erreur : fail", y, { size: 28 }), ch('L064', 960, 1000, "la fin du réseau fixe l'état du job", y, { size: 24 }),
+    ch('L065', 1600, 1040, "le chef d'orchestre →", o, { size: 22 }),
   ],
-  quiz: [{ q: 'L053', a: 'L054', question: 'COMPLETED_WITH_REJECTS arrive, aucune transition ne le prévoit, mais le filet * existe. Que se passe-t-il ?', choices: ['Next state not found', 'job FAILED explicite', 'suite normale'], win: 1, answer: 'Le filet l\'attrape : le job se termine en échec, explicitement. Sans filet : Next state not found.' }],
-  cues: [{ a: 'L041', s: 'pop' }, { a: 'L042', s: 'error' }],
+  quiz: [{ q: 'L061', a: 'L062', question: 'COMPLETED_WITH_REJECTS arrive, aucune transition ne le prévoit, mais le filet * existe. Que se passe-t-il ?', choices: ['Next state not found', 'job FAILED explicite', 'suite normale'], win: 1, answer: "Le filet l'attrape : le job se termine en échec, explicitement. Sans filet : Next state not found." }],
+  cues: [{ a: 'L042', s: 'blip' }, { a: 'L044', s: 'error' }, { a: 'L049', s: 'pop' }, { a: 'L050', s: 'error' }],
 });
 
+// ---------- Scène 4 : le chef d'orchestre ----------
 SCENES[4] = mk({
-  label: 'DECIDER', color: o, part: '5.4 · LE JOB EXECUTION DECIDER',
+  label: 'DECIDER', color: o, part: "5.4 · LE DECIDER : LE CHEF D'ORCHESTRE",
   els: [
-    code('L060', 100, 190, 1300, 300, 'RejectsDecider', [['L060', '@Component public class RejectsDecider implements JobExecutionDecider {', y], ['L061', '  FlowExecutionStatus decide(JobExecution je, StepExecution se) {', C.text],
-      ['L062', '    long rejected = se.getExecutionContext().getLong("rejectedCount", 0L);', b], ['L063', '    return new FlowExecutionStatus("TOO_MANY_REJECTS");', g]], { size: 21 }),
-    code('L065', 100, 520, 1300, 320, 'bankDecisionJob', [['L065', '.start(loadBankStep).next(rejectsDecider)', C.text], ['L066', '    .on("NO_REJECTS").to(bankReportStep)', g], ['L066', '    .from(rejectsDecider).on("FEW_REJECTS").to(bankReportStep)', g], ['L067', '    .from(rejectsDecider).on("TOO_MANY_REJECTS").to(alertStep)', o], ['L067', '    .from(rejectsDecider).on("*").fail()', r]], { size: 21 }),
-    ch('L058', 1650, 240, 'décider d\'après un compteur', d, { size: 22 }), ch('L059', 1650, 310, 'décision pure, sans traitement', g, { size: 22 }), ch('L064', 1650, 380, '3 codes : NO · FEW · TOO_MANY', y, { size: 20 }), ch('L068', 1650, 450, 'pas un step : rien en base', d, { size: 22 }),
-    ch('L069', 1650, 540, 'StepScope : pendant un step seulement', b, { size: 18 }), ch('L070', 1650, 610, 'entre deux steps : aucun contexte', r, { size: 20 }), ch('L071', 1650, 680, 'singleton sans état', g, { size: 22 }), ch('L072', 1650, 750, 'JobScope, ou lire les arguments', b, { size: 20 }), ch('L073', 1650, 820, 'decider pur : il ne modifie rien', y, { size: 20 }),
-    ch('L076', 1500, 960, 'la machine à états →', p, { size: 26 }), ch('L075', 960, 900, 'code de sortie : règle simple · decider : plusieurs sources', y, { size: 24 }),
+    ch('L066', 960, 330, 'rejectedCount = 150', o, { size: 44, b: 'L067' }),
+    bx('L067', 400, 360, 300, 100, 'step A', b, { b: 'L070' }), bx('L067', 960, 360, 340, 100, 'DECIDER', o, { b: 'L070' }), bx('L067', 1520, 360, 300, 100, 'step B', g, { b: 'L070' }),
+    ar('L067', 560, 360, 780, 360, w, { b: 'L070' }), ar('L067', 1140, 360, 1360, 360, w, { b: 'L070' }), ch('L067', 960, 260, "chef d'orchestre · arbitre", y, { size: 26, b: 'L070' }),
+    ch('L068', 960, 500, 'lit le compteur · dit : on continue, ou on alerte', o, { size: 28, b: 'L070' }), ch('L069', 960, 570, "ne traite rien · n'écrit rien en base", g, { size: 28, b: 'L070' }),
+    code('L070', 100, 190, 1300, 430, 'RejectsDecider', [
+      ['L070', '@Component', p], ['L070', 'public class RejectsDecider implements JobExecutionDecider {', C.text],
+      ['L071', '  public FlowExecutionStatus decide(JobExecution job, StepExecution step) {', g],
+      ['L072', '    long rejected = step.getExecutionContext().getLong("rejectedCount", 0L);', b],
+      ['L073', "    // code libre : FlowExecutionStatus joue le rôle d'ExitStatus", d],
+      ['L074', '    if (rejected == 0) return new FlowExecutionStatus("NO_REJECTS");', g],
+      ['L074', '    return rejected > 100 ? new FlowExecutionStatus("TOO_MANY_REJECTS") : new FlowExecutionStatus("FEW_REJECTS");', y],
+      ['L074', '  }', C.text], ['L074', '}', C.text]], { size: 20, accent: o, b: 'L075' }),
+    code('L075', 100, 190, 1300, 330, 'BankFlowJob', [['L075', '.start(loadBankStep).next(rejectsDecider)', C.text], ['L076', '    .on("NO_REJECTS").to(bankReportStep)', g], ['L076', '    .on("FEW_REJECTS").to(bankReportStep)', g], ['L077', '    .on("TOO_MANY_REJECTS").to(alertStep)', o], ['L077', '    .on("*").fail()', r]], { size: 22, accent: p, b: 'L078' }),
+    bx('L078', 400, 360, 300, 100, 'step', b, { b: 'L080' }), bx('L078', 900, 360, 300, 100, 'decider', o, { b: 'L080' }), bx('L078', 1400, 360, 300, 100, 'step', b, { b: 'L080' }),
+    ch('L078', 400, 260, 'StepScope : actif ici', g, { size: 22, b: 'L080' }), ch('L078', 1400, 260, 'StepScope : actif ici', g, { size: 22, b: 'L080' }), ch('L078', 900, 260, 'aucun contexte de step', r, { size: 22, b: 'L080' }), ch('L078', 900, 460, 'entre deux steps', y, { size: 22, b: 'L080' }),
+    stp('L079', 960, 600, 'AUCUN CONTEXTE DE STEP ACTIF', r, { size: 36, b: 'L080' }),
+    ch('L080', 960, 330, 'singleton sans état', g, { size: 40, b: 'L083' }), ch('L081', 960, 420, 'JobScope, ou lire les arguments reçus', b, { size: 30, b: 'L083' }), stp('L082', 960, 580, 'UN DECIDER EST PUR', g, { size: 44, b: 'L083' }),
+    ch('L084', 960, 330, 'code de sortie : règle simple du step', b, { size: 30, b: 'L085' }), ch('L084', 960, 420, 'decider : plusieurs sources, ou test isolé', o, { size: 30, b: 'L085' }),
+    tx('L085', 960, 900, '5.5 · Le jeu de société →', { size: 48, c: g }),
   ],
-  quiz: [{ q: 'L074', a: 'L075', question: 'Quand préférer un decider à un code de sortie ?', choices: ['règle simple', 'sources multiples', 'jamais'], win: 1, answer: 'Le code de sortie convient à une règle simple du step. Le decider, quand la décision combine plusieurs sources ou doit se tester seule.' }],
-  cues: [{ a: 'L070', s: 'error' }, { a: 'L067', s: 'pop' }],
+  quiz: [{ q: 'L083', a: 'L084', question: 'Quand utiliser un decider plutôt qu\'un code de sortie ?', choices: ['toujours', 'plusieurs sources, ou test isolé', 'jamais'], win: 1, answer: 'Code de sortie : règle simple, propre au step. Decider : décision multi-sources, ou à tester seule.' }],
+  cues: [{ a: 'L067', s: 'pop' }, { a: 'L070', s: 'blip' }, { a: 'L079', s: 'error' }, { a: 'L082', s: 'success' }],
 });
 
+// ---------- Scène 5 : le jeu de société ----------
 SCENES[5] = mk({
-  label: 'MACHINE_ETATS', color: p, part: '5.5 · SOUS LE CAPOT : LA MACHINE À ÉTATS',
+  label: 'MACHINE_A_ETATS', color: g, part: '5.5 · LA MACHINE À ÉTATS : LE JEU DE SOCIÉTÉ',
   els: [
-    ch('L077', 960, 160, 'comment le moteur choisit l\'état suivant', y, { size: 26 }), ch('L078', 960, 215, 'SimpleFlow : des états + une table de transitions', d, { size: 22 }),
-    tb('L083', 100, 250, [300, 620, 780], ['état', 'exécute', 'statut produit par'], [
-      row('L083', ['StepState', 'un step', 'le code ExitStatus du step'], b), row('L083', ['DecisionState', 'un decider', 'le FlowExecutionStatus retourné'], o), row('L084', ['SplitState', 'plusieurs flux', 'le statut le plus grave'], p), row('L084', ['FlowState', 'un sous-flux', 'son statut final'], g), row('L084', ['EndState', 'rien : termine le job', 'COMPLETED, FAILED ou STOPPED'], r)], { size: 22, rh: 60 }),
-    bx('L079', 210, 700, 300, 100, '1 · exécuter', b, { size: 26 }), bx('L080', 570, 700, 300, 100, '2 · statut', o, { size: 26 }), bx('L081', 930, 700, 300, 100, '3 · transition', p, { size: 24 }), bx('L082', 1290, 700, 300, 100, '4 · suivant', g, { size: 26 }), bx('L082', 1650, 700, 300, 100, '5 · fin', d, { size: 26 }),
-    ar('L080', 360, 700, 420, 700, d), ar('L081', 720, 700, 780, 700, d), ar('L082', 1080, 700, 1140, 700, d), ar('L082', 1440, 700, 1500, 700, d),
-    ch('L085', 1500, 190, 'le statut vient de l\'état', d, { size: 22 }),
-    ch('L086', 500, 840, 'Next state not found … exit status=…', r, { size: 22 }), ch('L087', 500, 900, 'à l\'exécution : le job échoue', r, { size: 22 }), ch('L088', 1350, 840, 'No end state was found', r, { size: 22 }), ch('L089', 1350, 900, 'au moins une fin : end · fail · stop', g, { size: 22 }),
-    ch('L092', 1550, 1000, 'le split →', b, { size: 26 }),
+    ch('L086', 960, 330, 'comment le moteur choisit-il la suite ?', g, { size: 38, b: 'L087' }),
+    bx('L087', 300, 330, 280, 100, 'case : chargement', b, { size: 22, b: 'L092' }), bx('L087', 700, 330, 280, 100, 'case : rapport', g, { size: 22, b: 'L092' }), bx('L087', 1100, 330, 280, 100, 'case : alerte', o, { size: 22, b: 'L092' }), bx('L087', 1500, 330, 280, 100, 'ARRIVÉE', r, { size: 26, b: 'L092' }),
+    ar('L087', 440, 330, 560, 330, w, { b: 'L092' }), ar('L087', 840, 330, 960, 330, w, { b: 'L092' }), ar('L087', 1240, 330, 1360, 330, w, { b: 'L092' }), ch('L087', 300, 230, 'une case = un step', b, { size: 22, b: 'L092' }),
+    bx('L088', 300, 560, 160, 140, 'dé', y, { size: 36, b: 'L092' }), ch('L088', 300, 660, 'on exécute le step', y, { size: 22, b: 'L092' }),
+    ch('L089', 600, 560, 'chiffre : COMPLETED', g, { size: 26, b: 'L092' }), ch('L089', 600, 610, "c'est l'ExitStatus", d, { size: 20, b: 'L092' }),
+    ch('L090', 1000, 560, 'plateau : table des transitions', p, { size: 24, b: 'L092' }), ch('L091', 1500, 560, "jusqu'à la case arrivée", r, { size: 24, b: 'L092' }),
+    tb('L092', 100, 200, [420, 600], ['état', 'transitions'], [row('L092', ['loadBankStep', 'COMPLETED → bankReportStep'], b), row('L092', ['', 'FAILED → alertStep'], o), row('L092', ['', '* → fail'], r)], { size: 24, rh: 58, b: 'L097' }),
+    ch('L092', 1500, 260, 'SimpleFlow : le plateau', y, { size: 26, b: 'L097' }),
+    pl('L093', 200, 520, 1, "exécuter l'état", b, { size: 26, b: 'L097' }), pl('L094', 200, 590, 2, 'produire un statut', g, { size: 26, b: 'L097' }), pl('L095', 200, 660, 3, 'chercher la transition', p, { size: 26, b: 'L097' }),
+    pl('L096', 200, 730, 4, "aller à l'état suivant", o, { size: 26, b: 'L097' }), pl('L096', 200, 800, 5, "recommencer, jusqu'à une fin", r, { size: 26, b: 'L097' }),
+    tb('L097', 100, 200, [380, 620, 520], ['case', 'classe', 'rôle'], [row('L097', ['case étape', 'StepState', 'exécute un step'], b), row('L097', ['case décision', 'DecisionState', 'appelle un decider'], o), row('L098', ['case carrefour', 'SplitState', 'lance des flux sur des threads'], g), row('L098', ['case sous-plateau', 'FlowState', 'exécute un sous-flux'], p), row('L098', ['case arrivée', 'EndState', 'termine le job'], r)], { size: 24, rh: 60, b: 'L100' }),
+    tb('L099', 100, 620, [520, 700], ['case', 'le chiffre vient de…'], [row('L099', ['step', 'ExitStatus du step'], b), row('L099', ['decider', 'FlowExecutionStatus'], o), row('L099', ['split', 'agrégation des flux'], g)], { size: 22, rh: 52, b: 'L100' }),
+    code('L100', 100, 200, 1500, 130, "erreur à l'exécution", [['L100', 'FlowExecutionException: Next state not found in flow … exit status=COMPLETED_WITH_REJECTS', r]], { size: 21, accent: r, b: 'L102' }),
+    ch('L101', 960, 420, 'le dé donne un chiffre écrit sur aucune flèche', r, { size: 28, b: 'L102' }),
+    code('L102', 100, 200, 1500, 130, 'erreur à la construction', [['L102', 'No end state was found. You must specify at least one transition with no next state.', r]], { size: 21, accent: r, b: 'L104' }),
+    ch('L103', 960, 420, 'plateau sans case arrivée : refusé au lancement', r, { size: 28, b: 'L104' }),
+    ch('L105', 960, 330, 'construction : refusé au lancement', g, { size: 36, b: 'L106' }),
+    tx('L106', 960, 900, '5.6 · Le péage →', { size: 48, c: b }),
   ],
-  quiz: [{ q: 'L090', a: 'L091', question: "Un flux n'a aucune transition vers une fin. L'erreur apparaît quand ?", choices: ['construction', 'exécution'], win: 0, answer: 'À la construction : le job est refusé au lancement. Next state not found apparaît, lui, à l\'exécution.' }],
-  cues: [{ a: 'L086', s: 'error' }, { a: 'L088', s: 'error' }],
+  quiz: [{ q: 'L104', a: 'L105', question: 'Un flux n\'a aucune transition vers une fin. L\'erreur apparaît quand ?', choices: ['à la construction', "à l'exécution", 'jamais'], win: 0, answer: "À la construction : le job est refusé au lancement. Next state not found, lui, apparaît à l'exécution." }],
+  cues: [{ a: 'L087', s: 'pop' }, { a: 'L088', s: 'blip' }, { a: 'L100', s: 'error' }, { a: 'L102', s: 'error' }],
 });
 
+// ---------- Scène 6 : le péage d'autoroute ----------
 SCENES[6] = mk({
-  label: 'SPLIT', color: b, part: '5.6 · LE SPLIT ET LES THREADS',
+  label: 'SPLIT', color: b, part: "5.6 · LE SPLIT : LE PÉAGE D'AUTOROUTE",
   els: [
-    code('L095', 100, 190, 1400, 500, 'parallelJob', [
-      ['L095', 'ThreadPoolTaskExecutor pool = new ThreadPoolTaskExecutor();', C.text], ['L096', 'pool.setThreadNamePrefix("flow-");', y], ['L097', 'pool.setCorePoolSize(2);   pool.setQueueCapacity(0);', g],
-      ['L099', 'new FlowBuilder<SimpleFlow>("accountsFlow").start(importAccountsStep).build();', b], ['L100', '.split(flowExecutor).add(accountsFlow, operationsFlow)', o], ['L101', '.start(parallelFlow).next(consolidateStep)', g]], { size: 21 }),
-    ch('L093', 1650, 240, 'comptes + opérations en parallèle', d, { size: 20 }), ch('L094', 1650, 310, 'barrière de synchronisation', y, { size: 22 }), ch('L098', 1650, 380, 'pool trop petit ou trop grand', r, { size: 22 }),
-    ch('L105', 1650, 450, 'singleton partagé : course', r, { size: 22 }), ch('L106', 1650, 520, 'pool de threads ≠ pool de connexions', o, { size: 20 }), ch('L109', 1650, 590, 'un flux échoue : le job échoue', r, { size: 22 }), ch('L110', 1650, 660, 'reprise : seul le step en échec', g, { size: 22 }), ch('L111', 1650, 730, 'split ≠ accélérer un seul step', d, { size: 20 }),
-    bx('L103', 400, 820, 380, 90, 'thread flow-1 : accountsFlow', b, { size: 22 }), bx('L103', 400, 930, 380, 90, 'thread flow-2 : operationsFlow', g, { size: 22 }),
-    bx('L102', 900, 875, 60, 200, '', r), ch('L102', 900, 790, 'barrière', r, { size: 20 }), bx('L102', 1300, 875, 360, 100, 'consolidateStep', o, { size: 26 }), ar('L102', 600, 820, 860, 860, d), ar('L102', 600, 930, 860, 890, d), ar('L102', 940, 875, 1110, 875, d),
-    ch('L104', 1650, 880, '2 StepExecution distinctes', d, { size: 20 }), ch('L112', 1550, 1000, "cas d'usage →", y, { size: 24 }),
+    ch('L107', 960, 330, 'comptes + opérations en même temps, puis consolidation', o, { size: 34, b: 'L108' }),
+    ln('L108', 100, 330, 650, 330, d, { lw: 12, b: 'L111' }), ar('L108', 650, 330, 900, 250, b, { b: 'L111' }), ar('L108', 650, 330, 900, 410, b, { b: 'L111' }), ch('L108', 380, 260, 'autoroute : le job', d, { size: 22, b: 'L111' }),
+    bx('L109', 1100, 250, 280, 80, 'guichet 1 · thread', b, { size: 22, b: 'L111' }), bx('L109', 1100, 410, 280, 80, 'guichet 2 · thread', b, { size: 22, b: 'L111' }),
+    ch('L109', 800, 190, 'voiture : un flux', y, { size: 22, b: 'L111' }), ch('L109', 800, 470, 'voiture : un flux', y, { size: 22, b: 'L111' }),
+    ln('L110', 1400, 190, 1400, 470, r, { lw: 8, b: 'L111' }), ch('L110', 1400, 160, 'barrière', r, { size: 24, b: 'L111' }), bx('L110', 1650, 330, 240, 90, 'consolidation', g, { size: 22, b: 'L111' }),
+    code('L111', 100, 190, 1300, 430, 'FlowConfig.java', [
+      ['L111', '@Bean TaskExecutor flowExecutor() {', C.text], ['L111', '  var pool = new ThreadPoolTaskExecutor();', C.text],
+      ['L112', '  pool.setThreadNamePrefix("flow-");', g],
+      ['L113', '  pool.setCorePoolSize(2); pool.setMaxPoolSize(2); pool.setQueueCapacity(0);', b],
+      ['L115', 'Flow accountsFlow = new FlowBuilder<SimpleFlow>("accountsFlow").start(importAccountsStep).build();', p],
+      ['L116', '.split(flowExecutor).add(accountsFlow, operationsFlow)', y],
+      ['L117', '.start(parallelFlow).next(consolidateStep)', g]], { size: 19, accent: b, b: 'L122' }),
+    ch('L114', 1650, 300, 'trop petit : on attend', o, { size: 20, b: 'L122' }), ch('L114', 1650, 350, 'illimité : base saturée', r, { size: 20, b: 'L122' }),
+    ch('L118', 1650, 420, 'barrière de synchronisation', r, { size: 20, b: 'L122' }), ch('L119', 1650, 500, 'une transaction par guichet', g, { size: 20, b: 'L122' }),
+    ch('L120', 1650, 560, 'deux StepExecution', b, { size: 20, b: 'L122' }), ch('L121', 1650, 620, 'singleton partagé : course', r, { size: 20, b: 'L122' }),
+    ch('L122', 960, 230, 'chaque voiture a besoin de tickets : les connexions', o, { size: 30, b: 'L126' }),
+    bx('L123', 200, 330, 150, 80, 'ticket', y, { size: 22, b: 'L126' }), bx('L123', 390, 330, 150, 80, 'ticket', y, { size: 22, b: 'L126' }), bx('L123', 580, 330, 150, 80, 'ticket', y, { size: 22, b: 'L126' }), bx('L123', 770, 330, 150, 80, 'ticket', y, { size: 22, b: 'L126' }),
+    bx('L123', 960, 330, 150, 80, 'ticket', y, { size: 22, b: 'L126' }), bx('L123', 1150, 330, 150, 80, 'ticket', y, { size: 22, b: 'L126' }), bx('L123', 1340, 330, 150, 80, 'ticket', y, { size: 22, b: 'L126' }),
+    ch('L123', 960, 450, '2 voitures × 3 tickets + 1 pour le contrôleur = 7', g, { size: 28, b: 'L124' }),
+    ch('L124', 960, 450, '5 tickets : chacune en tient 2 et attend le 3e : blocage', r, { size: 28, b: 'L125' }),
+    ch('L125', 960, 520, "3e voiture, 7 tickets : elle attend que l'une libère les siens", o, { size: 26, b: 'L126' }),
+    ch('L127', 960, 330, '7 = 2 × 3 + 1', g, { size: 64, b: 'L128' }),
+    bx('L128', 560, 330, 440, 100, 'guichets = threads', b, { b: 'L129' }), bx('L128', 1360, 330, 440, 100, 'tickets = connexions', o, { b: 'L129' }),
+    bx('L129', 560, 330, 440, 100, 'flux A : échec', r, { b: 'L130' }), bx('L129', 1360, 330, 440, 100, 'flux B : succès', g, { b: 'L130' }), ch('L129', 960, 470, 'split : le plus grave l\'emporte → job FAILED', r, { size: 30, b: 'L130' }),
+    ch('L130', 960, 330, 'reprise : seul le step en échec est rejoué', g, { size: 34, b: 'L131' }),
+    ch('L131', 960, 330, 'un même step plus vite : multithread ou partitionnement', y, { size: 30, b: 'L132' }),
+    tx('L132', 960, 900, "Trois situations réelles →", { size: 48, c: o }),
   ],
-  quiz: [{ q: 'L107', a: 'L108', question: 'Deux flux utilisent chacun 3 connexions, plus 1 pour le JobRepository. Quel minimum dans le pool ?', choices: ['6', '7', '2'], win: 1, answer: 'Sept : deux fois trois, plus une. Moins, et les flux se bloquent en attendant une connexion détenue par un autre.' }],
-  cues: [{ a: 'L102', s: 'stamp' }, { a: 'L109', s: 'error' }],
+  quiz: [{ q: 'L126', a: 'L127', question: 'Deux flux parallèles utilisent chacun 3 connexions, plus 1 pour le JobRepository. Quel minimum dans le pool ?', choices: ['6', '7', '10'], win: 1, answer: 'Sept : 2 × 3 + 1. Moins, et les flux se bloquent en attendant une connexion détenue par un autre.' }],
+  cues: [{ a: 'L108', s: 'blip' }, { a: 'L110', s: 'pop' }, { a: 'L124', s: 'error' }, { a: 'L127', s: 'success' }],
 });
 
 SCENES[7] = mk({
   label: 'CAS_USAGE', color: g, part: "CAS D'USAGE",
   els: [
-    cd('L113', 100, 200, 560, 260, "L'import avec alerte", ['plus de 100 rejets : alerte à la place du rapport'], r), ch('L114', 380, 530, 'job FAILED : la supervision le voit', r, { size: 22 }),
-    cd('L115', 680, 200, 560, 260, 'Deux sources', ['comptes (fichier) + opérations (base)'], b), ch('L116', 960, 530, 'durée = le plus long, pas la somme', g, { size: 22 }),
-    cd('L117', 1260, 200, 560, 260, 'Le bon chemin selon le jour', ['fin de mois : clôture en plus'], o), ch('L118', 1540, 530, 'decider : MONTH_END ou NORMAL', y, { size: 22 }),
-    ch('L119', 1550, 960, 'Top 10 des pièges →', r, { size: 28 }),
+    cd('L133', 100, 200, 560, 260, "L'import avec alerte", ['plus de 100 rejets : alerte à la place du rapport'], r), ch('L134', 380, 530, 'job FAILED : la supervision le voit', r, { size: 22 }),
+    cd('L135', 680, 200, 560, 260, 'Deux sources', ['comptes (fichier) + opérations (base)'], b), ch('L136', 960, 530, 'durée = le plus long, pas la somme', g, { size: 22 }),
+    cd('L137', 1260, 200, 560, 260, 'Le bon chemin selon le jour', ['fin de mois : clôture en plus'], o), ch('L138', 1540, 530, 'decider : MONTH_END ou NORMAL', y, { size: 22 }),
+    ch('L139', 1550, 960, 'Top 10 des pièges →', r, { size: 28 }),
   ],
-  cues: [{ a: 'L114', s: 'pop' }],
+  cues: [{ a: 'L134', s: 'pop' }],
 });
 
 SCENES[8] = mk({
   label: 'TOP10_1', color: r, part: 'TOP 10 DES PIÈGES (1/2)',
   els: [
-    tb('L120', 100, 190, PC2, PH2, [
-      row('L121', ['1', 'ExitStatus personnalisé non aiguillé', 'Next state not found', 'transition + filet *'], r), row('L123', ['2', 'BatchStatus confondu avec ExitStatus', 'on("FAILED") ne se déclenche pas', 'aiguiller sur le code'], o),
-      row('L125', ['3', 'decider en StepScope', 'aucun contexte de step', 'singleton ou JobScope'], r), row('L127', ['4', 'split mal dimensionné', 'base saturée ou flux en attente', 'pool borné, nommé'], o),
-      row('L129', ['5', 'pool de connexions trop petit', 'blocage des flux', 'flux × connexions + 1'], r)], { size: 21, rh: 70, noBold: true }),
-    extrait2('L122', 'L123', [['FlowExecutionException: Next state not found … exit status=COMPLETED_WITH_REJECTS', r]]), extrait2('L124', 'L125', [['status = COMPLETED     exit_code = COMPLETED_WITH_REJECTS', r]]),
-    extrait2('L126', 'L127', [['IllegalStateException: No context holder available for step scope', r]]), extrait2('L128', 'L129', [['HikariPool: Connection is not available, request timed out after 30000ms', r]]),
-    extrait2('L130', null, [['active=7   idle=0   waiting=2', r]]),
+    tb('L140', 100, 190, PC2, PH2, [
+      row('L141', ['1', 'ExitStatus personnalisé non aiguillé', 'Next state not found', 'transition + filet *'], r), row('L143', ['2', 'BatchStatus confondu avec ExitStatus', 'on("FAILED") ne se déclenche pas', 'aiguiller sur le code'], o),
+      row('L145', ['3', 'decider en StepScope', 'aucun contexte de step', 'singleton ou JobScope'], r), row('L147', ['4', 'split mal dimensionné', 'base saturée ou flux en attente', 'pool borné, nommé'], o),
+      row('L149', ['5', 'pool de connexions trop petit', 'blocage des flux', 'flux × connexions + 1'], r)], { size: 21, rh: 70, noBold: true }),
+    extrait2('L142', 'L143', [['FlowExecutionException: Next state not found … exit status=COMPLETED_WITH_REJECTS', r]]), extrait2('L144', 'L145', [['status = COMPLETED     exit_code = COMPLETED_WITH_REJECTS', r]]),
+    extrait2('L146', 'L147', [['IllegalStateException: No context holder available for step scope', r]]), extrait2('L148', 'L149', [['HikariPool: Connection is not available, request timed out after 30000ms', r]]),
+    extrait2('L150', null, [['active=7   idle=0   waiting=2', r]]),
   ],
-  cues: [{ a: 'L121', s: 'pop' }, { a: 'L123', s: 'pop' }, { a: 'L125', s: 'alarm', g: -12 }, { a: 'L127', s: 'pop' }, { a: 'L129', s: 'pop' }],
+  cues: [{ a: 'L141', s: 'pop' }, { a: 'L143', s: 'pop' }, { a: 'L145', s: 'alarm', g: -12 }, { a: 'L147', s: 'pop' }, { a: 'L149', s: 'pop' }],
 });
 
 SCENES[9] = mk({
   label: 'TOP10_2', color: r, part: 'TOP 10 DES PIÈGES (2/2)',
   els: [
-    tb('L131', 100, 190, PC2, PH2, [
-      row('L132', ['6', 'branche d\'erreur terminée par end', 'le job apparaît réussi', 'fail()'], r), row('L134', ['7', 'état partagé entre flux', 'course entre threads', 'composants sans état'], r),
-      row('L136', ['8', 'decider avec effets de bord', 'effet répété à la reprise', 'decider pur'], o), row('L138', ['9', 'motifs mal compris', 'COMP* capte aussi COMPLETED_WITH_REJECTS', 'motifs explicites, tester'], o),
-      row('L140', ['10', 'flux sans état final', 'No end state was found', 'end, fail ou stopAndRestart'], o)], { size: 21, rh: 70, noBold: true }),
-    extrait2('L133', 'L134', [['job status = COMPLETED      loadBankStep = FAILED', r]]), extrait2('L135', 'L136', [['total = 1 187,00      puis      1 203,50', r]]),
-    extrait2('L137', 'L138', [['alerte envoyée', r], ['alerte envoyée   (après reprise)', r]]), extrait2('L139', 'L140', [['COMPLETED_WITH_REJECTS  →  bankReportStep   (capté par COMP*)', r]]),
-    extrait2('L141', 'L142', [['No end state was found. You must specify at least one transition with no next state.', r]]),
-    ch('L142', 480, 650, 'un test par issue : COMPLETED · FAILED · …_WITH_REJECTS · inconnu', g, { size: 22 }), ch('L143', 480, 720, 'vérifier les steps exécutés, chemin par chemin', b, { size: 22 }), ch('L144', 1400, 880, 'on ne teste souvent que le chemin heureux', y, { size: 22 }),
+    tb('L151', 100, 190, PC2, PH2, [
+      row('L152', ['6', 'branche d\'erreur terminée par end', 'le job apparaît réussi', 'fail()'], r), row('L154', ['7', 'état partagé entre flux', 'course entre threads', 'composants sans état'], r),
+      row('L156', ['8', 'decider avec effets de bord', 'effet répété à la reprise', 'decider pur'], o), row('L158', ['9', 'motifs mal compris', 'COMP* capte aussi COMPLETED_WITH_REJECTS', 'motifs explicites, tester'], o),
+      row('L160', ['10', 'flux sans état final', 'No end state was found', 'end, fail ou stopAndRestart'], o)], { size: 21, rh: 70, noBold: true }),
+    extrait2('L153', 'L154', [['job status = COMPLETED      loadBankStep = FAILED', r]]), extrait2('L155', 'L156', [['total = 1 187,00      puis      1 203,50', r]]),
+    extrait2('L157', 'L158', [['alerte envoyée', r], ['alerte envoyée   (après reprise)', r]]), extrait2('L159', 'L160', [['COMPLETED_WITH_REJECTS  →  bankReportStep   (capté par COMP*)', r]]),
+    extrait2('L161', 'L162', [['No end state was found. You must specify at least one transition with no next state.', r]]),
+    ch('L162', 480, 650, 'un test par issue : COMPLETED · FAILED · …_WITH_REJECTS · inconnu', g, { size: 22 }), ch('L163', 480, 720, 'vérifier les steps exécutés, chemin par chemin', b, { size: 22 }), ch('L164', 1400, 880, 'on ne teste souvent que le chemin heureux', y, { size: 22 }),
   ],
-  cues: [{ a: 'L132', s: 'pop' }, { a: 'L134', s: 'pop' }, { a: 'L136', s: 'pop' }, { a: 'L138', s: 'alarm', g: -12 }, { a: 'L140', s: 'pop' }],
+  cues: [{ a: 'L152', s: 'pop' }, { a: 'L154', s: 'pop' }, { a: 'L156', s: 'pop' }, { a: 'L158', s: 'alarm', g: -12 }, { a: 'L160', s: 'pop' }],
 });
 
 SCENES[10] = mk({
   label: 'BILAN', color: g, part: 'BILAN ET EXERCICES',
   els: [
-    bx('L145', 400, 300, 360, 110, 'job vert', g, { size: 30 }), ar('L145', 600, 300, 760, 300, d), bx('L145', 960, 300, 360, 110, 'fail()', r, { size: 30 }),
-    pl('L146', 1250, 240, 1, 'graphe · ExitStatus aiguille · BatchStatus reprend', g, { size: 22 }), pl('L147', 1250, 320, 2, 'decider sans StepScope · split borné', b, { size: 22 }), pl('L148', 1250, 400, 3, 'branche d\'erreur : fail + filet *', r, { size: 22 }),
-    cd('L149', 100, 500, 410, 300, 'Exercice 1', ['Listener : COMPLETED_WITH_REJECTS. Statuts ? Suite du flux ?'], b, { size: 20 }), cd('L150', 540, 500, 410, 300, 'Exercice 2', ['Pourquoi un decider n\'est pas en StepScope ? Deux solutions.'], o, { size: 20 }),
-    cd('L151', 980, 500, 410, 300, 'Exercice 3', ['2 flux × 3 connexions + 1 : minimum ? Pourquoi 20 threads n\'aident pas ?'], p, { size: 20 }), cd('L152', 1420, 500, 400, 300, 'Exercice 4', ['Branche d\'erreur terminée par end : détecter, corriger ?'], r, { size: 20 }),
-    bar('L153', 960, 930, 800, 36, [['L153', 1], ['L154', 0]], y, { label: 'réfléchis…', b: 'L154' }),
-    ch('L154', 305, 850, 'Batch COMPLETED · filet * : échec', g, { size: 18 }), ch('L155', 745, 850, 'hors contexte step', g, { size: 20 }), ch('L156', 1185, 850, '7 connexions', g, { size: 22 }), ch('L157', 1620, 850, 'job COMPLETED, step FAILED : fail()', g, { size: 18 }),
-    ch('L158', 1500, 990, 'Module 6 : fiabilité →', o, { size: 26 }),
+    bx('L165', 400, 300, 360, 110, 'job vert', g, { size: 30 }), ar('L165', 600, 300, 760, 300, d), bx('L165', 960, 300, 360, 110, 'fail()', r, { size: 30 }),
+    pl('L166', 1250, 240, 1, 'graphe · ExitStatus aiguille · BatchStatus reprend', g, { size: 22 }), pl('L167', 1250, 320, 2, 'decider sans StepScope · split borné', b, { size: 22 }), pl('L168', 1250, 400, 3, 'branche d\'erreur : fail + filet *', r, { size: 22 }),
+    cd('L169', 100, 500, 410, 300, 'Exercice 1', ['Listener : COMPLETED_WITH_REJECTS. Statuts ? Suite du flux ?'], b, { size: 20 }), cd('L170', 540, 500, 410, 300, 'Exercice 2', ['Pourquoi un decider n\'est pas en StepScope ? Deux solutions.'], o, { size: 20 }),
+    cd('L171', 980, 500, 410, 300, 'Exercice 3', ['2 flux × 3 connexions + 1 : minimum ? Pourquoi 20 threads n\'aident pas ?'], p, { size: 20 }), cd('L172', 1420, 500, 400, 300, 'Exercice 4', ['Branche d\'erreur terminée par end : détecter, corriger ?'], r, { size: 20 }),
+    bar('L173', 960, 930, 800, 36, [['L173', 1], ['L174', 0]], y, { label: 'réfléchis…', b: 'L174' }),
+    ch('L174', 305, 850, 'Batch COMPLETED · filet * : échec', g, { size: 18 }), ch('L175', 745, 850, 'hors contexte step', g, { size: 20 }), ch('L176', 1185, 850, '7 connexions', g, { size: 22 }), ch('L177', 1620, 850, 'job COMPLETED, step FAILED : fail()', g, { size: 18 }),
+    ch('L178', 1500, 990, 'Module 6 : fiabilité →', o, { size: 26 }),
   ],
-  cues: [{ a: 'L154', s: 'success' }, { a: 'L158', s: 'levelup', g: -10 }],
+  cues: [{ a: 'L174', s: 'success' }, { a: 'L178', s: 'levelup', g: -10 }],
 });
+

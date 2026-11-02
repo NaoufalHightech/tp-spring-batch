@@ -86,336 +86,582 @@
  {
   "id": "L015",
   "scene": 1,
+  "expr": "technique",
+  "text": "Un mot sur l'identité. addString accepte un troisième argument : identifying. À faux, le paramètre ne compte pas dans l'identité de l'instance. Idéal pour un horodatage de traçabilité."
+ },
+ {
+  "id": "L016",
+  "scene": 1,
+  "expr": "défi, direct",
+  "text": "Question. Tu oublies un paramètre obligatoire, runDate. Que fait le videur ?"
+ },
+ {
+  "id": "L017",
+  "scene": 1,
+  "expr": "posé",
+  "text": "Il refuse le lancement : InvalidJobParametersException, et aucun step ne s'exécute."
+ },
+ {
+  "id": "L018",
+  "scene": 1,
   "expr": "défi, direct",
   "text": "Question. Un job déclare runDate obligatoire et format facultatif. On le lance avec runDate, et un paramètre mode. Que se passe-t-il ?"
  },
  {
-  "id": "L016",
+  "id": "L019",
   "scene": 1,
   "expr": "posé",
   "text": "Le lancement est refusé : mode n'est pas dans les clés autorisées. Le job ne démarre pas."
  },
  {
-  "id": "L017",
+  "id": "L020",
   "scene": 1,
   "expr": "pont",
   "text": "Et si tu veux, au contraire, forcer une nouvelle instance à la demande ? Un rappel."
  },
  {
-  "id": "L018",
+  "id": "L021",
   "scene": 2,
   "expr": "besoin",
   "text": "Tu as un job de reporting à la demande. Tu veux qu'il tourne à chaque clic, même si la date métier n'a pas changé."
  },
  {
-  "id": "L019",
+  "id": "L022",
   "scene": 2,
   "expr": "défi, direct",
   "text": "Comment forcer une nouvelle instance, sans casser la reprise ?"
  },
  {
-  "id": "L020",
+  "id": "L023",
   "scene": 2,
   "expr": "pédagogue",
   "text": "C'est le rôle de RunIdIncrementer. Il ajoute un paramètre run point id, qui s'incrémente tout seul."
  },
  {
-  "id": "L021",
+  "id": "L024",
   "scene": 2,
   "expr": "explicatif",
   "text": "Ce paramètre est identifiant : une nouvelle valeur, une nouvelle instance. Et la reprise reste intacte, puisque le même run id désigne la même instance."
  },
  {
-  "id": "L022",
+  "id": "L025",
   "scene": 2,
   "expr": "technique",
   "text": "Tu le déclares avec incrementer, dans le builder du job."
  },
  {
-  "id": "L023",
+  "id": "L026",
   "scene": 2,
   "expr": "attention",
   "text": "Attention : il ne s'applique qu'avec startNextInstance. Avec JobOperator point start, et avec le lancement automatique de Spring Boot quatre point un, il n'est pas appelé."
  },
  {
-  "id": "L024",
+  "id": "L027",
   "scene": 2,
   "expr": "appuyé",
   "text": "Et si ton validateur liste des clés facultatives, ajoutes-y run point id : sinon il refuse ton propre incrémenteur."
  },
  {
-  "id": "L025",
+  "id": "L028",
   "scene": 2,
-  "expr": "rappel",
-  "text": "Pour les détails, le code et la requête SQL, regarde l'Annexe 1."
+  "expr": "défi, direct",
+  "text": "Question. Ton job a un RunIdIncrementer, et Spring Boot quatre point un le lance au démarrage. Le run point id est-il ajouté ?"
  },
  {
-  "id": "L026",
+  "id": "L029",
+  "scene": 2,
+  "expr": "posé",
+  "text": "Non. Le lancement automatique appelle JobOperator point start, sans incrémenteur. Pour l'avoir, tu appelles startNextInstance."
+ },
+ {
+  "id": "L030",
+  "scene": 2,
+  "expr": "rappel",
+  "text": "Pour le détail du hachage, de la JOB KEY et du code, regarde l'Annexe 1."
+ },
+ {
+  "id": "L031",
   "scene": 2,
   "expr": "pont",
   "text": "Passons au chef de chantier."
  },
  {
-  "id": "L027",
+  "id": "L032",
   "scene": 3,
   "expr": "besoin",
   "text": "Mon besoin : savoir quand le job commence et comment il a fini, sans ouvrir les journaux."
  },
  {
-  "id": "L028",
+  "id": "L033",
   "scene": 3,
   "expr": "technique",
   "text": "JobExecutionListener a deux méthodes : beforeJob, avant le premier step, et afterJob, à la fin."
  },
  {
-  "id": "L029",
+  "id": "L034",
   "scene": 3,
   "expr": "explicatif",
   "text": "Les deux ont une version par défaut, vide. Tu redéfinis seulement celle dont tu as besoin."
  },
  {
-  "id": "L030",
+  "id": "L035",
   "scene": 3,
   "expr": "appuyé",
   "text": "Et afterJob est appelé quelle que soit la fin : réussite ou échec."
  },
  {
-  "id": "L031",
+  "id": "L036",
   "scene": 3,
   "expr": "appuyé",
   "text": "D'où le test sur le statut. Sans lui, tu enverrais « terminé » après un échec."
  },
  {
-  "id": "L032",
+  "id": "L037",
   "scene": 3,
   "expr": "explicatif",
   "text": "Les usages typiques : notifier, nettoyer des fichiers temporaires, libérer une ressource."
  },
  {
-  "id": "L033",
+  "id": "L038",
   "scene": 3,
   "expr": "technique",
   "text": "Tu le branches avec listener. Une classe annotée BeforeJob et AfterJob se branche de la même façon."
  },
  {
-  "id": "L034",
+  "id": "L039",
   "scene": 3,
   "expr": "défi, direct",
   "text": "Question. Le job échoue au deuxième step. La méthode afterJob est-elle appelée ?"
  },
  {
-  "id": "L035",
+  "id": "L040",
   "scene": 3,
   "expr": "posé",
   "text": "Oui, elle est appelée, avec le statut FAILED. C'est voulu : un job qui échoue doit aussi nettoyer."
  },
  {
-  "id": "L036",
+  "id": "L041",
   "scene": 3,
   "expr": "appuyé",
   "text": "Garde ton listener court et sûr : une exception dans un listener peut perturber l'issue du job."
  },
  {
-  "id": "L037",
+  "id": "L042",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Après un échec, regarde la base. Dans batch job execution, le statut du job, FAILED, et son code de sortie."
+ },
+ {
+  "id": "L043",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Le statut que ton afterJob lit est celui que tu vois ici. Ce que tu lis dans le listener, tu peux le vérifier dans la table."
+ },
+ {
+  "id": "L044",
   "scene": 3,
   "expr": "technique",
   "text": "Le step a le même mécanisme : le contremaître. beforeStep avant le step, afterStep après."
  },
  {
-  "id": "L038",
+  "id": "L045",
   "scene": 3,
   "expr": "explicatif",
   "text": "Une différence : afterStep retourne un ExitStatus. Il peut donc changer l'issue du step."
  },
  {
-  "id": "L039",
+  "id": "L046",
   "scene": 3,
   "expr": "pont",
   "text": "Reste à faire voyager une consigne d'un step à l'autre."
  },
  {
-  "id": "L040",
+  "id": "L047",
   "scene": 4,
   "expr": "besoin",
   "text": "Mon besoin : le step de chargement compte les lignes, et le step de contrôle doit connaître ce total."
  },
  {
-  "id": "L041",
+  "id": "L048",
   "scene": 4,
   "expr": "explicatif",
   "text": "Chaque step a son carnet de notes : son ExecutionContext. Le job a le sien."
  },
  {
-  "id": "L042",
+  "id": "L049",
   "scene": 4,
   "expr": "appuyé",
   "text": "Une note écrite dans le carnet d'un step n'est pas visible des steps suivants."
  },
  {
-  "id": "L043",
+  "id": "L050",
   "scene": 4,
   "expr": "pédagogue",
   "text": "ExecutionContextPromotionListener recopie une note du carnet du step vers le carnet du job."
  },
  {
-  "id": "L044",
+  "id": "L051",
   "scene": 4,
   "expr": "technique",
   "text": "Tu lui donnes les clés à recopier, avec setKeys. Ici : totalLines."
  },
  {
-  "id": "L045",
+  "id": "L052",
   "scene": 4,
   "expr": "technique",
   "text": "Et tu le branches sur le step qui écrit la note."
  },
  {
-  "id": "L046",
+  "id": "L053",
   "scene": 4,
   "expr": "explicatif",
   "text": "Par défaut, il ne recopie que si le step a réussi. Une note d'un step échoué décrit un état incomplet."
  },
  {
-  "id": "L047",
+  "id": "L054",
   "scene": 4,
   "expr": "appuyé",
   "text": "Avec setStrict à vrai, il fait échouer le step si la clé est absente. Sans cela, la valeur manque sans erreur."
  },
  {
-  "id": "L048",
+  "id": "L055",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Voyons-le en base. Dans batch job execution context, la note du job apparaît, en JSON."
+ },
+ {
+  "id": "L056",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "On y lit totalLines égal à douze mille quatre cent quatre-vingts. La note est enregistrée avec le job : elle survit à une reprise."
+ },
+ {
+  "id": "L057",
   "scene": 4,
   "expr": "défi, direct",
   "text": "Question. Le step un écrit totalLines, sans promotion. Que lit le step deux ?"
  },
  {
-  "id": "L049",
+  "id": "L058",
   "scene": 4,
   "expr": "posé",
   "text": "Null. La note est restée dans le carnet du step un. Sans promotion, personne d'autre ne la voit."
  },
  {
-  "id": "L050",
+  "id": "L059",
   "scene": 4,
   "expr": "pont",
   "text": "Dernière partie : réutiliser des steps, et les outils tout faits."
  },
  {
-  "id": "L051",
+  "id": "L060",
   "scene": 5,
   "expr": "besoin",
   "text": "Mon besoin : réutiliser la même suite de steps dans plusieurs jobs."
  },
  {
-  "id": "L052",
+  "id": "L061",
   "scene": 5,
   "expr": "explicatif",
   "text": "Première option : un flow, passé au job. Dans le repository, les steps apparaissent comme s'ils étaient écrits dans le job. Un plan de travail photocopié."
  },
  {
-  "id": "L053",
+  "id": "L062",
   "scene": 5,
   "expr": "explicatif",
   "text": "Deuxième option : un FlowStep, avec StepBuilder point flow. Une ligne de plus dans le repository : le plan, avec un titre. Pratique pour le suivre comme un tout."
  },
  {
-  "id": "L054",
+  "id": "L063",
   "scene": 5,
   "expr": "explicatif",
   "text": "Troisième option : un JobStep, avec StepBuilder point job. Le job enfant est un sous-traitant : sa propre instance, sa propre exécution."
  },
  {
-  "id": "L055",
+  "id": "L064",
   "scene": 5,
   "expr": "technique",
   "text": "Le job enfant a ses propres paramètres. DefaultJobParametersExtractor les prend dans ceux du parent. Sans extracteur, il démarre sans paramètres."
  },
  {
-  "id": "L056",
+  "id": "L065",
   "scene": 5,
   "expr": "règle",
   "text": "Un seul niveau de JobStep. Au-delà, tu ne peux plus suspendre un job intermédiaire sans toucher au maître."
  },
  {
-  "id": "L057",
+  "id": "L066",
   "scene": 5,
   "expr": "besoin",
   "text": "Autre besoin : un step qui appelle du code existant, sans écrire de tasklet."
  },
  {
-  "id": "L058",
+  "id": "L067",
   "scene": 5,
   "expr": "technique",
   "text": "MethodInvokingTaskletAdapter appelle une méthode d'un bean existant, une seule fois."
  },
  {
-  "id": "L059",
+  "id": "L068",
   "scene": 5,
   "expr": "technique",
   "text": "CallableTaskletAdapter exécute un Callable. Mais le step attend la fin : ce n'est pas du parallélisme."
  },
  {
-  "id": "L060",
+  "id": "L069",
+  "scene": 5,
+  "expr": "défi, direct",
+  "text": "Question. CallableTaskletAdapter exécute ton code sur un autre thread. Le step avance-t-il en parallèle ?"
+ },
+ {
+  "id": "L070",
+  "scene": 5,
+  "expr": "posé",
+  "text": "Non. Le step attend la fin du Callable. Un autre thread, mais aucun gain de temps : ce n'est pas du parallélisme."
+ },
+ {
+  "id": "L071",
   "scene": 5,
   "expr": "technique",
   "text": "SystemCommandTasklet lance une commande du système."
  },
  {
-  "id": "L061",
+  "id": "L072",
   "scene": 5,
   "expr": "technique",
   "text": "En version six, tu donnes la commande en morceaux : tar, czf, le nom de l'archive, le dossier. Pas de shell, donc pas d'injection."
  },
  {
-  "id": "L062",
+  "id": "L073",
   "scene": 5,
   "expr": "appuyé",
   "text": "Mets un timeout, sinon un processus bloqué bloque le step. Et interruptOnCancel pour l'arrêter avec le job."
  },
  {
-  "id": "L063",
+  "id": "L074",
   "scene": 5,
   "expr": "explicatif",
   "text": "Le code de sortie de la commande se traduit en statut avec un SystemProcessExitCodeMapper."
  },
  {
-  "id": "L064",
+  "id": "L075",
   "scene": 5,
   "expr": "explicatif",
   "text": "Pour lancer le job depuis l'extérieur, Spring Boot quatre point un fournit JobLauncherApplicationRunner, et JobExecutionExitCodeGenerator pour le code de sortie du processus."
  },
  {
-  "id": "L065",
+  "id": "L076",
   "scene": 5,
   "expr": "explicatif",
   "text": "Un cron ou un orchestrateur sait ainsi si le job a réussi. La propriété spring point batch point job point name choisit le job quand il y en a plusieurs."
  },
  {
-  "id": "L066",
-  "scene": 5,
+  "id": "L077",
+  "scene": 6,
   "expr": "pédagogue",
-  "text": "Récapitulons les pièges. Un : run point id oublié dans le validateur. Deux : afterJob sans tester le statut."
+  "text": "Dix pièges, avec pour chacun ce qui se passe, la parade, et comment le repérer dans les journaux ou en base."
  },
  {
-  "id": "L067",
-  "scene": 5,
+  "id": "L078",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Un : un validateur qui liste des clés facultatives et oublie run point id. Le lancement est refusé. Parade : l'ajouter aux clés facultatives."
+ },
+ {
+  "id": "L079",
+  "scene": 6,
   "expr": "pédagogue",
-  "text": "Trois : une note qu'on oublie de promouvoir. Quatre : un JobStep sans extracteur de paramètres."
+  "text": "Comment le repérer : un lancement refusé dès que l'incrémenteur est actif."
  },
  {
-  "id": "L068",
-  "scene": 5,
+  "id": "L080",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Deux : un afterJob qui annonce « terminé » sans tester le statut. Parade : tester le BatchStatus."
+ },
+ {
+  "id": "L081",
+  "scene": 6,
   "expr": "pédagogue",
-  "text": "Cinq : un SystemCommandTasklet sans timeout. Six : copier les anciens noms, JobParametersInvalidException ou JobBuilderFactory."
+  "text": "Comment le repérer : un message de réussite dans le journal, et un statut FAILED en base."
  },
  {
-  "id": "L069",
-  "scene": 5,
-  "expr": "rappel",
-  "text": "Les exercices du module écrit reprennent ces cas."
+  "id": "L082",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Trois : lire dans un step une note écrite dans un autre, sans promotion. Parade : ExecutionContextPromotionListener."
  },
  {
-  "id": "L070",
-  "scene": 5,
+  "id": "L083",
+  "scene": 6,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : totalLines vaut null dans le step suivant."
+ },
+ {
+  "id": "L084",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Quatre : une clé promue absente, avec setStrict à faux. La valeur manque, sans erreur. Parade : setStrict à vrai."
+ },
+ {
+  "id": "L085",
+  "scene": 6,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un contrôle qui travaille sur zéro ligne, sans qu'aucune erreur ait été levée."
+ },
+ {
+  "id": "L086",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Cinq : un listener de job qui lève une exception. Il peut perturber l'issue du job. Parade : un listener court, les notifications dans un try catch."
+ },
+ {
+  "id": "L087",
+  "scene": 6,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : une exception venue d'afterJob dans les journaux."
+ },
+ {
+  "id": "L088",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Six : une chaîne de JobStep sur plusieurs niveaux. Impossible de suspendre un job intermédiaire. Parade : un seul niveau, ou un planificateur."
+ },
+ {
+  "id": "L089",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : des jobs imbriqués dans batch job instance, parent, enfant, petit-enfant."
+ },
+ {
+  "id": "L090",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Sept : un JobStep sans extracteur de paramètres. Le job enfant démarre sans paramètres. Parade : DefaultJobParametersExtractor."
+ },
+ {
+  "id": "L091",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un refus de paramètres sur le job enfant."
+ },
+ {
+  "id": "L092",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Huit : prendre CallableTaskletAdapter pour du parallélisme. Le step attend. Parade : un split, ou un step multithread."
+ },
+ {
+  "id": "L093",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : une durée totale égale à la somme des durées, sans aucun gain."
+ },
+ {
+  "id": "L094",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Neuf : un SystemCommandTasklet sans timeout. Un processus bloqué bloque le step. Parade : setTimeout."
+ },
+ {
+  "id": "L095",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un step en cours depuis des heures, sans progression."
+ },
+ {
+  "id": "L096",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Dix : copier les anciens noms, JobParametersInvalidException ou JobBuilderFactory. Parade : les noms de la six point zéro point six."
+ },
+ {
+  "id": "L097",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : une erreur de compilation, dès que tu copies le code d'un ancien tutoriel."
+ },
+ {
+  "id": "L098",
+  "scene": 8,
+  "expr": "pédagogue",
+  "text": "Reprenons notre chantier. Le videur refuse les mauvais paramètres. Le chef de chantier note le début et la fin. Le carnet transmet les consignes d'un step à l'autre."
+ },
+ {
+  "id": "L099",
+  "scene": 8,
+  "expr": "récapitulatif",
+  "text": "Pour réutiliser des steps : le plan photocopié, le plan avec un titre, ou le sous-traitant. Et pour une nouvelle instance à la demande : RunIdIncrementer, et l'Annexe 1."
+ },
+ {
+  "id": "L100",
+  "scene": 8,
+  "expr": "défi",
+  "text": "Cinq exercices. Un : un job déclare runDate obligatoire et format facultatif. On le lance avec runDate et mode. Que se passe-t-il, et avec un RunIdIncrementer ?"
+ },
+ {
+  "id": "L101",
+  "scene": 8,
+  "expr": "défi",
+  "text": "Deux : le job échoue au deuxième step. Quelles méthodes de listener sont appelées, et que contient le statut dans afterJob ?"
+ },
+ {
+  "id": "L102",
+  "scene": 8,
+  "expr": "défi",
+  "text": "Trois : le step un écrit totalLines, le step deux lit null. Qu'oublie-t-on ? Que change setStrict à vrai ?"
+ },
+ {
+  "id": "L103",
+  "scene": 8,
+  "expr": "défi",
+  "text": "Quatre : quelle différence voit-on dans batch job instance entre un FlowStep et un JobStep ?"
+ },
+ {
+  "id": "L104",
+  "scene": 8,
+  "expr": "défi",
+  "text": "Cinq : pourquoi donner la commande en morceaux à SystemCommandTasklet est-il plus sûr qu'une seule chaîne ?"
+ },
+ {
+  "id": "L105",
+  "scene": 8,
+  "expr": "pause",
+  "text": "Prends le temps d'y réfléchir."
+ },
+ {
+  "id": "L106",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Correction un. Le lancement est refusé : mode n'est pas autorisé. Avec un RunIdIncrementer, il faut aussi autoriser run point id."
+ },
+ {
+  "id": "L107",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Correction deux. beforeJob, puis afterJob, appelé même après un échec. Le statut vaut FAILED."
+ },
+ {
+  "id": "L108",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Correction trois. On oublie la promotion. Avec setStrict à vrai, le step échoue si la clé est absente."
+ },
+ {
+  "id": "L109",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Correction quatre. Un FlowStep ne crée aucune nouvelle instance. Un JobStep en crée une : celle du job enfant."
+ },
+ {
+  "id": "L110",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Correction cinq. Aucun shell n'interprète la commande : un nom de fichier piégé ne peut pas injecter de commande."
+ },
+ {
+  "id": "L111",
+  "scene": 8,
   "expr": "transition",
   "text": "Tu maîtrises le cycle de vie d'un job. Au module trois, tu entres dans le cœur de Spring Batch : le chunk."
  }
