@@ -25,4 +25,5 @@ python tools/voxtral_local.py episodes/m1_fondations                            
 | 3B | écrit : 132 lignes, ≈ 20 min estimées | écrit : 9 scènes, vérifié | à faire | à faire |
 | 4 | écrit : 151 lignes, ≈ 22 min estimées | écrit : 13 scènes, vérifié | à faire | à faire |
 | 5 | écrit : 158 lignes, ≈ 22 min estimées | écrit : 11 scènes, vérifié | à faire | à faire |
-| 6 à 8 | à faire | | | |
+| 6 | écrit : 176 lignes, ≈ 25 min estimées | écrit : 12 scènes, vérifié | à faire | à faire |
+| 7, 8 | à faire | | | |

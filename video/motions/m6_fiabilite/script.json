@@ -1,0 +1,1058 @@
+[
+ {
+  "id": "L001",
+  "scene": 0,
+  "expr": "calme, accroche",
+  "text": "Il est trois heures douze. Une mise à jour système envoie un signal d'arrêt à ton serveur. Le job de nuit en est à la ligne trois mille quatre cents."
+ },
+ {
+  "id": "L002",
+  "scene": 0,
+  "expr": "pédagogue",
+  "text": "Au matin, deux scénarios. Dans le premier, tout reprend à la ligne trois mille quatre cent un, sans perte ni doublon. Dans le second, le job est orphelin et refuse de repartir."
+ },
+ {
+  "id": "L003",
+  "scene": 0,
+  "expr": "rappel",
+  "text": "Un rappel du module trois. La position de lecture est sauvegardée à chaque commit, dans la même transaction que les données. C'est ce qui permet une reprise sans perte ni doublon."
+ },
+ {
+  "id": "L004",
+  "scene": 0,
+  "expr": "rappel",
+  "text": "Un rappel du module quatre. Un chunk rejoué rappelle le processor : un total accumulé dedans compte l'élément deux fois."
+ },
+ {
+  "id": "L005",
+  "scene": 0,
+  "expr": "rappel",
+  "text": "Et un rappel du module un. Le statut de la dernière exécution décide si un restart est permis."
+ },
+ {
+  "id": "L006",
+  "scene": 0,
+  "expr": "annonce",
+  "text": "Sept étapes : trois problèmes et trois outils, le skip, le retry, le restart, ce qui se passe sous le capot, l'arrêt gracieux, et les pièges."
+ },
+ {
+  "id": "L007",
+  "scene": 1,
+  "expr": "besoin",
+  "text": "Mon besoin : qu'un lot de nuit survive aux ennuis, sans que je les traite tous de la même façon."
+ },
+ {
+  "id": "L008",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Premier ennui : une donnée est mauvaise. Une ligne mal formée, un montant illisible."
+ },
+ {
+  "id": "L009",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Deuxième ennui : une ressource est momentanément indisponible. Un verrou, un délai réseau, une panne de deux secondes."
+ },
+ {
+  "id": "L010",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Troisième ennui : le processus s'arrête. Un crash, un redémarrage, un arrêt demandé."
+ },
+ {
+  "id": "L011",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Chaque ennui a son réflexe. Pour la donnée : le skip. On ignore cette ligne, on la consigne, et on continue."
+ },
+ {
+  "id": "L012",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Pour la ressource : le retry. On réessaie après une courte pause."
+ },
+ {
+  "id": "L013",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Pour le processus : le restart. On reprend au dernier point validé."
+ },
+ {
+  "id": "L014",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Voici l'arbre de décision. L'erreur vient-elle de la donnée ? Alors skip : la relancer ne changera rien, la ligne est fausse."
+ },
+ {
+  "id": "L015",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Sinon, est-elle transitoire, comme un réseau ou un verrou ? Alors retry : dans quelques secondes, ça passera."
+ },
+ {
+  "id": "L016",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Sinon, bug, panne durable ou arrêt : le step échoue, et on fait un restart après correction."
+ },
+ {
+  "id": "L017",
+  "scene": 1,
+  "expr": "défi, direct",
+  "text": "Question. Une ligne du fichier a un montant illisible. Skip, retry ou restart ?"
+ },
+ {
+  "id": "L018",
+  "scene": 1,
+  "expr": "posé",
+  "text": "Skip : relancer ne changera rien, la ligne est fausse. On l'ignore et on la consigne."
+ },
+ {
+  "id": "L019",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Un mot sur ce qui change en version six. Le step tolérant aux fautes se construit sur le builder de chunk, avec faultTolerant."
+ },
+ {
+  "id": "L020",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Le retry n'est plus fourni par la bibliothèque Spring Retry. Il s'appuie sur le paquet retry de Spring Framework sept."
+ },
+ {
+  "id": "L021",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Les anciens backOffPolicy et ExponentialBackOffPolicy n'existent plus sur le builder. On utilise retryPolicy."
+ },
+ {
+  "id": "L022",
+  "scene": 1,
+  "expr": "pont",
+  "text": "Commençons par le skip, avec ses deux pièces : la règle, et la trace."
+ },
+ {
+  "id": "L023",
+  "scene": 2,
+  "expr": "besoin",
+  "text": "Mon besoin : ignorer une ligne mauvaise, sans perdre la trace de ce qu'on a ignoré."
+ },
+ {
+  "id": "L024",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Le step du module trois, avec chunk de cent, et le reader, le processor, le writer."
+ },
+ {
+  "id": "L025",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Puis faultTolerant. Sans cet appel, tout skip et tout retry sont ignorés, et la première exception fait échouer le step."
+ },
+ {
+  "id": "L026",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Les lignes mal formées du fichier : FlatFileParseException, ignorables. Les éléments invalides du module quatre aussi : ValidationException."
+ },
+ {
+  "id": "L027",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Et skipLimit à dix : à la onzième erreur ignorée, le step échoue. Au-delà d'un seuil, ce n'est plus une ligne mauvaise, c'est un fichier mauvais."
+ },
+ {
+  "id": "L028",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Un listener de skip : appelé à chaque élément ignoré. C'est lui qui laisse une trace."
+ },
+ {
+  "id": "L029",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Il implémente SkipListener, avec trois méthodes : une pour la lecture, une pour le traitement, une pour l'écriture."
+ },
+ {
+  "id": "L030",
+  "scene": 2,
+  "expr": "technique",
+  "text": "En lecture, si c'est une erreur de format, on a de quoi être précis : le numéro de la ligne et son texte brut."
+ },
+ {
+  "id": "L031",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Voilà de quoi écrire un rapport de rejets exploitable, à envoyer au partenaire le lendemain."
+ },
+ {
+  "id": "L032",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "En lecture, on n'a pas d'élément : la lecture a échoué. En traitement, on a l'élément d'entrée. En écriture, l'élément de sortie."
+ },
+ {
+  "id": "L033",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Sans listener, des lignes disparaissent sans trace. Inacceptable quand il s'agit d'argent."
+ },
+ {
+  "id": "L034",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Quand telle exception jusqu'à N fois ne suffit pas, on écrit sa propre règle : une SkipPolicy."
+ },
+ {
+  "id": "L035",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Elle reçoit l'exception et le nombre d'éléments déjà ignorés. Un switch avec pattern matching sur le type de l'exception."
+ },
+ {
+  "id": "L036",
+  "scene": 2,
+  "expr": "technique",
+  "text": "Un fichier manquant n'est jamais ignorable. Une ligne mal formée l'est, tant que le seuil n'est pas atteint."
+ },
+ {
+  "id": "L037",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "On la branche avec skipPolicy, à la place de skip et de skipLimit."
+ },
+ {
+  "id": "L038",
+  "scene": 2,
+  "expr": "défi, direct",
+  "text": "Question. Tu oublies faultTolerant mais tu écris skip et skipLimit. Que se passe-t-il ?"
+ },
+ {
+  "id": "L039",
+  "scene": 2,
+  "expr": "posé",
+  "text": "Les règles sont ignorées : la première exception fait échouer le step."
+ },
+ {
+  "id": "L040",
+  "scene": 2,
+  "expr": "pont",
+  "text": "Passons au retry, avec la nouvelle politique de Spring Framework sept."
+ },
+ {
+  "id": "L041",
+  "scene": 3,
+  "expr": "besoin",
+  "text": "Mon besoin : réessayer après un verrou de quelques secondes, sans marteler la base."
+ },
+ {
+  "id": "L042",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Première idée : réessayer tout de suite, plusieurs fois. Ça marche, mais on martèle une base déjà en difficulté."
+ },
+ {
+  "id": "L043",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "La bonne idée : une politique, avec des pauses qui grandissent. RetryPolicy point builder."
+ },
+ {
+  "id": "L044",
+  "scene": 3,
+  "expr": "technique",
+  "text": "maxRetries : le nombre de nouvelles tentatives. À mesurer, sans supposer que la tentative initiale est comptée."
+ },
+ {
+  "id": "L045",
+  "scene": 3,
+  "expr": "technique",
+  "text": "delay : la pause avant la première nouvelle tentative, deux cents millisecondes."
+ },
+ {
+  "id": "L046",
+  "scene": 3,
+  "expr": "technique",
+  "text": "multiplier : une progression exponentielle. Deux cents, quatre cents, huit cents."
+ },
+ {
+  "id": "L047",
+  "scene": 3,
+  "expr": "technique",
+  "text": "maxDelay : un plafond, jamais plus de deux secondes."
+ },
+ {
+  "id": "L048",
+  "scene": 3,
+  "expr": "technique",
+  "text": "jitter : un peu d'aléa, pour que plusieurs jobs ne réessaient pas à la même milliseconde. C'est l'effet de troupeau."
+ },
+ {
+  "id": "L049",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "includes : seules les erreurs transitoires sont retentées. Un échec de verrou ou de délai, pas un NullPointerException."
+ },
+ {
+  "id": "L050",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Et la politique se branche sur le step tolérant avec retryPolicy."
+ },
+ {
+  "id": "L051",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Forme courte, quand aucune pause n'est nécessaire : retry, avec la classe, et retryLimit."
+ },
+ {
+  "id": "L052",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "On peut combiner skip et retry. Une erreur à la fois retentable et ignorable est d'abord retentée."
+ },
+ {
+  "id": "L053",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Si les tentatives sont épuisées, l'élément est ignoré, et consigné. Une erreur ignorable mais pas retentable est ignorée tout de suite."
+ },
+ {
+  "id": "L054",
+  "scene": 3,
+  "expr": "défi, direct",
+  "text": "Question. Pourquoi ne pas réessayer un NullPointerException ?"
+ },
+ {
+  "id": "L055",
+  "scene": 3,
+  "expr": "posé",
+  "text": "Parce que c'est un bug, pas un hoquet. On le réessaie trois fois pour rien, et on masque une régression."
+ },
+ {
+  "id": "L056",
+  "scene": 3,
+  "expr": "pont",
+  "text": "Maintenant, le troisième outil : reprendre un job échoué."
+ },
+ {
+  "id": "L057",
+  "scene": 4,
+  "expr": "besoin",
+  "text": "Mon besoin : reprendre le lot du premier octobre après un échec, sans rien rejouer."
+ },
+ {
+  "id": "L058",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Un service avec le JobOperator et le JobRepository."
+ },
+ {
+  "id": "L059",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Le paramètre identifiant runDate désigne la même JobInstance. Il suffit : inputFile, non identifiant, n'entre pas dans l'identité."
+ },
+ {
+  "id": "L060",
+  "scene": 4,
+  "expr": "technique",
+  "text": "On retrouve la dernière exécution de cette instance, dans PostgreSQL."
+ },
+ {
+  "id": "L061",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Un switch sur le statut. Le comportement est explicite pour chaque cas."
+ },
+ {
+  "id": "L062",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Seuls FAILED et STOPPED autorisent un restart. Il crée une nouvelle exécution de la même instance, et retourne son identifiant."
+ },
+ {
+  "id": "L063",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "COMPLETED : rien à reprendre. Un autre statut, comme STARTED : le dépôt croit que le job tourne encore."
+ },
+ {
+  "id": "L064",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "La documentation indique aussi qu'un start avec les mêmes paramètres sur une instance FAILED fait lui-même le restart. Restart reste la forme explicite."
+ },
+ {
+  "id": "L065",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Des réglages utiles : startLimit, trois démarrages au maximum pour ce step."
+ },
+ {
+  "id": "L066",
+  "scene": 4,
+  "expr": "technique",
+  "text": "allowStartIfComplete : rejouer ce step même s'il a déjà réussi, par exemple pour un nettoyage."
+ },
+ {
+  "id": "L067",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Et preventRestart sur le job : pour déclarer un job non reprenable."
+ },
+ {
+  "id": "L068",
+  "scene": 4,
+  "expr": "défi, direct",
+  "text": "Question. Tu relances un job COMPLETED avec les mêmes paramètres. Que se passe-t-il ?"
+ },
+ {
+  "id": "L069",
+  "scene": 4,
+  "expr": "posé",
+  "text": "JobInstanceAlreadyCompleteException : l'instance est terminée, rien à reprendre."
+ },
+ {
+  "id": "L070",
+  "scene": 4,
+  "expr": "pont",
+  "text": "Comment Spring Batch sait-il où reprendre ? Regardons les tables."
+ },
+ {
+  "id": "L071",
+  "scene": 5,
+  "expr": "besoin",
+  "text": "Mon besoin : comprendre exactement ce que lit un restart."
+ },
+ {
+  "id": "L072",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "En haut : une JobInstance, bankJob avec la date du premier octobre. C'est l'identité du lot."
+ },
+ {
+  "id": "L073",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "En dessous : la première exécution, FAILED, un crash à trois heures douze. Son step loadBankStep, FAILED, avec trente-quatre commits."
+ },
+ {
+  "id": "L074",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Et son contexte : bankCsvReader point read point count égale trois mille quatre cents."
+ },
+ {
+  "id": "L075",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Au restart : une deuxième exécution, rattachée à la même instance."
+ },
+ {
+  "id": "L076",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Pour chaque step, on examine la dernière StepExecution. Un step COMPLETED est sauté. Un step FAILED ou STOPPED est rejoué."
+ },
+ {
+  "id": "L077",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Le contexte de la dernière exécution est relu. Open restaure la position."
+ },
+ {
+  "id": "L078",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Le reader saute trois mille quatre cents lignes, et reprend à la trois mille quatre cent unième."
+ },
+ {
+  "id": "L079",
+  "scene": 5,
+  "expr": "règle",
+  "text": "Pourquoi sans perte ni doublon ? Parce que, à chaque commit, les lignes et la position sont validées dans la même transaction."
+ },
+ {
+  "id": "L080",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Au crash, il n'existe que deux états : le chunk est entièrement validé, ou pas du tout."
+ },
+ {
+  "id": "L081",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Un crash à la ligne trois mille quatre cent cinquante : les cinquante lignes non validées sont rejouées."
+ },
+ {
+  "id": "L082",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Quatre conditions. Le reader sauvegarde son état : un nom, saveState actif."
+ },
+ {
+  "id": "L083",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Les paramètres identifiants sont identiques. Le reader est rejouable : le fichier n'a pas été remplacé."
+ },
+ {
+  "id": "L084",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Et l'écriture est dans la même base que le JobRepository, ou idempotente, avec ON CONFLICT DO UPDATE."
+ },
+ {
+  "id": "L085",
+  "scene": 5,
+  "expr": "défi, direct",
+  "text": "Question. Le fichier est remplacé entre le crash et la reprise. Que se passe-t-il ?"
+ },
+ {
+  "id": "L086",
+  "scene": 5,
+  "expr": "posé",
+  "text": "Le reader saute trois mille quatre cents lignes d'un autre fichier : la reprise est fausse. Il faut figer le fichier, un répertoire par exécution."
+ },
+ {
+  "id": "L087",
+  "scene": 5,
+  "expr": "pont",
+  "text": "Voyons maintenant ce qui se passe dans la transaction quand un chunk échoue, puis qu'on retente."
+ },
+ {
+  "id": "L088",
+  "scene": 6,
+  "expr": "besoin",
+  "text": "Mon besoin : comprendre le coût exact d'un retry."
+ },
+ {
+  "id": "L089",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Début du chunk, première transaction. On lit cent éléments, on les traite. À l'élément trente-sept, une exception transitoire, un verrou."
+ },
+ {
+  "id": "L090",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Rollback. Les trente-six éléments déjà traités sont annulés. Rien n'est écrit."
+ },
+ {
+  "id": "L091",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Une pause : deux cents millisecondes, puis quatre cents, puis huit cents."
+ },
+ {
+  "id": "L092",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Puis une deuxième transaction. Le chunk est rejoué en entier : les cent éléments sont retraités depuis le début."
+ },
+ {
+  "id": "L093",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Si ça passe : écriture des cent, sauvegarde de la position, commit. Sinon, retour au rollback, jusqu'à épuisement."
+ },
+ {
+  "id": "L094",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "À l'épuisement : si l'exception est ignorable, l'élément fautif est écarté. Sinon, le step échoue, et un restart reste possible."
+ },
+ {
+  "id": "L095",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Première conséquence : le rollback annule le chunk entier. Plus le chunk est grand, plus le rejeu coûte."
+ },
+ {
+  "id": "L096",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Deuxième : les trente-six premiers éléments sont retraités. Ce qu'ils ont fait hors de la transaction, un appel d'API, un e-mail, est répété."
+ },
+ {
+  "id": "L097",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Et tout compteur en mémoire les compte deux fois, comme au module quatre."
+ },
+ {
+  "id": "L098",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Troisième : quand l'écriture échoue et qu'un skip est possible, Spring Batch rejoue le chunk élément par élément, pour isoler le fautif."
+ },
+ {
+  "id": "L099",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "C'est exact, mais plus lent : cent petites transactions au lieu d'une."
+ },
+ {
+  "id": "L100",
+  "scene": 6,
+  "expr": "règle",
+  "text": "Valide en amont, comme au module quatre, pour que l'écriture n'échoue pas."
+ },
+ {
+  "id": "L101",
+  "scene": 6,
+  "expr": "défi, direct",
+  "text": "Question. Un chunk de cent, un échec à l'élément trente-sept en traitement, puis succès. Combien d'éléments sont écrits en base ?"
+ },
+ {
+  "id": "L102",
+  "scene": 6,
+  "expr": "posé",
+  "text": "Cent, une seule fois. La première tentative est annulée, la deuxième écrit tout. Mais le processor a été appelé plus de cent fois."
+ },
+ {
+  "id": "L103",
+  "scene": 6,
+  "expr": "pont",
+  "text": "Reste le cas du SIGTERM, qui arrive en pleine nuit."
+ },
+ {
+  "id": "L104",
+  "scene": 7,
+  "expr": "besoin",
+  "text": "Mon besoin : quand le serveur reçoit SIGTERM, que le job finisse le chunk en cours, puis s'arrête proprement."
+ },
+ {
+  "id": "L105",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Sans cela, la JVM est coupée au milieu d'une transaction. Avec un hook, l'arrêt est demandé, et coopératif."
+ },
+ {
+  "id": "L106",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Un listener de job. Il retient une association par exécution : un listener est un singleton, il peut surveiller plusieurs exécutions."
+ },
+ {
+  "id": "L107",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Jamais un champ unique : c'est le piège du module deux et du module quatre."
+ },
+ {
+  "id": "L108",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Le JobOperator est injecté à la demande, avec ObjectProvider, pour éviter une dépendance circulaire."
+ },
+ {
+  "id": "L109",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Dans beforeJob : l'exécution a un identifiant. On crée un JobExecutionShutdownHook, avec l'exécution et l'opérateur."
+ },
+ {
+  "id": "L110",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Et on l'enregistre auprès de la JVM, avec addShutdownHook."
+ },
+ {
+  "id": "L111",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Dans afterJob : le job est terminé, le hook devient inutile. On le retire."
+ },
+ {
+  "id": "L112",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Si la JVM est déjà en train de s'arrêter, le retrait est refusé : on ignore cette exception."
+ },
+ {
+  "id": "L113",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Le listener se branche sur le job, avec listener."
+ },
+ {
+  "id": "L114",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Que fait le hook ? À la réception du signal, il journalise, puis appelle jobOperator point stop sur l'exécution."
+ },
+ {
+  "id": "L115",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Il demande l'arrêt. Il n'attend pas la fin. L'exécution est marquée arrêt demandé."
+ },
+ {
+  "id": "L116",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Le chunk en cours continue, valide son commit, lignes et position."
+ },
+ {
+  "id": "L117",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Avant le chunk suivant, la politique d'interruption constate la demande, et lève une JobInterruptedException."
+ },
+ {
+  "id": "L118",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "La StepExecution et la JobExecution passent à STOPPED, le contexte est sauvegardé, et la JVM s'arrête proprement."
+ },
+ {
+  "id": "L119",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "L'arrêt est coopératif : il a lieu entre deux chunks. Un chunk de cent mille éléments retarde l'arrêt d'autant."
+ },
+ {
+  "id": "L120",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Et le statut final est STOPPED, pas FAILED : le restart est autorisé, sans rien corriger."
+ },
+ {
+  "id": "L121",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Côté exploitation : le délai accordé par l'orchestrateur doit dépasser la durée d'un chunk. Sinon la JVM est tuée avant la fin."
+ },
+ {
+  "id": "L122",
+  "scene": 7,
+  "expr": "défi, direct",
+  "text": "Question. Que se passe-t-il si le délai d'arrêt de l'orchestrateur est plus court qu'un chunk ?"
+ },
+ {
+  "id": "L123",
+  "scene": 7,
+  "expr": "posé",
+  "text": "La JVM est tuée avant la fin du chunk : on retombe dans le cas du crash, avec une exécution orpheline."
+ },
+ {
+  "id": "L124",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Un kill moins neuf, une erreur de mémoire, une coupure de courant : aucun hook ne s'exécute."
+ },
+ {
+  "id": "L125",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Le chunk en cours est annulé par PostgreSQL, ce qui est sain. Mais le dépôt garde l'exécution à l'état STARTED."
+ },
+ {
+  "id": "L126",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Conséquence : un restart est refusé, car le dépôt croit que le job tourne encore."
+ },
+ {
+  "id": "L127",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Il faut d'abord déclarer l'exécution orpheline, avec recover, ou abandon."
+ },
+ {
+  "id": "L128",
+  "scene": 7,
+  "expr": "règle",
+  "text": "Avant de le faire, vérifie qu'aucune JVM n'exécute plus ce job. Sinon, deux exécutions simultanées."
+ },
+ {
+  "id": "L129",
+  "scene": 7,
+  "expr": "pont",
+  "text": "Trois situations réelles pour fixer ces idées."
+ },
+ {
+  "id": "L130",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Premier cas : la nuit du serveur qui redémarre. À trois heures douze, SIGTERM. Le hook demande l'arrêt, le chunk en cours se termine, le job passe à STOPPED."
+ },
+ {
+  "id": "L131",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "Au matin, restartFor reprend à la ligne trois mille quatre cent un. Aucune ligne perdue ni dupliquée."
+ },
+ {
+  "id": "L132",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Deuxième cas : le fichier d'un partenaire contient trois lignes cassées sur deux millions. Un skip, un plafond à dix, un listener."
+ },
+ {
+  "id": "L133",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "Le lot va au bout, et le rapport de rejets part au partenaire le lendemain."
+ },
+ {
+  "id": "L134",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Troisième cas : la base qui hoquette. Un verrou de quelques secondes fait échouer un chunk."
+ },
+ {
+  "id": "L135",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "Avec un retry exponentiel, la deuxième tentative passe. Personne n'a rien vu, hormis une ligne de journal."
+ },
+ {
+  "id": "L136",
+  "scene": 8,
+  "expr": "pont",
+  "text": "Voyons les dix pièges."
+ },
+ {
+  "id": "L137",
+  "scene": 9,
+  "expr": "pédagogue",
+  "text": "Dix pièges, avec pour chacun ce qui se passe, la parade, et comment le repérer."
+ },
+ {
+  "id": "L138",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Un : un skip silencieux. Des lignes disparaissent sans trace."
+ },
+ {
+  "id": "L139",
+  "scene": 9,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un skip count supérieur à zéro, et aucune ligne dans le journal des rejets."
+ },
+ {
+  "id": "L140",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Deux : un retry sur une exception non transitoire. On réessaie un bug trois fois pour rien."
+ },
+ {
+  "id": "L141",
+  "scene": 9,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : la même NullPointerException, répétée trois fois, avec des pauses."
+ },
+ {
+  "id": "L142",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Trois : un restart d'un job dont le statut n'est pas FAILED ni STOPPED."
+ },
+ {
+  "id": "L143",
+  "scene": 9,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : une exception sur le statut, ou une nouvelle instance si les paramètres changent."
+ },
+ {
+  "id": "L144",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Quatre : un skipLimit trop haut. Un fichier totalement mauvais passe pour quelques erreurs."
+ },
+ {
+  "id": "L145",
+  "scene": 9,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un lot COMPLETED, avec un taux de rejets énorme."
+ },
+ {
+  "id": "L146",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Cinq : skip ou retry sans faultTolerant. Les règles sont ignorées."
+ },
+ {
+  "id": "L147",
+  "scene": 9,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un step qui échoue à la première exception, malgré les règles écrites."
+ },
+ {
+  "id": "L148",
+  "scene": 10,
+  "expr": "pont",
+  "text": "Les cinq suivants touchent le débit, les effets de bord et l'arrêt."
+ },
+ {
+  "id": "L149",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Six : un skip en écriture, sans y penser. Le chunk est rejoué élément par élément."
+ },
+ {
+  "id": "L150",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un débit qui s'effondre dès qu'un élément échoue à l'écriture."
+ },
+ {
+  "id": "L151",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Sept : un retry avec des effets de bord, ou des totaux dans le processor."
+ },
+ {
+  "id": "L152",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un e-mail envoyé deux fois, un compteur doublé après rejeu."
+ },
+ {
+  "id": "L153",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Huit : un retry sans pause ni plafond. On martèle une base déjà en difficulté."
+ },
+ {
+  "id": "L154",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : des dizaines de tentatives par seconde, et une base qui sature."
+ },
+ {
+  "id": "L155",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Neuf : un reader non reprenable. Pas de nom, saveState désactivé, ou fichier remplacé."
+ },
+ {
+  "id": "L156",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un restart qui repart de zéro, avec des doublons ou des pertes."
+ },
+ {
+  "id": "L157",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Dix : un arrêt non gracieux. Pas de hook, ou un délai plus court qu'un chunk. Exécution orpheline."
+ },
+ {
+  "id": "L158",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : une exécution STARTED au matin, sans processus, et un restart refusé."
+ },
+ {
+  "id": "L159",
+  "scene": 10,
+  "expr": "explicatif",
+  "text": "Trois tests qu'un job de production doit avoir. Le skip : un fichier avec deux lignes mauvaises, job COMPLETED, skip count égal à deux."
+ },
+ {
+  "id": "L160",
+  "scene": 10,
+  "expr": "explicatif",
+  "text": "Le retry : un processor qui échoue deux fois puis réussit, job COMPLETED. On compte les appels, et on vérifie qu'aucun total n'est doublé."
+ },
+ {
+  "id": "L161",
+  "scene": 10,
+  "expr": "explicatif",
+  "text": "Le restart : un writer qui échoue au trois cent cinquantième élément. Puis relance avec les mêmes paramètres, et un SELECT COUNT égal au nombre de lignes."
+ },
+ {
+  "id": "L162",
+  "scene": 10,
+  "expr": "règle",
+  "text": "Ni plus, ce serait des doublons. Ni moins, ce serait des pertes."
+ },
+ {
+  "id": "L163",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Reprenons notre nuit de trois heures douze. Tu sais maintenant comment le job reprend, ou pourquoi il refuse de repartir."
+ },
+ {
+  "id": "L164",
+  "scene": 11,
+  "expr": "récapitulatif",
+  "text": "Skip pour la donnée, retry pour la ressource, restart pour le processus."
+ },
+ {
+  "id": "L165",
+  "scene": 11,
+  "expr": "récapitulatif",
+  "text": "Un skip se consigne. Un retry se borne, avec pauses et jitter. Un restart reprend au dernier commit."
+ },
+ {
+  "id": "L166",
+  "scene": 11,
+  "expr": "récapitulatif",
+  "text": "Un arrêt gracieux demande l'arrêt, laisse finir le chunk, et passe à STOPPED."
+ },
+ {
+  "id": "L167",
+  "scene": 11,
+  "expr": "défi",
+  "text": "Quatre exercices. Un : pourquoi un skip sans listener est-il dangereux pour un fichier bancaire ?"
+ },
+ {
+  "id": "L168",
+  "scene": 11,
+  "expr": "défi",
+  "text": "Deux : un processor échoue deux fois par élément sur trois éléments. Combien d'appels, combien de rollbacks ? Mesure-le sur ta version."
+ },
+ {
+  "id": "L169",
+  "scene": 11,
+  "expr": "défi",
+  "text": "Trois : un job est STARTED au matin, sans aucun processus. Que fais-tu, dans quel ordre ?"
+ },
+ {
+  "id": "L170",
+  "scene": 11,
+  "expr": "défi",
+  "text": "Quatre : un chunk de cent mille et un délai d'arrêt de trente secondes. Quel est le risque ?"
+ },
+ {
+  "id": "L171",
+  "scene": 11,
+  "expr": "pause",
+  "text": "Prends le temps d'y réfléchir."
+ },
+ {
+  "id": "L172",
+  "scene": 11,
+  "expr": "explicatif",
+  "text": "Correction un. Des lignes disparaissent sans trace : à la réconciliation, on ne sait pas lesquelles. Il faut le numéro de ligne et le texte brut."
+ },
+ {
+  "id": "L173",
+  "scene": 11,
+  "expr": "explicatif",
+  "text": "Correction deux. À mesurer sur ta version : c'est précisément le but de l'exercice. Compte les appels et les rollbacks."
+ },
+ {
+  "id": "L174",
+  "scene": 11,
+  "expr": "explicatif",
+  "text": "Correction trois. Vérifier qu'aucune JVM n'exécute plus ce job. Puis recover ou abandon. Puis restart."
+ },
+ {
+  "id": "L175",
+  "scene": 11,
+  "expr": "explicatif",
+  "text": "Correction quatre. L'arrêt est coopératif, entre deux chunks. Un chunk trop long dépasse le délai : la JVM est tuée, exécution orpheline."
+ },
+ {
+  "id": "L176",
+  "scene": 11,
+  "expr": "transition",
+  "text": "Au module suivant, tu passes à l'échelle : multithread, partitionnement, plusieurs instances, et le verrou SKIP LOCKED."
+ }
+]
