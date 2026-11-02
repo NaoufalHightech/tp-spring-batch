@@ -1,0 +1,1070 @@
+[
+ {
+  "id": "L001",
+  "scene": 0,
+  "expr": "calme, accroche",
+  "text": "Le rapprochement doit être fini à six heures. Il se termine à huit heures. Et le volume double chaque année. Ton premier réflexe : ajouter des threads."
+ },
+ {
+  "id": "L002",
+  "scene": 0,
+  "expr": "pédagogue",
+  "text": "Mauvais réflexe, ou en tout cas, réflexe trop rapide. Aujourd'hui, on apprend à mesurer, puis à choisir la bonne façon de passer à l'échelle."
+ },
+ {
+  "id": "L003",
+  "scene": 0,
+  "expr": "rappel",
+  "text": "Un rappel du module un. Tous les serveurs partagent la même base de métadonnées : c'est elle qui fait de plusieurs processus un seul système."
+ },
+ {
+  "id": "L004",
+  "scene": 0,
+  "expr": "rappel",
+  "text": "Du module quatre : un singleton avec état, en multithread, ne fait plus un bug à retardement. Il fait des résultats aléatoires."
+ },
+ {
+  "id": "L005",
+  "scene": 0,
+  "expr": "rappel",
+  "text": "Du module cinq : le split parallélise des steps différents. Aujourd'hui, on parallélise un même step."
+ },
+ {
+  "id": "L006",
+  "scene": 0,
+  "expr": "annonce",
+  "text": "Neuf étapes : mesurer, le panorama, le multithread, l'asynchrone, le partitionnement local, restart, le distribué, SKIP LOCKED, et les pièges."
+ },
+ {
+  "id": "L007",
+  "scene": 1,
+  "expr": "besoin",
+  "text": "Mon besoin : un job qui ne tient plus dans ses délais. Et une envie : lui donner plus de threads."
+ },
+ {
+  "id": "L008",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Une règle ancienne de l'optimisation : ne pas optimiser. Et, pour les experts, pas encore."
+ },
+ {
+  "id": "L009",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Un job lent a souvent un défaut que le parallélisme ne guérit pas : une boucle accidentelle, une requête par élément, une chaîne qui grossit."
+ },
+ {
+  "id": "L010",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Paralléliser un code défaillant ne le répare pas : on obtient le même défaut, plus vite, et sur plus de threads."
+ },
+ {
+  "id": "L011",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Première étape : mesurer où va le temps. Le processeur, la mémoire, ou les entrées-sorties."
+ },
+ {
+  "id": "L012",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Les outils : Java Flight Recorder, fourni avec le JDK, utilisable sur une JVM de production. Et VisualVM, un outil externe."
+ },
+ {
+  "id": "L013",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Un échantillonnage du processeur désigne les méthodes qui consomment le plus."
+ },
+ {
+  "id": "L014",
+  "scene": 1,
+  "expr": "règle",
+  "text": "Deuxième étape : corriger les défauts de code. Troisième étape seulement : choisir une stratégie."
+ },
+ {
+  "id": "L015",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "La plupart des traitements par lots sont limités par les entrées-sorties, base ou fichiers, pas par le processeur. C'est ce qui oriente le choix."
+ },
+ {
+  "id": "L016",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Trois bonnes raisons de passer à l'échelle. Le volume qui grossit : deux millions de lignes hier, cinquante millions dans un an."
+ },
+ {
+  "id": "L017",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Le SLA, la fenêtre de traitement. Et la disponibilité : un seul serveur est un point de défaillance."
+ },
+ {
+  "id": "L018",
+  "scene": 1,
+  "expr": "défi, direct",
+  "text": "Question. Un job lit des fichiers et écrit en base. Le processeur est à dix pour cent, la base à quatre-vingt-dix pour cent. Que fais-tu ?"
+ },
+ {
+  "id": "L019",
+  "scene": 1,
+  "expr": "posé",
+  "text": "Je ne rajoute pas de threads de calcul : le goulot est la base. J'optimise les écritures, ou je partitionne en respectant le pool de connexions."
+ },
+ {
+  "id": "L020",
+  "scene": 2,
+  "expr": "besoin",
+  "text": "Mon besoin : choisir une stratégie parmi sept. De la plus simple à la plus complexe."
+ },
+ {
+  "id": "L021",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Sur un seul serveur : un, le step multithread, qui parallélise les chunks d'un même step."
+ },
+ {
+  "id": "L022",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Deux : les flux parallèles, avec le split du module cinq. Trois : l'AsyncItemProcessor, qui ne parallélise que le processor."
+ },
+ {
+  "id": "L023",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Quatre : le partitionnement local. Le même step, sur des plages de données disjointes."
+ },
+ {
+  "id": "L024",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Sur plusieurs serveurs : cinq, le partitionnement distribué. Six, le remote chunking. Sept, la compétition sur une file, avec SKIP LOCKED."
+ },
+ {
+  "id": "L025",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Le step multithread : gain rapide si le reader est déjà thread-safe. Le point faible : l'état du reader, pas de restart au chunk près, l'ordre perdu."
+ },
+ {
+  "id": "L026",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "L'AsyncItemProcessor : quand le processor est lent. La lecture et l'écriture restent séquentielles."
+ },
+ {
+  "id": "L027",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Le partitionnement local : gros volume, un serveur suffit. Limité à une JVM."
+ },
+ {
+  "id": "L028",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Le remote chunking : quand c'est le traitement le goulot, pas l'I/O. Les données transitent par le réseau."
+ },
+ {
+  "id": "L029",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "SKIP LOCKED : un travail en continu, des instances interchangeables. La conception de la réservation est à ta charge."
+ },
+ {
+  "id": "L030",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Une confusion fréquente : deux situations très différentes avec plusieurs serveurs."
+ },
+ {
+  "id": "L031",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Première situation : éviter les doublons. Deux serveurs déclenchent le même job avec la même date. Qui l'exécute ?"
+ },
+ {
+  "id": "L032",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Le JobRepository : un seul démarre, l'autre reçoit JobExecutionAlreadyRunningException, comme au module un."
+ },
+ {
+  "id": "L033",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Deuxième situation : se partager le travail. Deux serveurs veulent travailler ensemble sur le même volume."
+ },
+ {
+  "id": "L034",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Le partitionnement, découpage décidé à l'avance. Ou la réservation de lignes, SKIP LOCKED : chacun prend ce que l'autre ne prend pas."
+ },
+ {
+  "id": "L035",
+  "scene": 2,
+  "expr": "défi, direct",
+  "text": "Question. Deux serveurs lancent le même job, avec la même date, à deux heures. Est-ce du partage de travail ?"
+ },
+ {
+  "id": "L036",
+  "scene": 2,
+  "expr": "posé",
+  "text": "Non : c'est un doublon. Le JobRepository en laisse passer un seul. Pour partager un volume, il faut partitionner, ou réserver."
+ },
+ {
+  "id": "L037",
+  "scene": 3,
+  "expr": "besoin",
+  "text": "Mon besoin : plus de chunks en même temps, sans réécrire mon step."
+ },
+ {
+  "id": "L038",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Un exécuteur asynchrone, avec un préfixe de nom de thread : indispensable pour lire les journaux."
+ },
+ {
+  "id": "L039",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Et un plafond de quatre chunks simultanés. Sans limite, il crée un thread par tâche, sans recyclage : à proscrire en production."
+ },
+ {
+  "id": "L040",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Le step, comme au module trois : chunk de cent, le reader, le processor, le writer."
+ },
+ {
+  "id": "L041",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Chaque chunk, dans son thread, a sa propre transaction."
+ },
+ {
+  "id": "L042",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Et taskExecutor, avec l'exécuteur. En version six, il attend un AsyncTaskExecutor."
+ },
+ {
+  "id": "L043",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Le reader doit être thread-safe. Un reader paginé l'est. Un curseur ou un reader de fichier ne l'est pas."
+ },
+ {
+  "id": "L044",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Un tableau pour retenir. JdbcPagingItemReader : oui, chaque page est une requête indépendante."
+ },
+ {
+  "id": "L045",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "JdbcCursorItemReader : non, un seul ResultSet partagé. FlatFileItemReader : non, un flux et un compteur."
+ },
+ {
+  "id": "L046",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "XML et JSON : non plus. Tout reader enveloppé dans un SynchronizedItemStreamReader : oui, la lecture est sérialisée."
+ },
+ {
+  "id": "L047",
+  "scene": 3,
+  "expr": "technique",
+  "text": "SynchronizedItemStreamReader met un verrou autour de read : un seul thread lit à la fois. Le reste reste parallèle."
+ },
+ {
+  "id": "L048",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Et on l'enregistre aussi comme flux, avec stream."
+ },
+ {
+  "id": "L049",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Le prix à payer : les chunks se terminent dans le désordre. Une position de lecture n'a plus de sens."
+ },
+ {
+  "id": "L050",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Un reader de fichier doit alors avoir saveState à false : plus de position sauvegardée, et un restart qui repart du début."
+ },
+ {
+  "id": "L051",
+  "scene": 3,
+  "expr": "règle",
+  "text": "Pour une reprise précise, ne fais pas du multithread : fais du partitionnement."
+ },
+ {
+  "id": "L052",
+  "scene": 3,
+  "expr": "défi, direct",
+  "text": "Question. Un FlatFileItemReader est utilisé par quatre threads, sans précaution. Que risque-t-on ?"
+ },
+ {
+  "id": "L053",
+  "scene": 3,
+  "expr": "posé",
+  "text": "Des lignes sautées ou dupliquées, sans erreur : le flux de lecture et le compteur sont partagés."
+ },
+ {
+  "id": "L054",
+  "scene": 4,
+  "expr": "besoin",
+  "text": "Mon besoin : accélérer un processor lent, sans toucher à la lecture."
+ },
+ {
+  "id": "L055",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "AsyncItemProcessor décore ton processor, et exécute chaque process sur un thread. Il vit dans spring-batch-integration."
+ },
+ {
+  "id": "L056",
+  "scene": 4,
+  "expr": "technique",
+  "text": "On lui donne le vrai traitement avec setDelegate, et le pool avec setTaskExecutor."
+ },
+ {
+  "id": "L057",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Et le writer asynchrone va toujours avec : il déballe les Future, et passe les résultats au writer réel."
+ },
+ {
+  "id": "L058",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Le type de sortie du chunk change : c'est un Future de BankTransaction."
+ },
+ {
+  "id": "L059",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Un ordre de grandeur : cinq millisecondes par élément, sur un million d'éléments. Environ une heure vingt-trois en séquentiel."
+ },
+ {
+  "id": "L060",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Réparti sur huit threads, environ dix minutes, si le reste ne devient pas le goulot."
+ },
+ {
+  "id": "L061",
+  "scene": 4,
+  "expr": "défi, direct",
+  "text": "Question. Le processor est rapide, mais l'écriture est lente. L'AsyncItemProcessor aide-t-il ?"
+ },
+ {
+  "id": "L062",
+  "scene": 4,
+  "expr": "posé",
+  "text": "Non : lecture et écriture restent séquentielles. Il ne parallélise que le processor."
+ },
+ {
+  "id": "L063",
+  "scene": 5,
+  "expr": "besoin",
+  "text": "Mon besoin : traiter un gros volume sur un serveur, avec une reprise précise."
+ },
+ {
+  "id": "L064",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Le principe : un step maître découpe les données en plages disjointes."
+ },
+ {
+  "id": "L065",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Pour chaque plage, un step ouvrier complet s'exécute, avec reader, processor et writer, et sa propre StepExecution."
+ },
+ {
+  "id": "L066",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Quatre plages : un à deux mille cinq cents, deux mille cinq cent un à cinq mille, et ainsi de suite jusqu'à dix mille."
+ },
+ {
+  "id": "L067",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "À la fin, le maître agrège les statuts : COMPLETED, ou FAILED."
+ },
+ {
+  "id": "L068",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Le découpage : une classe qui implémente Partitioner. Elle reçoit gridSize, une indication, c'est toi qui la fixes."
+ },
+ {
+  "id": "L069",
+  "scene": 5,
+  "expr": "technique",
+  "text": "On lit le minimum et le maximum des identifiants dans la table."
+ },
+ {
+  "id": "L070",
+  "scene": 5,
+  "expr": "technique",
+  "text": "ceilDiv : un arrondi supérieur, pour que les plages couvrent tout l'intervalle, sans trou."
+ },
+ {
+  "id": "L071",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Chaque identifiant appartient à exactement une plage. Pas de chevauchement."
+ },
+ {
+  "id": "L072",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Une partition est un ExecutionContext : il porte la plage, minId et maxId."
+ },
+ {
+  "id": "L073",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Le nom de la partition doit être unique et déterministe : au restart, c'est lui qui la retrouve."
+ },
+ {
+  "id": "L074",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Le step ouvrier : un reader en StepScope, qui lit sa plage dans le contexte du step ouvrier, et pas dans les paramètres du job."
+ },
+ {
+  "id": "L075",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "C'est ce qui rend chaque ouvrier différent. D'où StepScope, comme au module deux."
+ },
+ {
+  "id": "L076",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Le step maître : partitioner, avec le nom du step ouvrier et le découpeur."
+ },
+ {
+  "id": "L077",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Le step ouvrier à exécuter pour chaque plage, et gridSize, le nombre de partitions."
+ },
+ {
+  "id": "L078",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Et taskExecutor. Sans exécuteur, tout s'exécute dans un seul thread : l'exécuteur par défaut est synchrone."
+ },
+ {
+  "id": "L079",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Le partitionnement fonctionne, mais sans aucun gain. Aucune erreur, aucun avertissement."
+ },
+ {
+  "id": "L080",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Le pool : borné, nommé, aussi grand que le nombre de partitions simultanées, et plus petit que le pool de connexions."
+ },
+ {
+  "id": "L081",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "On peut avoir seize partitions et quatre threads : les partitions sont servies quatre par quatre."
+ },
+ {
+  "id": "L082",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Un thread, une StepExecution, ses propres transactions et connexions. Le pool de connexions doit être dimensionné en conséquence."
+ },
+ {
+  "id": "L083",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "En base, une ligne pour le maître, et une par partition : loadWorkerStep deux points partition zéro, et ainsi de suite."
+ },
+ {
+  "id": "L084",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Les compteurs du maître sont la somme de ceux des partitions."
+ },
+ {
+  "id": "L085",
+  "scene": 5,
+  "expr": "défi, direct",
+  "text": "Question. Avec min égal un, max égal dix mille et quatre partitions, quelles sont les plages ?"
+ },
+ {
+  "id": "L086",
+  "scene": 5,
+  "expr": "posé",
+  "text": "Un à deux mille cinq cents, deux mille cinq cent un à cinq mille, cinq mille un à sept mille cinq cents, sept mille cinq cent un à dix mille."
+ },
+ {
+  "id": "L087",
+  "scene": 5,
+  "expr": "défi, direct",
+  "text": "Et avec max égal dix mille deux ? Combien d'identifiants dans la dernière plage ?"
+ },
+ {
+  "id": "L088",
+  "scene": 5,
+  "expr": "posé",
+  "text": "La taille devient deux mille cinq cent un. La dernière plage va de sept mille cinq cent quatre à dix mille deux : deux mille quatre cent quatre-vingt-dix-neuf identifiants."
+ },
+ {
+  "id": "L089",
+  "scene": 5,
+  "expr": "pont",
+  "text": "Voyons maintenant ce qui se passe au restart d'un job partitionné."
+ },
+ {
+  "id": "L090",
+  "scene": 6,
+  "expr": "besoin",
+  "text": "Mon besoin : qu'une partition en échec soit reprise, sans rejouer celles qui ont réussi."
+ },
+ {
+  "id": "L091",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Si un ouvrier échoue, le maître échoue. Au restart, seule la partition échouée est rejouée."
+ },
+ {
+  "id": "L092",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "C'est le nom déterministe de la partition qui permet de la retrouver. Un nom aléatoire casserait la reprise."
+ },
+ {
+  "id": "L093",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Chaque partition a son propre contexte : sa position de lecture est sauvegardée à chaque commit, comme au module trois."
+ },
+ {
+  "id": "L094",
+  "scene": 6,
+  "expr": "règle",
+  "text": "Pour une reprise précise sur un gros volume, le partitionnement bat le multithread."
+ },
+ {
+  "id": "L095",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Le piège majeur : des plages qui se chevauchent, ou qui laissent un trou. Des lignes traitées deux fois, ou jamais."
+ },
+ {
+  "id": "L096",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Un test : pour plusieurs jeux de bornes, vérifier que chaque identifiant est dans exactement une plage."
+ },
+ {
+  "id": "L097",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Et que la première plage commence au minimum, que la dernière finit au maximum."
+ },
+ {
+  "id": "L098",
+  "scene": 6,
+  "expr": "défi, direct",
+  "text": "Question. Les plages se chevauchent de dix identifiants. Que se passe-t-il ?"
+ },
+ {
+  "id": "L099",
+  "scene": 6,
+  "expr": "posé",
+  "text": "Dix lignes traitées deux fois : des doublons, ou des totaux faux. Sans aucune erreur."
+ },
+ {
+  "id": "L100",
+  "scene": 6,
+  "expr": "pont",
+  "text": "Et si une seule machine ne suffit plus ? Passons au distribué."
+ },
+ {
+  "id": "L101",
+  "scene": 7,
+  "expr": "besoin",
+  "text": "Mon besoin : répartir les partitions sur plusieurs serveurs. Cette partie est théorique : le code vient des classes de Spring Batch six, sans exécution."
+ },
+ {
+  "id": "L102",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Même découpage, mais chaque partition est envoyée par un message à un autre serveur. Seules les métadonnées voyagent : la plage."
+ },
+ {
+  "id": "L103",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Côté maître : RemotePartitioningManagerStepBuilderFactory. En version quatre, on disait Master. On lui donne le partitioner, et des canaux."
+ },
+ {
+  "id": "L104",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Un canal de sortie pour les requêtes, un canal d'entrée pour les réponses."
+ },
+ {
+  "id": "L105",
+  "scene": 7,
+  "expr": "technique",
+  "text": "Côté ouvrier : RemotePartitioningWorkerStepBuilderFactory, avec un canal d'entrée et un canal de sortie."
+ },
+ {
+  "id": "L106",
+  "scene": 7,
+  "expr": "technique",
+  "text": "EnableBatchIntegration active les builders. Les canaux sont reliés à un courtier de messages, RabbitMQ, Kafka, par Spring Integration."
+ },
+ {
+  "id": "L107",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Le job ne doit exister que sur le profil manager. Sinon, avec un seul jar, Spring Boot lancerait le job aussi sur chaque ouvrier."
+ },
+ {
+  "id": "L108",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Tous les serveurs partagent le même JobRepository : c'est là que vit l'état de chaque partition."
+ },
+ {
+  "id": "L109",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Un ouvrier exécute son step hors du contexte du job. Tout ce qu'il lui faut doit être dans le contexte de sa partition."
+ },
+ {
+  "id": "L110",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Et le courtier doit offrir une livraison garantie : des messages persistants."
+ },
+ {
+  "id": "L111",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Il existe aussi un partitionnement à lancement dynamique, avec Spring Cloud Task, qui lance de nouvelles instances à la demande."
+ },
+ {
+  "id": "L112",
+  "scene": 7,
+  "expr": "explicatif",
+  "text": "Autre approche : le remote chunking. Ici, c'est le maître qui lit. Il envoie les éléments aux ouvriers, qui traitent et écrivent."
+ },
+ {
+  "id": "L113",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "À réserver au cas où le processor est le goulot. Si l'I/O est le goulot, les données transitent par le réseau : c'est plus lent qu'avant."
+ },
+ {
+  "id": "L114",
+  "scene": 7,
+  "expr": "défi, direct",
+  "text": "Question. Le goulot est l'écriture en base. Remote chunking ou partitionnement ?"
+ },
+ {
+  "id": "L115",
+  "scene": 7,
+  "expr": "posé",
+  "text": "Partitionnement : chaque ouvrier lit et écrit sa plage. Le remote chunking ferait transiter toutes les données par le réseau."
+ },
+ {
+  "id": "L116",
+  "scene": 7,
+  "expr": "pont",
+  "text": "Reste la dernière approche : des instances interchangeables, qui se partagent une file."
+ },
+ {
+  "id": "L117",
+  "scene": 8,
+  "expr": "besoin",
+  "text": "Mon besoin : des lignes arrivent en continu, plusieurs instances tournent, et chacune doit prendre des lignes que les autres ne prennent pas."
+ },
+ {
+  "id": "L118",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Première idée : un verrou distribué. Complexe et fragile. Deuxième idée : laisser la base arbitrer, avec SKIP LOCKED."
+ },
+ {
+  "id": "L119",
+  "scene": 8,
+  "expr": "technique",
+  "text": "La table de travail : un statut NEW, CLAIMED, DONE, une colonne claimed by, une colonne claimed at."
+ },
+ {
+  "id": "L120",
+  "scene": 8,
+  "expr": "technique",
+  "text": "Et un index sur le statut, la date de réservation, et l'identifiant."
+ },
+ {
+  "id": "L121",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "La réservation, en une requête atomique : un UPDATE, dont la sous-requête sélectionne les lignes."
+ },
+ {
+  "id": "L122",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "FOR UPDATE SKIP LOCKED : la sous-requête verrouille les lignes sélectionnées. Les lignes déjà verrouillées par une autre transaction sont sautées, pas attendues."
+ },
+ {
+  "id": "L123",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Deux instances qui réservent en même temps obtiennent des lignes différentes, sans jamais se bloquer."
+ },
+ {
+  "id": "L124",
+  "scene": 8,
+  "expr": "appuyé",
+  "text": "Et le bail : une ligne CLAIMED depuis trop longtemps redevient disponible. Sans cela, un crash laisserait des lignes réservées pour toujours."
+ },
+ {
+  "id": "L125",
+  "scene": 8,
+  "expr": "technique",
+  "text": "Le reader : un TransactionTemplate, en REQUIRES NEW. La réservation est validée tout de suite, dans sa propre transaction."
+ },
+ {
+  "id": "L126",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Le verrou n'est tenu que le temps de la réservation. Ensuite, c'est une ligne marquée, qui appartient à cette instance."
+ },
+ {
+  "id": "L127",
+  "scene": 8,
+  "expr": "technique",
+  "text": "La méthode read est synchronisée : elle remplit un tampon par une réservation, puis sert les éléments un par un."
+ },
+ {
+  "id": "L128",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Un tampon vide déclenche une réservation de lot. Poll retourne null quand il n'y a plus rien."
+ },
+ {
+  "id": "L129",
+  "scene": 8,
+  "expr": "défi, direct",
+  "text": "Question. Une instance réserve cent lignes, puis plante. Que deviennent ces lignes ?"
+ },
+ {
+  "id": "L130",
+  "scene": 8,
+  "expr": "posé",
+  "text": "Elles restent CLAIMED, jusqu'à l'expiration du bail : alors une autre instance les reprend. Sans bail, elles seraient perdues."
+ },
+ {
+  "id": "L131",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Comment SKIP LOCKED règle la concurrence : une seule requête, un verrou de ligne, jamais d'attente."
+ },
+ {
+  "id": "L132",
+  "scene": 8,
+  "expr": "explicatif",
+  "text": "Comparaison : sans SKIP LOCKED, la deuxième instance attend la première, ou elle prend les mêmes lignes."
+ },
+ {
+  "id": "L133",
+  "scene": 8,
+  "expr": "pont",
+  "text": "Voyons comment le JobRepository gère lui-même la concurrence entre instances."
+ },
+ {
+  "id": "L134",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Trois mécanismes. L'isolation de création SERIALIZABLE : elle protège contre deux lancements simultanés du même job."
+ },
+ {
+  "id": "L135",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "La vérification des exécutions en cours : elle lève JobExecutionAlreadyRunningException."
+ },
+ {
+  "id": "L136",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "La colonne version : le verrouillage optimiste, contre deux écritures concurrentes sur la même ligne."
+ },
+ {
+  "id": "L137",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "En multi-instance, une OptimisticLockingFailureException signale que deux processus écrivent la même StepExecution."
+ },
+ {
+  "id": "L138",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Un message livré deux fois, une reprise lancée en parallèle. Ne la masque pas : c'est un signal."
+ },
+ {
+  "id": "L139",
+  "scene": 9,
+  "expr": "explicatif",
+  "text": "Un scénario : un message de partition est livré en double. Deux ouvriers exécutent la même partition."
+ },
+ {
+  "id": "L140",
+  "scene": 9,
+  "expr": "appuyé",
+  "text": "Le deuxième écrit une StepExecution déjà modifiée : l'exception tombe. C'est le verrouillage optimiste qui fait son travail."
+ },
+ {
+  "id": "L141",
+  "scene": 9,
+  "expr": "pont",
+  "text": "Voyons maintenant les dix pièges."
+ },
+ {
+  "id": "L142",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Dix pièges, avec pour chacun ce qui se passe, la parade, et comment le repérer."
+ },
+ {
+  "id": "L143",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Un : un reader non thread-safe partagé entre threads. Lignes sautées ou dupliquées, sans erreur."
+ },
+ {
+  "id": "L144",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un total qui diffère de la source, sans exception."
+ },
+ {
+  "id": "L145",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Deux : un singleton avec état en multithread. Résultats aléatoires."
+ },
+ {
+  "id": "L146",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un résultat différent à chaque lancement, sur les mêmes données."
+ },
+ {
+  "id": "L147",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Trois : un pool de threads mal dimensionné. SimpleAsyncTaskExecutor illimité, ou un pool supérieur au pool de connexions."
+ },
+ {
+  "id": "L148",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : une base saturée, des connexions qui expirent."
+ },
+ {
+  "id": "L149",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Quatre : une OptimisticLockingFailureException en multi-instance. Ne la masque pas."
+ },
+ {
+  "id": "L150",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : l'exception sur la table des steps, avec deux exécuteurs de la même partition."
+ },
+ {
+  "id": "L151",
+  "scene": 10,
+  "expr": "appuyé",
+  "text": "Cinq : des plages de partitionnement qui se chevauchent, ou qui laissent un trou."
+ },
+ {
+  "id": "L152",
+  "scene": 10,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : des doublons en base, ou des lignes jamais traitées."
+ },
+ {
+  "id": "L153",
+  "scene": 11,
+  "expr": "pont",
+  "text": "Les cinq suivants touchent l'exécuteur, la reprise, le remote chunking, le bail et les profils."
+ },
+ {
+  "id": "L154",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Six : un partitionnement sans TaskExecutor. L'exécuteur est synchrone : aucun gain."
+ },
+ {
+  "id": "L155",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : tous les journaux sur un seul thread, et la même durée qu'avant."
+ },
+ {
+  "id": "L156",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Sept : du multithread avec reprise. SaveState oublié, ou position sauvegardée dans le désordre."
+ },
+ {
+  "id": "L157",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un restart qui repart au mauvais endroit."
+ },
+ {
+  "id": "L158",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Huit : du remote chunking quand l'I/O est le goulot. Plus lent qu'avant."
+ },
+ {
+  "id": "L159",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : un réseau saturé, un débit inférieur à la version locale."
+ },
+ {
+  "id": "L160",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Neuf : SKIP LOCKED sans bail. Un crash laisse des lignes réservées pour toujours."
+ },
+ {
+  "id": "L161",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : des lignes CLAIMED très anciennes, que personne ne traite."
+ },
+ {
+  "id": "L162",
+  "scene": 11,
+  "expr": "appuyé",
+  "text": "Dix : le job démarré sur chaque ouvrier. Un seul jar, pas de profil."
+ },
+ {
+  "id": "L163",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Comment le repérer : le même job qui tourne sur le maître et sur chaque ouvrier."
+ },
+ {
+  "id": "L164",
+  "scene": 11,
+  "expr": "pédagogue",
+  "text": "Pourquoi on y tombe : parce que chaque approche semble simple en démonstration, avec un seul serveur, une seule base, et peu de données."
+ },
+ {
+  "id": "L165",
+  "scene": 12,
+  "expr": "pédagogue",
+  "text": "Reprenons notre rapprochement de six heures. Tu sais maintenant quoi mesurer, et quelle approche choisir."
+ },
+ {
+  "id": "L166",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Mesurer d'abord. Le multithread pour un reader sûr. L'asynchrone pour un processor lent."
+ },
+ {
+  "id": "L167",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "Le partitionnement pour un gros volume avec reprise précise. Le remote chunking quand le processor est le goulot."
+ },
+ {
+  "id": "L168",
+  "scene": 12,
+  "expr": "récapitulatif",
+  "text": "SKIP LOCKED avec un bail pour des instances interchangeables."
+ },
+ {
+  "id": "L169",
+  "scene": 12,
+  "expr": "défi",
+  "text": "Quatre exercices. Un : un job de quarante minutes lit un fichier unique de quatre gigaoctets, applique un calcul lent de trente millisecondes à chaque ligne, puis écrit en base. Quel goulot, et quelles approches ?"
+ },
+ {
+  "id": "L170",
+  "scene": 12,
+  "expr": "défi",
+  "text": "Deux : avec min un, max dix mille et quatre partitions, quelles plages ? Et avec max dix mille deux ?"
+ },
+ {
+  "id": "L171",
+  "scene": 12,
+  "expr": "défi",
+  "text": "Trois : un collègue active le partitionnement avec huit partitions et ne voit aucune amélioration. Quelle ligne manque ?"
+ },
+ {
+  "id": "L172",
+  "scene": 12,
+  "expr": "défi",
+  "text": "Quatre : une instance plante après avoir réservé cent lignes. Que se passe-t-il, avec et sans bail ?"
+ },
+ {
+  "id": "L173",
+  "scene": 12,
+  "expr": "pause",
+  "text": "Prends le temps d'y réfléchir."
+ },
+ {
+  "id": "L174",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Correction un. Le goulot est le calcul de trente millisecondes par ligne : c'est le processor. AsyncItemProcessor, ou remote chunking. Pas un reader multithread sur un fichier unique."
+ },
+ {
+  "id": "L175",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Correction deux. Plages de deux mille cinq cents. Avec dix mille deux, la taille devient deux mille cinq cent un, et la dernière plage contient deux mille quatre cent quatre-vingt-dix-neuf identifiants."
+ },
+ {
+  "id": "L176",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Correction trois. Le taskExecutor manque : l'exécuteur par défaut est synchrone. On le voit dans les journaux, sur un seul thread."
+ },
+ {
+  "id": "L177",
+  "scene": 12,
+  "expr": "explicatif",
+  "text": "Correction quatre. Sans bail, les lignes restent réservées pour toujours. Avec bail, une autre instance les reprend à l'expiration."
+ },
+ {
+  "id": "L178",
+  "scene": 12,
+  "expr": "transition",
+  "text": "Au dernier module, tu passes en production : tests, supervision, déploiement, et Kubernetes."
+ }
+]
