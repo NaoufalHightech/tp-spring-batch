@@ -26,7 +26,7 @@ python tools/voxtral_local.py episodes/m1_fondations                            
 | 4 | écrit : 151 lignes, ≈ 22 min estimées | écrit : 13 scènes, vérifié | à faire | à faire |
 | 5 | écrit : 158 lignes, ≈ 22 min estimées | écrit : 11 scènes, vérifié | à faire | à faire |
 | 6 | écrit : 176 lignes, ≈ 25 min estimées | écrit : 12 scènes, vérifié | à faire | à faire |
-| 7 | écrit : 178 lignes, ≈ 27 min estimées | écrit : 13 scènes, vérifié | à faire | à faire |
+| 7 | écrit : 192 lignes, ≈ 30 min estimées | écrit : 14 scènes, vérifié | à faire | à faire |
 | 8 | écrit : 175 lignes, ≈ 26 min estimées | écrit : 13 scènes, vérifié | à faire | à faire |
 | Annexe 1 (`../annexe_1/`) | écrit : 52 lignes, ≈ 8,5 min estimées | écrit : 7 scènes, vérifié | à faire | à faire |
 | Annexe REST (`../annexe_rest/`) | écrit : 102 lignes, ≈ 17 min estimées | écrit : 9 scènes, vérifié | à faire | à faire |
