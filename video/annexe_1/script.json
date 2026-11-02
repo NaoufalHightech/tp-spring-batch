@@ -1,0 +1,314 @@
+[
+ {
+  "id": "L001",
+  "scene": 1,
+  "expr": "calme, accroche",
+  "text": "Tu veux relancer ton job. Spring Batch refuse : JobInstanceAlreadyCompleteException. L'instance est déjà COMPLETED."
+ },
+ {
+  "id": "L002",
+  "scene": 1,
+  "expr": "complice",
+  "text": "Alors tu fais ce que tout le monde fait : tu ajoutes un paramètre timestamp, avec l'heure courante. Et ça marche."
+ },
+ {
+  "id": "L003",
+  "scene": 1,
+  "expr": "appuyé",
+  "text": "Ça marche, oui. Et tu viens de casser la reprise. Au module un, c'était le piège numéro cinq."
+ },
+ {
+  "id": "L004",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Rappel. Une JobInstance, c'est un job plus ses paramètres identifiants. Le timestamp change à chaque lancement, donc chaque lancement crée une nouvelle instance."
+ },
+ {
+  "id": "L005",
+  "scene": 1,
+  "expr": "explicatif",
+  "text": "Ton job échoue à la ligne neuf cent mille. Tu le relances. Le timestamp a changé : nouvelle instance, et tout repart de zéro."
+ },
+ {
+  "id": "L006",
+  "scene": 1,
+  "expr": "posé",
+  "text": "Le timestamp n'est donc pas la solution. Mais ton besoin, lui, est légitime."
+ },
+ {
+  "id": "L007",
+  "scene": 1,
+  "expr": "annonce",
+  "text": "Dans cette annexe : le besoin, la solution, ce qui se passe dans la base, et le piège à repérer. Environ sept minutes."
+ },
+ {
+  "id": "L008",
+  "scene": 1,
+  "expr": "pont",
+  "text": "Commençons par le besoin. Quand veut-on vraiment une nouvelle instance ?"
+ },
+ {
+  "id": "L009",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Il existe des jobs sans identité métier. Un rapport à la demande, par exemple. Chaque demande est un nouveau travail."
+ },
+ {
+  "id": "L010",
+  "scene": 2,
+  "expr": "exemple",
+  "text": "Un client demande son relevé en PDF. Dix minutes plus tard, il le redemande. Même job, mêmes données, mais deux demandes distinctes."
+ },
+ {
+  "id": "L011",
+  "scene": 2,
+  "expr": "explicatif",
+  "text": "Autre cas : un job de nettoyage lancé toutes les heures, sans date métier. Il n'y a pas de runDate à mettre."
+ },
+ {
+  "id": "L012",
+  "scene": 2,
+  "expr": "appuyé",
+  "text": "Dans ces cas, aucun paramètre naturel ne distingue deux lancements. Il faut en fabriquer un."
+ },
+ {
+  "id": "L013",
+  "scene": 2,
+  "expr": "pédagogue",
+  "text": "Mais pas n'importe lequel. Un compteur, simple, qui avance d'un à chaque nouvelle instance, et qui laisse la reprise intacte."
+ },
+ {
+  "id": "L014",
+  "scene": 2,
+  "expr": "pont",
+  "text": "Spring Batch fournit exactement ça. Voyons comment."
+ },
+ {
+  "id": "L015",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Le job s'appelle rapportClient. Le JobBuilder reçoit le nom et le JobRepository."
+ },
+ {
+  "id": "L016",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Ensuite, un seul appel : incrementer, avec un nouveau RunIdIncrementer. Puis le premier step, comme d'habitude."
+ },
+ {
+  "id": "L017",
+  "scene": 3,
+  "expr": "explicatif",
+  "text": "Que fait cet objet ? Il ajoute un paramètre nommé run point id, de type Long, et il l'augmente d'un à chaque nouvelle instance."
+ },
+ {
+  "id": "L018",
+  "scene": 3,
+  "expr": "appuyé",
+  "text": "Et ce paramètre est identifiant. C'est lui qui fait la différence entre deux lancements."
+ },
+ {
+  "id": "L019",
+  "scene": 3,
+  "expr": "attention",
+  "text": "Attention : l'incrémenteur ne se déclenche pas tout seul. Avec JobOperator point start et des paramètres, il n'est pas appelé."
+ },
+ {
+  "id": "L020",
+  "scene": 3,
+  "expr": "technique",
+  "text": "Il intervient quand tu demandes la prochaine instance : JobOperator point startNextInstance. Spring Batch prend les derniers paramètres, appelle l'incrémenteur, et lance."
+ },
+ {
+  "id": "L021",
+  "scene": 3,
+  "expr": "défi, direct",
+  "text": "Question. Base vide, premier lancement avec startNextInstance. Quelle valeur prend run point id ?"
+ },
+ {
+  "id": "L022",
+  "scene": 3,
+  "expr": "posé",
+  "text": "Un. L'incrémenteur part de zéro quand le paramètre n'existe pas, et ajoute un. Puis deux, puis trois."
+ },
+ {
+  "id": "L023",
+  "scene": 3,
+  "expr": "pont",
+  "text": "Mais comment Spring Batch sait-il que c'est une nouvelle instance ? Ouvrons la base."
+ },
+ {
+  "id": "L024",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Dans la table batch_job_instance, chaque instance a un nom de job et une colonne job_key."
+ },
+ {
+  "id": "L025",
+  "scene": 4,
+  "expr": "technique",
+  "text": "La job_key est une empreinte de trente-deux caractères, un hachage MD5 des paramètres identifiants, triés par nom."
+ },
+ {
+  "id": "L026",
+  "scene": 4,
+  "expr": "appuyé",
+  "text": "Seuls les paramètres identifiants entrent dans le calcul. Un paramètre non identifiant ne change jamais la clé."
+ },
+ {
+  "id": "L027",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Il existe une contrainte d'unicité sur le couple job_name et job_key. Même nom, même clé : même instance."
+ },
+ {
+  "id": "L028",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Avec run point id égal à un, on obtient une clé. Avec run point id égal à deux, une autre clé, donc une nouvelle ligne."
+ },
+ {
+  "id": "L029",
+  "scene": 4,
+  "expr": "technique",
+  "text": "Les valeurs elles-mêmes sont dans batch_job_execution_params : le nom, le type, la valeur, et une colonne identifying."
+ },
+ {
+  "id": "L030",
+  "scene": 4,
+  "expr": "explicatif",
+  "text": "Dans Spring Batch six, ces colonnes s'appellent parameter_name, parameter_type et parameter_value. Les anciens tutoriels parlent de key_name et type_cd."
+ },
+ {
+  "id": "L031",
+  "scene": 4,
+  "expr": "pont",
+  "text": "Maintenant que tu sais où chercher, voyons le piège, directement en base."
+ },
+ {
+  "id": "L032",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Tu hérites d'un batch en production. Tu veux savoir si quelqu'un a mis un horodatage en paramètre identifiant. Une seule requête suffit."
+ },
+ {
+  "id": "L033",
+  "scene": 5,
+  "expr": "technique",
+  "text": "Tu sélectionnes les paramètres de la table batch_job_execution_params, uniquement ceux où identifying vaut Y."
+ },
+ {
+  "id": "L034",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Voici un résultat sain. runDate, de type LocalDate, vaut deux mille vingt-six, onze, un, aux deux exécutions."
+ },
+ {
+  "id": "L035",
+  "scene": 5,
+  "expr": "explicatif",
+  "text": "Même valeur, donc une seule instance, deux exécutions : le premier essai a échoué, la reprise a réussi. C'est exactement ce qu'on veut."
+ },
+ {
+  "id": "L036",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Et voici le problème. Un paramètre timestamp, de type Long, avec treize chiffres. Et une autre valeur à l'exécution suivante."
+ },
+ {
+  "id": "L037",
+  "scene": 5,
+  "expr": "appuyé",
+  "text": "Treize chiffres, c'est un nombre de millisecondes depuis mille neuf cent soixante-dix. Une valeur qui ne se répète jamais ne peut pas servir d'identité."
+ },
+ {
+  "id": "L038",
+  "scene": 5,
+  "expr": "pédagogue",
+  "text": "Comment le reconnaître vite ? Un nom comme timestamp, now ou runTime, un type Long, et une valeur différente à chaque ligne."
+ },
+ {
+  "id": "L039",
+  "scene": 5,
+  "expr": "posé",
+  "text": "Comparé à un runDate, qui est lisible, qui a un sens métier, et qui se répète lors d'une reprise."
+ },
+ {
+  "id": "L040",
+  "scene": 5,
+  "expr": "pont",
+  "text": "Reste un dernier piège, qui touche la reprise elle-même."
+ },
+ {
+  "id": "L041",
+  "scene": 6,
+  "expr": "défi, direct",
+  "text": "Question. Ton job a échoué avec run point id égal à trois. Tu veux le reprendre, sans repartir de zéro. Quel run point id utilises-tu ?"
+ },
+ {
+  "id": "L042",
+  "scene": 6,
+  "expr": "posé",
+  "text": "Le même, trois. Avec quatre, tu crées une nouvelle instance et tu repars de zéro. Avec restart sur l'identifiant d'exécution, Spring Batch reprend les paramètres tout seul."
+ },
+ {
+  "id": "L043",
+  "scene": 6,
+  "expr": "appuyé",
+  "text": "Autre piège classique. Tu ajoutes un validateur de paramètres, avec une liste de clés autorisées. Tu oublies run point id."
+ },
+ {
+  "id": "L044",
+  "scene": 6,
+  "expr": "explicatif",
+  "text": "Résultat : le lancement est refusé, parce que run point id n'est pas dans les clés optionnelles. Le validateur dit non à ton propre incrémenteur."
+ },
+ {
+  "id": "L045",
+  "scene": 6,
+  "expr": "technique",
+  "text": "Tu l'ajoutes aux clés optionnelles, et le lancement repasse. Une ligne, mais il faut y penser."
+ },
+ {
+  "id": "L046",
+  "scene": 6,
+  "expr": "pont",
+  "text": "Récapitulons, avec une règle de décision."
+ },
+ {
+  "id": "L047",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "Premier cas : ton job a une identité métier, une date, un client, un fichier. Tu utilises ce paramètre métier. C'est la règle du module un."
+ },
+ {
+  "id": "L048",
+  "scene": 7,
+  "expr": "pédagogue",
+  "text": "Deuxième cas : le job n'a aucune identité métier, et chaque lancement est une demande distincte. Tu utilises RunIdIncrementer."
+ },
+ {
+  "id": "L049",
+  "scene": 7,
+  "expr": "appuyé",
+  "text": "Jamais un timestamp comme paramètre identifiant. Si tu veux garder l'heure pour la traçabilité, mets-la en paramètre non identifiant."
+ },
+ {
+  "id": "L050",
+  "scene": 7,
+  "expr": "posé",
+  "text": "Trois réflexes à retenir. Une instance égale un job plus ses paramètres identifiants. L'incrémenteur n'agit qu'avec startNextInstance. Et pour reprendre, on garde le même run point id."
+ },
+ {
+  "id": "L051",
+  "scene": 7,
+  "expr": "calme",
+  "text": "Tu retrouveras le contexte dans les modules un et deux, et la reprise en détail au module six."
+ },
+ {
+  "id": "L052",
+  "scene": 7,
+  "expr": "léger, conclusion",
+  "text": "Voilà pour cette annexe. La prochaine fois que ton job refuse de se relancer, tu sauras quoi regarder avant d'ajouter un timestamp."
+ }
+]
